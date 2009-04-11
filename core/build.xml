@@ -34,7 +34,7 @@
     <pathelement location="${my-src.dir}/classlib"/>
   </path>
   <path id="classpath-sources-vm">
-    <pathelement location="${my-src.dir}/classpath/ext"/>  
+    <pathelement location="${my-src.dir}/classpath/ext"/>
     <pathelement location="${my-src.dir}/classpath/vm"/>
     <pathelement location="${my-src.dir}/openjdk/vm"/>
   </path>
@@ -53,15 +53,11 @@
 	<pathelement location="${my-src.dir}/endorsed/nanoxml"/>
 	<pathelement location="${my-src.dir}/vmmagic"/>
 	<pathelement location="${my-src.dir}/mmtk-vm"/>
-	<pathelement location="${my-src.dir}/driver"/>
-	<pathelement location="${my-src.dir}/test"/>
-	<pathelement location="${my-src.dir}/emu"/>
   </path>
   <path id="my-sources">
 	<path refid="my-sources1"/>
-	<pathelement location="${my-gen.dir}"/>
   </path>
-		
+
   <macrodef name="ExpandTest">
     <attribute name="classname"/>
     <attribute name="type"/>
@@ -190,12 +186,8 @@
 	    <fileset dir="${my-src.dir}/driver" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/test" excludes="${my-non-resources}"/>
     </copy>
-  	
-  	<!-- Create & compile plan classes -->
-	<CreatePlan package="org.jnode.vm.memmgr.mmtk.genrc"/>
-	<CreatePlan package="org.jnode.vm.memmgr.mmtk.ms"/>
-	<CreatePlan package="org.jnode.vm.memmgr.mmtk.nogc"/>
-  </target>
+
+   </target>
 	
   <!-- Assemble the jarfile -->
   <target name="assemble" depends="compile">
