@@ -117,10 +117,6 @@
       <fileset dir="${my-src.dir}/openjdk/svm" includes="**/*.jav"/>
       <fileset dir="${my-src.dir}/openjdk/vm" includes="**/*.jav"/>
     </copy>
-    <ExpandTest classname="PrimitiveIntTest" type="int"/>
-    <ExpandTest classname="PrimitiveLongTest" type="long"/>
-    <ExpandTest classname="PrimitiveFloatTest" type="float"/>
-    <ExpandTest classname="PrimitiveDoubleTest" type="double"/>
 
     <taskdef name="template" classname="org.jnode.ant.taskdefs.TemplateTask" classpathref="cp-jnode"/>
     <template file="${my-src.dir}/template/org/jnode/vm/VmSystemSettings.java"
@@ -183,8 +179,6 @@
 	    <fileset dir="${my-src.dir}/endorsed/nanoxml" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/vmmagic" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/mmtk-vm" excludes="${my-non-resources}"/>
-	    <fileset dir="${my-src.dir}/driver" excludes="${my-non-resources}"/>
-	    <fileset dir="${my-src.dir}/test" excludes="${my-non-resources}"/>
     </copy>
 
    </target>
