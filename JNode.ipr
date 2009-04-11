@@ -352,21 +352,14 @@
   </component>
   <component name="ProjectFileVersion" converted="true" />
   <component name="ProjectKey">
-    <option name="state" value="https://jnode.svn.sourceforge.net/svnroot/jnode/trunk/JNode.ipr" />
+    <option name="state" value="https://jnode.svn.sourceforge.net/svnroot/jnode/classlib6/JNode.ipr" />
   </component>
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/all/all.iml" filepath="$PROJECT_DIR$/all/all.iml" />
       <module fileurl="file://$PROJECT_DIR$/builder/builder.iml" filepath="$PROJECT_DIR$/builder/builder.iml" />
       <module fileurl="file://$PROJECT_DIR$/core/core.iml" filepath="$PROJECT_DIR$/core/core.iml" />
-      <module fileurl="file://$PROJECT_DIR$/distr/distr.iml" filepath="$PROJECT_DIR$/distr/distr.iml" />
-      <module fileurl="file://$PROJECT_DIR$/fs/fs.iml" filepath="$PROJECT_DIR$/fs/fs.iml" />
-      <module fileurl="file://$PROJECT_DIR$/gui/gui.iml" filepath="$PROJECT_DIR$/gui/gui.iml" />
       <module fileurl="file://$PROJECT_DIR$/jnode.iml" filepath="$PROJECT_DIR$/jnode.iml" />
-      <module fileurl="file://$PROJECT_DIR$/net/net.iml" filepath="$PROJECT_DIR$/net/net.iml" />
-      <module fileurl="file://$PROJECT_DIR$/shell/shell.iml" filepath="$PROJECT_DIR$/shell/shell.iml" />
-      <module fileurl="file://$PROJECT_DIR$/sound/sound.iml" filepath="$PROJECT_DIR$/sound/sound.iml" />
-      <module fileurl="file://$PROJECT_DIR$/textui/textui.iml" filepath="$PROJECT_DIR$/textui/textui.iml" />
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6 - jnode" project-jdk-type="JavaSDK" />

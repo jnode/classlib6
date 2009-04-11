@@ -8,13 +8,7 @@
       <excludeFolder url="file://$MODULE_DIR$/all" />
       <excludeFolder url="file://$MODULE_DIR$/builder" />
       <excludeFolder url="file://$MODULE_DIR$/core" />
-      <excludeFolder url="file://$MODULE_DIR$/distr" />
       <excludeFolder url="file://$MODULE_DIR$/docs" />
-      <excludeFolder url="file://$MODULE_DIR$/fs" />
-      <excludeFolder url="file://$MODULE_DIR$/gui" />
-      <excludeFolder url="file://$MODULE_DIR$/net" />
-      <excludeFolder url="file://$MODULE_DIR$/shell" />
-      <excludeFolder url="file://$MODULE_DIR$/textui" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

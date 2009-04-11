@@ -88,7 +88,6 @@
   <target name="compile" depends="native2ascii">
     <jnode.compile>
       <src path="${my-src.dir}/builder"/>
-      <src path="${my-src.dir}/configure"/>
       <src path="${my-gen.dir}"/>
       <classpath refid="my-cp"/>
     </jnode.compile>

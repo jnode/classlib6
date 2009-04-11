@@ -111,7 +111,6 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module" module-name="fs" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
