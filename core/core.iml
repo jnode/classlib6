@@ -13,8 +13,6 @@
       <sourceFolder url="file://$MODULE_DIR$/src/classpath/tools" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/classpath/vm" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/core" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/driver" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/emu" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/endorsed/nanoxml" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/icedtea" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/mmtk-vm" isTestSource="false" />
@@ -28,8 +26,6 @@
       <sourceFolder url="file://$MODULE_DIR$/src/openjdk/sun" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/openjdk/svm" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/openjdk/vm" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/template" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/test" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/vmmagic" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
