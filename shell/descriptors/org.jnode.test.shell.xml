@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.test.shell" 
+        name="JNode Shell Test classes"
+        version="@VERSION@"
+        license-name="lgpl"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.runtime.core"/>
+    <import plugin="org.jnode.shell"/>
+    <import plugin="org.jnode.shell.help"/>
+    <import plugin="org.jnode.shell.syntax"/>
+    <import plugin="org.junit"/>
+    <import plugin="net.n3.nanoxml"/>
+    <import plugin="org.jnode.shell.help"/>
+    <import plugin="org.jnode.testrunner"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-shell.jar">
+      <export name="org.jnode.test.shell.*"/>
+      <export name="org.jnode.test.shell.bjorne.*"/>
+      <export name="org.jnode.test.shell.command.posix.*"/>
+      <export name="org.jnode.test.shell.harness.*"/>
+      <export name="org.jnode.test.shell.help.*"/>
+      <export name="org.jnode.test.shell.proclet.*"/>
+      <export name="org.jnode.test.shell.io.*"/>
+      <export name="org.jnode.test.shell.proclet.*"/>
+      <export name="org.jnode.test.shell.syntax.*"/>
+    </library>
+  </runtime>
+  
+  <extension point="org.jnode.testrunner.tests">
+    <suite class="org.jnode.test.shell.AllTests" category="shell"/>
+    <suite class="org.jnode.test.shell.syntax.AllTests" category="shell"/>
+    <test class="org.jnode.test.shell.help.DefaultHelpTest" category="shell"/>
+  </extension>  
+  
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.lang.RuntimePermission" name="setIO"/> 
+    <permission class="java.lang.RuntimePermission" name="exitVM"/> 
+    <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>
+    <permission class="org.jnode.security.JNodePermission" name="loadPlugin"/>
+    <permission class="java.io.FilePermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read"/>
+    <permission class="java.io.FilePermission" name="/jnode/tmp/test" actions="read,write,delete"/>
+    <permission class="java.io.FilePermission" name="/jnode/tmp/test/-" actions="read,write,delete"/>
+  </extension>
+</plugin>

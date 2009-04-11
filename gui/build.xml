@@ -1,0 +1,64 @@
+<project name="JNode-GUI" default="all" basedir=".">
+
+  <typedef file="${basedir}/../all/lib/jnode.xml"/>
+				
+  <property name="my-build.dir"   value="${basedir}/build"/>
+  <property name="my-classes.dir" value="${my-build.dir}/classes"/>
+  <property name="my-src.dir"     value="${basedir}/src"/>
+  <property name="my.jar"         value="${jnode-gui.jar}"/>
+
+<!-- Subproject specific classpath -->
+  <path id="my-cp">
+    <pathelement location="${jnode-core.jar}"/>
+    <pathelement location="${jnode-shell.jar}"/>
+    <path refid="cp"/>
+  </path>
+
+<!-- Initialize all subproject directories -->
+  <target name="prepare">
+    <mkdir dir="${my-classes.dir}"/>
+  	<jnode.copy-descriptors/>
+  </target>
+
+<!-- Compile all subproject java files -->
+  <target name="compile" depends="prepare">
+    <jnode.compile>
+	  <src path="${my-src.dir}/awt"/>
+	  <src path="${my-src.dir}/desktop"/>
+      <src path="${my-src.dir}/driver"/>
+	  <src path="${my-src.dir}/test"/>
+      <src path="${my-src.dir}/thinlet"/>
+      <src path="${my-src.dir}/font"/>  
+      <classpath refid="my-cp"/>
+    </jnode.compile>
+	<!-- copy properties files -->
+    <copy todir="${my-classes.dir}/org/jnode/font/bdf/">
+	  <fileset dir="${my-src.dir}/font/org/jnode/font/bdf/">
+	    <include name="**/*.properties" />
+	  </fileset>	    
+    </copy>    	  	
+  </target>
+
+<!-- Assemble the jarfile -->
+  <target name="assemble" depends="compile">
+    <jar jarfile="${jnode-fonts.jar}">
+      <fileset dir="${basedir}/fonts">
+      </fileset>
+    </jar>
+    <jar jarfile="${jnode-images.jar}">
+      <fileset dir="${basedir}/images">
+      </fileset>
+    </jar>
+  </target>
+
+<!-- Do it all -->
+  <target name="all" depends="assemble"/>
+
+<!-- Clean everything -->
+  <target name="clean">
+  	<jnode.clean/>
+  </target>
+
+</project>
+
+

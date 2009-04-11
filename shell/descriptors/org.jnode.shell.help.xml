@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.shell.help"
+        name="JNode Help System"
+        version="@VERSION@"
+        provider-name="JNode.org"
+        license-name="lgpl"
+		class="org.jnode.shell.help.def.SystemHelpPlugin">
+
+  <requires>
+    <import plugin="org.jnode.shell"/>
+    <import plugin="org.jnode.shell.syntax"/>
+  </requires>
+        
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.io.FilePermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read"/>
+  </extension>
+  
+</plugin>

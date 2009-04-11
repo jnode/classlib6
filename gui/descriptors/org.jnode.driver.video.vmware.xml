@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.driver.video.vmware" 
+        name="JNode Video VMWare SVGA driver"
+        version="@VERSION@"
+        license-name="lgpl"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.awt"/>
+    <!-- import plugin="org.jnode.driver"/ -->
+    <import plugin="org.jnode.driver.bus.pci"/>
+    <import plugin="org.jnode.driver.video"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-gui.jar">
+      <export name="org.jnode.driver.video.vmware.*"/>
+    </library>
+  </runtime>
+
+  <extension point="org.jnode.driver.mappers">
+    <!--  mapper class="org.jnode.driver.video.vmware.VMWareDeviceToDriverMapper"/ -->
+    <mapper id="15ad:0710" name="VMWare SVGA" driver-class="org.jnode.driver.video.vmware.VMWareDriver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+    <mapper id="15ad:0405" name="VMWare SVGA1" driver-class="org.jnode.driver.video.vmware.VMWareDriver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+  </extension>
+        
+  <extension point="org.jnode.security.permissions">
+    <permission class="org.jnode.system.ResourcePermission" name="ioports"/>
+  </extension>
+        
+</plugin>

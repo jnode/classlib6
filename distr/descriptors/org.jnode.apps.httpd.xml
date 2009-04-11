@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.apps.httpd"
+       name="JNode HTTPD Commands"
+       version="@VERSION@"
+       license-name="lgpl"
+       provider-name="JNode.org">
+
+  <requires>
+    <import plugin="org.jnode.net"/>
+    <import plugin="org.jnode.shell.help"/>
+  </requires>
+
+  <runtime>
+    <library name="jnode-distr.jar">
+      <export name="org.jnode.apps.httpd.*"/>
+      <export name="fi.iki.elonen.*"/>
+    </library>
+  </runtime>
+
+  <extension point="org.jnode.shell.aliases">
+    <alias name="nanohttpd" class="fi.iki.elonen.NanoHTTPD"/>
+  </extension>
+
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.net.SocketPermission" name="*" actions="resolve"/>
+    <permission class="java.net.SocketPermission" name="*:53" actions="resolve,listen,connect"/>
+    <permission class="java.util.PropertyPermission" name="dns.server" actions="read"/>
+    <permission class="java.util.PropertyPermission" name="dns.search" actions="read"/>
+    <permission class="java.util.PropertyPermission" name="user.dir" actions="read"/>
+    <permission class="java.util.PropertyPermission" name="file.encoding" actions="read"/>      
+    <permission class="org.jnode.net.NetPermission" name="bootpClient"/>
+    <permission class="java.io.FilePermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write"/>
+    <permission class="java.net.SocketPermission" name="*:80" actions="resolve,listen"/>
+  </extension>
+</plugin>

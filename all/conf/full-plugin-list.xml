@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plugin-list name="full">
+  <manifest>
+    <attribute key="Main-Class" value="org.jnode.shell.CommandShell"/>
+    <attribute key="Main-Class-Arg" value="boot"/>
+  </manifest>
+
+  <include file="default-plugin-list.xml"/>
+
+  <plugin id="sun.tools"/>
+  <plugin id="javax.ext.tools"/>
+  <plugin id="com.sun.tools.javac"/>
+  <plugin id="com.sun.tools.jdi"/>
+    
+  <plugin id="org.jnode.install"/>
+
+  <plugin id="charva"/>
+  <plugin id="org.jnode.apps.edit"/>
+  <plugin id="org.jnode.apps.editor"/>  
+  <plugin id="org.jnode.apps.charvabsh"/>
+  <plugin id="org.jnode.apps.commander"/>
+  <plugin id="org.jnode.apps.debug"/>
+  <plugin id="org.jnode.apps.httpd"/>
+
+  <plugin id="org.apache.tools.ant-launcher"/>
+  <plugin id="org.apache.tools.ant"/>  
+  <plugin id="org.jnode.shell.command.ant"/>
+  <plugin id="ejc"/>
+    
+
+  <plugin id="thinlet"/>
+
+  <plugin id="org.jnode.apps.jpartition"/>
+
+  <plugin id="org.apache.jakarta.commons.logging"/>
+  <plugin id="net.wimpi.telnetd"/>
+
+  <plugin id="jetty"/>
+    <!--
+  <plugin id="derby"/>
+    -->
+</plugin-list>

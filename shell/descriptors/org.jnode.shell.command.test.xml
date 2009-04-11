@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.shell.command.test"
+    name="JNode Test (JUnit) Commands"
+    version="@VERSION@"
+        license-name="lgpl"
+    provider-name="JNode.org">
+
+    <requires> 
+        <import plugin="org.jnode.runtime.core"/>
+	    <import plugin="org.junit"/>
+	    <import plugin="org.jnode.shell.help"/>
+		<import plugin="org.jnode.testrunner"/>
+    </requires>
+
+    <runtime>
+        <library name="jnode-shell.jar">
+            <export name="org.jnode.shell.command.test.*"/>
+        </library>
+    </runtime>
+
+    <extension point="org.jnode.shell.aliases">
+        <alias name="utest" class="org.jnode.shell.command.test.TestCommand"/>
+        <alias name="suite" class="org.jnode.shell.command.test.SuiteCommand"/>
+    </extension>
+    
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="utest">
+      <argument argLabel="className" description="run a JUnit testcase"/>
+    </syntax>
+    <syntax alias="suite">
+      <sequence description="run JUnit tests registered with the TestManager">
+        <option argLabel="run" longName="run" shortName="r"/>
+        <repeat minCount="0">
+          <argument argLabel="category"/>
+        </repeat>
+      </sequence>
+      <option argLabel="list" longName="list" shortName="l" 
+              description="list JUnit tests registered with the TestManager"/>
+    </syntax>
+  </extension>
+
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.util.PropertyPermission" name="user.home" actions="read"/>    
+    <permission class="java.util.PropertyPermission" name="user.dir" actions="read"/>
+    <permission class="java.util.PropertyPermission" name="os.name" actions="read"/>
+    <permission class="java.util.PropertyPermission" name="java.io.tmpdir" actions="read"/>
+    
+	<permission class="java.io.FilePermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write,delete"/>
+	
+	<permission class="java.lang.reflect.ReflectPermission" name="*" actions="suppressAccessChecks"/>	    
+    <permission class="java.lang.RuntimePermission" name="*" actions="accessDeclaredMembers"/>
+  </extension>
+
+</plugin>

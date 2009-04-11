@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.awt.font" 
+        name="JNode AWT Default Font Manager"
+        version="@VERSION@"
+        provider-name="JNode.org"
+        license-name="lgpl"
+        class="org.jnode.awt.font.def.FontPlugin">
+        
+  <requires>
+    <import plugin="org.jnode.awt"/>
+
+	<!-- should not be necessary here
+		since it is only necessary for bdf font renderer
+		TODO remove that import :
+	-->
+    <import plugin="org.jnode.font.bdf"/>    
+  </requires>
+        
+  <runtime>
+    <library name="jnode-gui.jar">
+	    <export name="org.jnode.awt.font.spi.*"/>
+		<export name="org.jnode.awt.font.def.*"/>
+		<export name="org.jnode.awt.font.renderer.*"/>
+    </library>
+    <library name="jnode-fonts.jar">
+      <export name="*"/>
+    </library>
+  </runtime>
+
+  <extension-point id="providers" name="JNode Font Providers"/>
+</plugin>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="com.jcraft.jsch"
+  name="JSch"
+  version="@VERSION@"
+  provider-name="JCraft, Inc"
+  provider-url="http://www.jcraft.com"
+  license-name="BSD-Style"
+  license-url="http://www.jcraft.com/jsch/LICENSE.txt">
+
+  <requires>
+    <import plugin="org.classpath.ext.security"/>
+  </requires>
+
+
+  <runtime>
+    <library name="jsch-0.1.24.jar">
+      <export name="*"/>
+    </library>
+  </runtime>
+  
+  <extension point="org.jnode.security.permissions">
+        <permission class="java.net.SocketPermission" name="*" actions="connect, resolve"/>
+  </extension>
+
+</plugin>

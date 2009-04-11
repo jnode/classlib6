@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.driver.sound.command" 
+        name="JNode speaker commands"
+        version="@VERSION@"
+        license-name="lgpl"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.driver.sound.speaker"/>
+    <import plugin="org.jnode.shell.help"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-gui.jar">
+      <export name="org.jnode.driver.sound.command.*"/>
+    </library>
+  </runtime>
+        
+  <extension point="org.jnode.shell.aliases">
+    <alias name="beep" class="org.jnode.driver.sound.command.BeepCommand"/>
+    <alias name="play" class="org.jnode.driver.sound.command.PlayCommand"/>
+  </extension>
+  
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="beep">
+      <empty description="Play a system beep"/>
+    </syntax>
+    <syntax alias="play">
+      <empty description="Play a scale"/>
+      <option argLabel="tune" shortName="t" longName="tune" description="Play a tune"/>
+    </syntax>
+  </extension>
+
+</plugin>

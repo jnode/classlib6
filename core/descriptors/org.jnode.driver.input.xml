@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.driver.input" 
+        name="JNode input driver"
+        version="@VERSION@"
+        license-name="lgpl"
+        provider-name="JNode.org"
+        class="org.jnode.driver.input.KeyboardInputPlugin">
+        
+  <requires>
+    <import plugin="org.jnode.driver.character"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-core.jar">
+      <export name="org.jnode.driver.input.*"/>
+    </library>
+  </runtime>
+  
+  <extension-point id="keyboard-layouts" name="Standard keyboard layout identifier mappings"/>
+        
+  <extension point="org.jnode.security.permissions">
+    <permission class="org.jnode.driver.DriverPermission" name="setPreferredListener"/>
+    <permission class="java.lang.RuntimePermission" name="setIO"/>
+  </extension>
+        
+</plugin>

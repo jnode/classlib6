@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.test"
+    name="JNode Test classes"
+    version="@VERSION@"
+    license-name="lgpl"
+    provider-name="JNode.org">
+
+    <requires>
+        <import plugin="org.junit"/>
+    </requires>
+
+    <runtime>
+        <library name="jnode-core.jar">
+            <export name="org.jnode.test.*"/>
+            <export name="org.jnode.test.bugs.*"/>
+            <export name="org.jnode.test.security.*"/>
+            <export name="org.jnode.test.threads.*"/>
+        </library>
+    </runtime>
+
+    <extension point="org.jnode.shell.aliases">
+        <alias name="TestSecurityManager" class="org.jnode.test.security.TestSecurityManager"/>
+    </extension>
+
+    <extension point="org.jnode.security.permissions">
+        <permission class="java.util.PropertyPermission" name="user.home" actions="read"/>
+        <!-- JMXTest -->
+        <permission class="javax.management.MBeanServerPermission" name="*"/>
+        <permission class="javax.management.MBeanPermission" name="*" actions="*"/>
+        
+        <!-- ResourceTest -->
+        <permission class="java.util.PropertyPermission" name="user.language" actions="write"/>       
+        
+        <!-- TestSecurityManager -->
+        <permission class="java.lang.RuntimePermission" name="createSecurityManager"/>
+        <permission class="java.lang.RuntimePermission" name="setSecurityManager"/>        
+        <permission class="java.lang.RuntimePermission" name="accessDeclaredMembers"/>         
+    </extension>
+
+</plugin>

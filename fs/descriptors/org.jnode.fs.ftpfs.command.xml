@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.fs.ftpfs.command"
+        name="FTP file system commands for JNode"
+        version="@VERSION@"
+        license-name="lgpl"
+        provider-name="JNode.org">
+        
+        
+  <requires>
+    <import plugin="org.jnode.shell"/>
+    <import plugin="org.jnode.fs.ftpfs"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-fs.jar">
+      <export name="org.jnode.fs.ftpfs.command.*"/>
+    </library>
+  </runtime>
+  
+  <extension point="org.jnode.shell.aliases">
+    <alias name="ftpmount" class="org.jnode.fs.ftpfs.command.FTPMountCommand"/>
+  </extension>
+  
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="ftpmount">
+      <sequence description="mount a remote FTP service as a file system">
+        <argument argLabel="directory"/>
+        <argument argLabel="host"/>
+        <argument argLabel="userName"/>
+        <optional><argument argLabel="password"/></optional>
+      </sequence>
+    </syntax>
+  </extension>
+  
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.net.SocketPermission" name="*:0-" actions="connect,resolve"/>
+  </extension> 
+        
+</plugin>

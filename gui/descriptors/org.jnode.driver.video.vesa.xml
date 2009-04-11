@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.driver.video.vesa" 
+        name="JNode Video VESA driver"
+        version="@VERSION@"
+        license-name="lgpl"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.driver.bus.pci"/>
+    <import plugin="org.jnode.driver.video"/>
+    <import plugin="org.jnode.awt"/>
+    <import plugin="org.jnode.driver.video.cursor"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-gui.jar">
+      <export name="org.jnode.driver.video.vesa.*"/>
+    </library>
+  </runtime>
+
+  <extension point="org.jnode.driver.mappers">
+	<mapper class="org.jnode.driver.video.vesa.VESADeviceToDriverMapper"/>
+  </extension>
+        
+  <extension point="org.jnode.security.permissions">
+    <permission class="org.jnode.system.ResourcePermission" name="ioports"/>
+  </extension>
+                
+  <extension point="org.jnode.shell.aliases">
+    <alias name="vesa" class="org.jnode.driver.video.vesa.VESACommand"/>
+  </extension>
+        
+</plugin>

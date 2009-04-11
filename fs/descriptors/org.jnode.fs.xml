@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.fs" 
+        name="JNode FileSystem Service"
+        version="@VERSION@"
+        provider-name="JNode.org"
+        license-name="lgpl"
+        class="org.jnode.fs.service.def.FileSystemPlugin">
+        
+  <requires>
+    <import plugin="org.jnode.driver.block"/>
+    <import plugin="org.jnode.fs.service"/>
+      <!--
+    <import plugin="org.jnode.log4j"/>
+    -->
+    <import plugin="org.jnode.partitions"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-fs.jar">
+      <export name="org.jnode.fs.*"/>
+      <export name="org.jnode.fs.service.def.*"/>
+      <export name="org.jnode.fs.spi.*"/>
+      <export name="org.jnode.fs.util.*"/>
+    </library>
+  </runtime>
+        
+  <extension-point id="types" name="FileSystemTypes"/>
+        
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.util.PropertyPermission" name="user.dir" actions="read"/>
+    <permission class="java.util.PropertyPermission" name="java.io.tmpdir" actions="read"/>
+    <permission class="java.net.SocketPermission" name="*:0-" actions="connect,resolve"/>
+    <permission class="java.net.NetPermission" name="specifyStreamHandler"/>
+    <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>
+    <permission class="java.lang.RuntimePermission" name="modifyThreadGroup"/>
+  </extension>
+        
+</plugin>

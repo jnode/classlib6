@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="thinlet"
+        name="Lightweigth GUI widgets"
+        version="@VERSION@"
+        provider-name="Robert Bajzat"
+        provider-url="http://thinlet.sourceforge.net/"
+        license-name="lgpl">
+        
+  <requires>
+      <import plugin="org.jnode.awt"/>
+  </requires>
+        
+  <runtime>
+    <library name="thinlet.jar">
+      <export name="thinlet.*"/>
+    </library>
+  </runtime>
+
+  <extension point="org.jnode.shell.aliases">
+    <alias name="ThinTest" class="thinlet.ThinTest"/>
+  </extension>
+
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.security.AllPermission" />
+  </extension>
+</plugin>

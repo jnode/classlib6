@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.desktop" 
+        name="JNode Desktop Implementation"
+        version="@VERSION@"
+        provider-name="JNode.org"
+        license-name="lgpl"
+        class="org.jnode.desktop.DesktopPlugin">
+        
+  <requires>  
+    <import plugin="org.classpath.ext.imageio"/>
+    <import plugin="org.jnode.awt"/>
+    <import plugin="org.jnode.awt.swingpeers"/>
+  </requires>
+  
+  <runtime>
+    <library name="jnode-gui.jar">
+      <export name="org.jnode.desktop.*"/>
+      <export name="org.jnode.desktop.classic.*"/>
+    </library>
+    
+    <library name="jnode-images.jar">
+      <export name="*"/>
+    </library>    
+  </runtime>
+
+  <extension-point id="apps" name="Applications that can be started from the desktop"/>
+
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.util.PropertyPermission" name="jnode.desktop" actions="read,write"/>
+    
+    <permission class="java.lang.RuntimePermission" name="getClassLoader" />
+    <permission class="java.lang.RuntimePermission" name="accessDeclaredMembers" />
+    <permission class="java.lang.RuntimePermission" name="preferences" />
+    <permission class="java.util.PropertyPermission" name="java.util.logging.manager" actions="read"/>
+    <permission class="java.util.logging.LoggingPermission" name="control" actions="" />
+    <permission class="java.util.PropertyPermission" name="java.util.logging.config.class" actions="read" />
+    <permission class="java.util.PropertyPermission" name="java.util.logging.config.file" actions="read" />
+    <permission class="java.util.PropertyPermission" name="gnu.classpath.home.url" actions="read" />
+    <permission class="java.awt.AWTPermission" name="listenToAllAWTEvents" actions="read" />
+    <permission class="java.awt.AWTPermission" name="setWindowAlwaysOnTop" />
+  </extension>
+        
+</plugin>

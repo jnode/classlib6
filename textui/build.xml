@@ -1,0 +1,44 @@
+<project name="JNode-TextUI" default="all" basedir=".">
+
+  <typedef file="${basedir}/../all/lib/jnode.xml"/>
+				
+  <property name="my-build.dir"   value="${basedir}/build"/>
+  <property name="my-classes.dir" value="${my-build.dir}/classes"/>
+  <property name="my-src.dir"     value="${basedir}/src"/>
+  <property name="my.jar"         value="${jnode-textui.jar}"/>
+
+<!-- Subproject specific classpath -->
+  <path id="my-cp">
+    <pathelement location="${jnode-core.jar}"/>
+    <pathelement location="${jnode-shell.jar}"/>
+    <path refid="cp"/>
+  </path>
+
+<!-- Initialize all subproject directories -->
+  <target name="prepare">
+    <mkdir dir="${my-classes.dir}"/>
+  	<jnode.copy-descriptors/>
+  </target>
+
+<!-- Compile all subproject java files -->
+  <target name="compile" depends="prepare">
+    <jnode.compile>
+      <src path="${my-src.dir}/textui"/>
+      <classpath refid="my-cp"/>
+    </jnode.compile>
+  </target>
+
+<!-- Assemble the jarfile -->
+  <target name="assemble" depends="compile"/>
+
+<!-- Do it all -->
+  <target name="all" depends="assemble"/>
+
+<!-- Clean everything -->
+  <target name="clean">
+  	<jnode.clean/>
+  </target>
+
+</project>
+
+

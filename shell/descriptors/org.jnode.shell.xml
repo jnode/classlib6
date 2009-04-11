@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.shell" 
+        name="JNode Command Shell"
+        version="@VERSION@"
+        provider-name="JNode.org"
+        license-name="lgpl"
+        class="org.jnode.shell.def.ShellPlugin">
+        
+  <requires>
+    <import plugin="org.jnode.driver.console"/>
+    <import plugin="org.jnode.driver.input"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-shell.jar">
+      <export name="org.jnode.shell.*"/>
+      <export name="org.jnode.shell.alias.*"/>
+      <export name="org.jnode.shell.alias.def.*"/>
+      <export name="org.jnode.shell.def.*"/>
+      <export name="org.jnode.shell.help.*"/>
+      <export name="org.jnode.shell.help.def.*"/>
+      <export name="org.jnode.shell.io.*"/>
+      <export name="org.jnode.shell.isolate.*"/>
+      <export name="org.jnode.shell.proclet.*"/>
+      <export name="org.jnode.shell.syntax.*"/>
+    </library>
+  </runtime>
+        
+  <extension-point id="aliases" name="System shell aliases"/>
+  
+  <extension-point id="syntaxes" name="System command syntaxes"/>
+
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.io.FilePermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write"/>
+    <permission class="java.lang.RuntimePermission" name="createClassLoader"/>
+    <permission class="java.lang.RuntimePermission" name="modifyThreadGroup"/>
+    <permission class="java.lang.RuntimePermission" name="modifyThread"/>
+    <permission class="java.lang.RuntimePermission" name="setIO"/>
+    <permission class="java.lang.RuntimePermission" name="exitVM" actions="*" />
+    <permission class="java.net.SocketPermission" name="*" actions="resolve,listen,connect"/>
+    <permission class="java.net.SocketPermission" name="*:0-" actions="connect,resolve,listen"/>
+    <permission class="java.util.PropertyPermission" name="jnode.cmdline" actions="read"/>
+    <permission class="java.util.PropertyPermission" name="jnode.debug" actions="read"/>
+    <permission class="java.util.PropertyPermission" name="jnode.history" actions="read"/>
+    <permission class="java.util.PropertyPermission" name="jnode.invoker" actions="read"/>
+    <permission class="java.util.PropertyPermission" name="jnode.interpreter" actions="read"/>
+    <permission class="java.util.PropertyPermission" name="jnode.prompt" actions="read,write"/>
+    <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>
+    <permission class="java.util.PropertyPermission" name="user.dir" actions="read"/>
+    <permission class="java.lang.reflect.ReflectPermission" name="suppressAccessChecks"/>
+  </extension>
+        
+</plugin>

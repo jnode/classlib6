@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.fs.jifs.command" 
+        name="Jnode Information FileSystem"
+        version="@VERSION@"
+        provider-name="JNode.org"
+        license-name="lgpl">
+        
+  <requires>
+	<import plugin="org.jnode.fs.jifs"/>
+    <import plugin="org.jnode.shell"/>
+    <import plugin="org.jnode.shell.syntax"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-fs.jar">
+      <export name="org.jnode.fs.jifs.command.*"/>
+    </library>
+  </runtime>
+  
+  <extension point="org.jnode.shell.aliases">
+    <alias name="jifs" class="org.jnode.fs.jifs.command.CreateJIFSCommand"/>
+  </extension>
+  
+  <extension point="org.jnode.shell.syntaxes">
+    <syntax alias="jifs">
+      <argument argLabel="action" description="Manage the JIFS filesystem plugin"/>
+    </syntax>
+  </extension>
+  
+  <extension point="org.jnode.security.permissions">
+    <permission class="org.jnode.security.JNodePermission" name="stopPlugin"/>
+    <permission class="org.jnode.security.JNodePermission" name="startPlugin"/>
+  </extension> 
+        
+</plugin>

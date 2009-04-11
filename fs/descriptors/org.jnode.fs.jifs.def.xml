@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.fs.jifs.def" 
+        name="Jnode Information FileSystem Def"
+        version="@VERSION@"
+        provider-name="JNode.org"
+        license-name="lgpl"
+        class="org.jnode.fs.jifs.def.JIFSPlugin">
+        
+  <requires>
+	<import plugin="org.jnode.fs.jifs"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-fs.jar">
+      <export name="org.jnode.fs.jifs.def.*"/>
+    </library>
+  </runtime>
+  
+  <extension-point id="info" name="ExternalInformation"/>
+        
+  <extension point="org.jnode.security.permissions">
+    <permission class="java.util.PropertyPermission" name="*" actions="read,write"/>
+    <permission class="java.lang.RuntimePermission" name="getProtectionDomain"/>
+    <permission class="java.lang.RuntimePermission" name="modifyThreadGroup"/>  
+    <permission class="org.jnode.security.JNodePermission" name="getVmThread"/>
+  </extension> 
+        
+</plugin>

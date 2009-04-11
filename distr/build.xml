@@ -1,0 +1,66 @@
+<project name="JNode-Distr" default="all" basedir=".">
+
+  <typedef file="${basedir}/../all/lib/jnode.xml"/>
+		
+  <property name="my-build.dir"   value="${basedir}/build"/>
+  <property name="my-classes.dir" value="${my-build.dir}/classes"/>
+  <property name="my-src.dir"     value="${basedir}/src"/>
+  <property name="my.jar"         value="${jnode-distr.jar}"/>
+	
+<!-- Subproject specific classpath -->
+  <path id="my-cp">
+    <pathelement location="${jnode-core.jar}"/>
+    <pathelement location="${jnode-gui.jar}"/>
+    <pathelement location="${jnode-textui.jar}"/>
+    <pathelement location="${jnode-shell.jar}"/>
+  	<pathelement location="${jnode-fs.jar}"/>
+  	
+    <pathelement location="${junit.jar}"/>
+  	<pathelement location="${telnetd.jar}"/>
+
+    <pathelement location="${jetty.jar}"/>
+  	<pathelement location="${jetty-util.jar}"/>
+
+    <path refid="cp"/>
+  </path>
+
+<!-- Initialize all subproject directories -->
+  <target name="prepare">
+    <mkdir dir="${my-classes.dir}"/>
+    <mkdir dir="${my-build.dir}"/>
+  	<jnode.copy-descriptors/>
+  </target>
+
+<!-- Compile all subproject java files -->
+  <target name="compile" depends="prepare">
+    <jnode.compile>
+	  <src path="${my-src.dir}/apps"/>
+	  <src path="${my-src.dir}/emu"/>
+	  <src path="${my-src.dir}/install"/>
+  	  <src path="${my-src.dir}/test"/>
+      <classpath refid="my-cp"/>
+    </jnode.compile>
+
+	<!-- copy properties files -->
+    <copy todir="${my-classes.dir}/org/jnode/apps/telnetd">
+	  <fileset dir="${my-src.dir}/apps/org/jnode/apps/telnetd">
+	    <include name="**/*.properties" />
+	  </fileset>
+    </copy>
+  </target>
+
+<!-- Assemble the jarfile(s) -->
+  <target name="assemble" depends="compile">
+  </target>
+
+<!-- Do it all -->
+  <target name="all" depends="assemble"/>
+
+<!-- Clean everything -->
+  <target name="clean">
+    <jnode.clean/>
+  </target>
+
+</project>
+
+

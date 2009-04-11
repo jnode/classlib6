@@ -1,0 +1,115 @@
+<project name="JNode-Builder" default="all" basedir=".">
+
+  <typedef file="${basedir}/../all/lib/jnode.xml"/>
+	
+  <property name="my-build.dir"   value="${basedir}/build"/>
+  <property name="my-gen.dir"   value="${basedir}/build/src"/>
+  <property name="my-classes.dir" value="${my-build.dir}/classes"/>
+  <property name="my-src.dir"     value="${basedir}/src"/>
+  <property name="javacc.dir"     value="${basedir}/lib" />
+  <property name="jnasm-src.dir"  value="${my-src.dir}/builder/org/jnode/jnasm"/>
+  <property name="jnasm-preprocessor-gen.dir"  value="${my-gen.dir}/org/jnode/jnasm/preprocessor/gen"/>
+  <property name="jnasm-assembler-gen.dir"  value="${my-gen.dir}/org/jnode/jnasm/assembler/gen"/>
+
+<!-- Subproject specific classpath -->
+  <path id="my-cp">
+    <pathelement location="${jnode-core.jar}"/>
+    <pathelement location="${jnode-fs.jar}"/>
+    <pathelement location="${basedir}/lib/xml-apis.jar"/>
+    <pathelement location="${bcel-5.1.jar}"/>
+    <pathelement location="${nanoxml-java.jar}"/>
+    <path refid="cp"/>
+  </path>
+
+<!-- Initialize all subproject directories -->
+  <target name="prepare">
+    <mkdir dir="${my-classes.dir}"/>
+    <mkdir dir="${jnasm-preprocessor-gen.dir}"/>
+    <mkdir dir="${jnasm-assembler-gen.dir}"/>
+  	
+    <copy todir="${my-classes.dir}">
+      <fileset dir="${my-src.dir}/builder" includes="**/*.properties"/>
+    </copy>  	
+  </target>
+
+  <!-- Compile the Template ANT task needed for compiling the core -->
+  <target name="pre-compile" depends="prepare">
+    <javac destdir="${my-classes.dir}"
+	       debug="on"
+	       optimize="on"
+           fork="off"
+           compiler="modern"
+	       includeJavaRuntime="true"
+           target="${java.target}"
+           source="${java.source}"
+           encoding="${java.encoding}"
+           excludes="**/*-template.java,**/package-info.java"
+           srcdir="${my-src.dir}/builder/">
+	  <bootclasspath path="${jnode-core.jar}"/>
+      <compilerarg value="${compilerarg}"/>
+        <filename name="org/jnode/ant/taskdefs/TemplateTask.java" />
+    </javac>
+    <jar jarfile="${jnode-builder.jar}"
+        basedir="${my-classes.dir}"
+        includes="org/jnode/ant/taskdefs/**"/>        
+  </target>
+
+  <target name="javacc" depends="prepare" >
+    <javacc target="${jnasm-src.dir}/preprocessor/gen/JNAsmPP.jj"
+            javacchome="${javacc.dir}"
+            outputdirectory="${jnasm-preprocessor-gen.dir}" />
+    <javacc target="${jnasm-src.dir}/assembler/gen/JNAsm.jj"
+            javacchome="${javacc.dir}"
+            outputdirectory="${jnasm-assembler-gen.dir}" />
+    <condition property="run.native2ascii">
+        <or>
+            <isfileselected file="${jnasm-assembler-gen.dir}/JNAsm.java">
+                <date datetime="${hotswap.class.tstamp}" pattern="${hotswap.class.tstamp.pattern}" when="after"/>
+            </isfileselected>
+            <isfileselected file="${jnasm-preprocessor-gen.dir}/JNAsmPP.java">
+                <date datetime="${hotswap.class.tstamp}" pattern="${hotswap.class.tstamp.pattern}" when="after"/>
+            </isfileselected>
+        </or>
+    </condition>
+  </target>
+
+  <target name="native2ascii" depends="javacc" if="run.native2ascii">
+      <native2ascii src="${jnasm-preprocessor-gen.dir}" includes="JNAsmPP.java"
+                    dest="${jnasm-preprocessor-gen.dir}" ext=".tmp"/>
+      <move file="${jnasm-preprocessor-gen.dir}/JNAsmPP.tmp"
+            tofile="${jnasm-preprocessor-gen.dir}/JNAsmPP.java" overwrite="yes"/>
+      <native2ascii src="${jnasm-assembler-gen.dir}" includes="JNAsm.java"
+                    dest="${jnasm-assembler-gen.dir}" ext=".tmp"/>
+      <move file="${jnasm-assembler-gen.dir}/JNAsm.tmp"
+            tofile="${jnasm-assembler-gen.dir}/JNAsm.java" overwrite="yes"/>
+  </target>
+
+<!-- Compile all subproject java files -->
+  <target name="compile" depends="native2ascii">
+    <jnode.compile>
+      <src path="${my-src.dir}/builder"/>
+      <src path="${my-src.dir}/configure"/>
+      <src path="${my-gen.dir}"/>
+      <classpath refid="my-cp"/>
+    </jnode.compile>
+  </target>
+
+<!-- Assemble the jarfiles -->
+  <target name="assemble" depends="compile">
+    <jar jarfile="${jnode-builder.jar}"
+        basedir="${my-classes.dir}"
+        excludes="org/jnode/configure/**"/>
+    <jar jarfile="${jnode-configure.jar}"
+        basedir="${my-classes.dir}"
+        includes="org/jnode/configure/**"/>
+  </target>
+
+<!-- Do it all -->
+  <target name="all" depends="assemble"/>
+
+<!-- Clean everything -->
+  <target name="clean">
+    <delete dir="${my-build.dir}" quiet="true"/>
+  </target>
+
+</project>

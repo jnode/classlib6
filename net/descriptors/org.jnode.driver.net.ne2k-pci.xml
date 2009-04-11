@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugin SYSTEM "jnode.dtd">
+
+<plugin id="org.jnode.driver.net.ne2k-pci" 
+        name="JNode NE2000 PCI driver(s)"
+        version="@VERSION@"
+        license-name="lgpl"
+        provider-name="JNode.org">
+        
+  <requires>
+    <import plugin="org.jnode.driver.bus.pci"/>
+    <import plugin="org.jnode.driver.net.ethernet"/>
+    <import plugin="org.jnode.net"/>
+  </requires>
+        
+  <runtime>
+    <library name="jnode-net.jar">
+      <export name="org.jnode.driver.net.ne2000.*"/>
+      <export name="org.jnode.driver.net.ne2000.pci.*"/>
+    </library>
+  </runtime>
+  
+  <extension point="org.jnode.driver.mappers">
+    <mapper id="10ec:8029" name="Realtek 8029" driver-class="org.jnode.driver.net.ne2000.pci.Ne2000PCIDriver" class="org.jnode.driver.bus.pci.PCIDeviceToDriverMapper"/>
+  </extension>
+        
+  <extension point="org.jnode.security.permissions">
+    <permission class="org.jnode.system.ResourcePermission" name="ioports"/>
+  </extension>
+        
+</plugin>
