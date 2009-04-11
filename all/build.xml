@@ -1,4 +1,4 @@
-<project name="JNode" default="help" basedir=".">
+<project name="JNode" default="assemble-plugins" basedir=".">
     <!-- if task is used from this -->
     <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
 	<!-- before including jnode.xml, we must set this property -->
@@ -369,35 +369,6 @@ clean             Remove all intermediate build results.
     <!-- Create the JOP boot image -->
     <target name="jop" depends="assemble">
         <ant antfile="build-jop.xml" inheritall="on" inheritrefs="on"/>
-    </target>
-
-    <!-- Build the boot files for windows NT/2K/XP (with NTLDR) -->
-    <target name="boot-files-winNT" depends="assemble">
-        <x86-build bits="32" target="boot-files-winNT"/>
-    </target>
-
-    <!-- Create a bootable CDROM image containing all x86 bootable images and the sources -->
-    <target name="cd-x86" depends="assemble" description="create a bootable JNode CD image with sources included">
-        <tar destfile="${sources.dist.tar.gz}" compression="gzip" basedir="${root.dir}" excludes="*/build/**"/>
-        <x86-build bits="32" target="java-image"/>
-        <!-- TODO enable this when 64 bit support is working -->
-        <!--x86-build bits="64" target="java-image"/-->
-        <property name="jnode.bits" value="32" />
-        <ant antfile="build-x86.xml" inheritall="true" inheritrefs="true" target="cdrom"/>
-    </target>
-
-    <!-- Create a bootable CDROM image for x86 32-bits -->
-    <target name="cd-x86-lite" depends="assemble" description="create a bootable JNode CD image">
-        <x86-build bits="32" target="java-image"/>
-        <property name="jnode.bits" value="32" />
-        <ant antfile="build-x86.xml" inheritall="true" inheritrefs="true" target="cdrom-lite"/>
-    </target>
-
-    <!-- Create a bootable CDROM image for x86 64-bits -->
-    <target name="cd-x86_64-lite" depends="assemble">
-        <x86-build bits="64" target="java-image"/>
-        <property name="jnode.bits" value="64" />
-        <ant antfile="build-x86.xml" inheritall="true" inheritrefs="true" target="cdrom_64-lite"/>
     </target>
 
     <!-- Upload a distribution -->
@@ -922,89 +893,6 @@ clean             Remove all intermediate build results.
 
     </target>
 
-    <target name="checkstyle" description="check the mandatory code conventions">
-        <taskdef resource="checkstyletask.properties" classpath="../core/lib/checkstyle-all-4.4.jar"/>
-        <checkstyle config="jnode_checks.xml">
-            <fileset dir="../builder/src/builder" includes="**/*.java"/>
-            <fileset dir="../builder/src/configure" includes="**/*.java"/>
-            <fileset dir="../core/src/core" includes="**/*.java"/>
-            <fileset dir="../core/src/driver" includes="**/*.java"/>
-            <fileset dir="../core/src/test" includes="**/*.java"/>
-            <fileset dir="../distr/src/apps" includes="**/*.java"/>
-            <fileset dir="../distr/src/emu" includes="**/*.java"/>
-            <fileset dir="../distr/src/install" includes="**/*.java"/>
-            <fileset dir="../distr/src/test" includes="**/*.java"/>
-            <fileset dir="../fs/src/fs" includes="**/*.java"/>
-            <fileset dir="../fs/src/driver" includes="**/*.java"/>
-            <fileset dir="../fs/src/test" includes="**/*.java"/>
-            <fileset dir="../gui/src/test" includes="**/*.java"/>
-            <fileset dir="../gui/src/desktop" includes="**/*.java"/>
-            <fileset dir="../gui/src/driver" includes="**/*.java"/>
-            <fileset dir="../gui/src/awt" includes="**/*.java"/>
-            <fileset dir="../net/src/net" includes="**/*.java"/>
-            <fileset dir="../net/src/driver" includes="**/*.java"/>
-            <fileset dir="../net/src/test" includes="**/*.java"/>
-            <fileset dir="../shell/src/test" includes="**/*.java"/>
-            <fileset dir="../shell/src/shell" includes="**/*.java"/>
-        </checkstyle>
-    </target>
-
-    <target name="checkstyle-new" description="check the recommanded code conventions">
-        <taskdef resource="checkstyletask.properties" classpath="../core/lib/checkstyle-all-4.4.jar"/>
-        <checkstyle config="new_checks.xml">
-            <!--
-            <fileset dir="../builder/src/builder" includes="**/*.java"/>
-            <fileset dir="../builder/src/configure" includes="**/*.java"/>
-            <fileset dir="../core/src/core" includes="**/*.java"/>
-            <fileset dir="../core/src/driver" includes="**/*.java"/>
-            <fileset dir="../core/src/test" includes="**/*.java"/>
-            -->
-            <fileset dir="../distr/src/apps" includes="**/*.java"/>
-            <fileset dir="../distr/src/emu" includes="**/*.java"/>
-            <fileset dir="../distr/src/install" includes="**/*.java"/>
-            <fileset dir="../distr/src/test" includes="**/*.java"/>
-            <!--
-            <fileset dir="../fs/src/fs" includes="**/*.java"/>
-            <fileset dir="../fs/src/driver" includes="**/*.java"/>
-            <fileset dir="../fs/src/test" includes="**/*.java"/>
-            <fileset dir="../gui/src/test" includes="**/*.java"/>
-            <fileset dir="../gui/src/desktop" includes="**/*.java"/>
-            <fileset dir="../gui/src/driver" includes="**/*.java"/>
-            <fileset dir="../gui/src/awt" includes="**/*.java"/>
-            <fileset dir="../net/src/net" includes="**/*.java"/>
-            <fileset dir="../net/src/driver" includes="**/*.java"/>
-            <fileset dir="../net/src/test" includes="**/*.java"/>
-            <fileset dir="../shell/src/test" includes="**/*.java"/>
-            <fileset dir="../shell/src/shell" includes="**/*.java"/>
-            -->
-        </checkstyle>
-    </target>
-
-  <target name="findbugs" depends="assemble-plugins">
-    <taskdef name="findbugs" classpath="../core/lib/findbugs/lib/findbugs-ant.jar"
-             classname="edu.umd.cs.findbugs.anttask.FindBugsTask"/>
-    <findbugs home="../core/lib/findbugs/" output="html" outputFile="./build/findbugs.html" >
-      <auxclasspath>
-          <pathelement location="./build/plugins/rt_${jnode-ver}.jar" />
-          <pathelement location="./build/plugins/org.classpath.ext.core_${jnode-ver}.jar" />
-          <pathelement location="./build/plugins/nanoxml_1.4.jar" />
-          <pathelement location="${nanoxml-java.jar}" />
-          <pathelement location="${log4j.jar}" />
-      </auxclasspath>
-      <sourcepath>
-          <pathelement path="../core/src/core/"/>
-      </sourcepath>
-      <class location="./build/plugins/org.jnode.vm_${jnode-ver}.jar"/>
-      <class location="./build/plugins/org.jnode.vm.core_${jnode-ver}.jar"/>
-      <class location="./build/plugins/org.jnode.vm.memmgr.def_${jnode-ver}.jar"/>
-      <class location="./build/plugins/org.jnode.driver_${jnode-ver}.jar"/>
-      <class location="./build/plugins/org.jnode.runtime_${jnode-ver}.jar"/>
-      <class location="./build/plugins/org.jnode.runtime.core_${jnode-ver}.jar"/>
-      <class location="./build/plugins/org.jnode.util_${jnode-ver}.jar"/>
-      <class location="./build/plugins/org.jnode.work_${jnode-ver}.jar"/>
-      <class location="./build/plugins/org.jnode.security_${jnode-ver}.jar"/>
-    </findbugs>
-  </target>
 
     <!-- Create a patch -->
     <!-- TODO create replacement SVN task
