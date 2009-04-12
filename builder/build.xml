@@ -24,8 +24,6 @@
 <!-- Initialize all subproject directories -->
   <target name="prepare">
     <mkdir dir="${my-classes.dir}"/>
-    <mkdir dir="${jnasm-preprocessor-gen.dir}"/>
-    <mkdir dir="${jnasm-assembler-gen.dir}"/>
   	
     <copy todir="${my-classes.dir}">
       <fileset dir="${my-src.dir}/builder" includes="**/*.properties"/>
@@ -37,17 +35,16 @@
     <javac destdir="${my-classes.dir}"
 	       debug="on"
 	       optimize="on"
-           fork="off"
+           fork="on"
            compiler="modern"
 	       includeJavaRuntime="true"
            target="${java.target}"
            source="${java.source}"
            encoding="${java.encoding}"
            excludes="**/*-template.java,**/package-info.java"
-           srcdir="${my-src.dir}/builder/">
-	  <bootclasspath path="${jnode-core.jar}"/>
-      <compilerarg value="${compilerarg}"/>
-        <filename name="org/jnode/ant/taskdefs/TemplateTask.java" />
+           srcdir="${my-src.dir}/builder">
+        <classpath refid="my-cp"/>
+        <filename name="org/jnode/ant/taskdefs/AnnotateTask.java" />
     </javac>
     <jar jarfile="${jnode-builder.jar}"
         basedir="${my-classes.dir}"

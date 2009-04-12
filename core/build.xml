@@ -33,11 +33,6 @@
     <pathelement location="${my-src.dir}/icedtea"/>
     <pathelement location="${my-src.dir}/classlib"/>
   </path>
-  <path id="classpath-sources-vm">
-    <pathelement location="${my-src.dir}/classpath/ext"/>
-    <pathelement location="${my-src.dir}/classpath/vm"/>
-    <pathelement location="${my-src.dir}/openjdk/vm"/>
-  </path>
   <path id="classpath-sources-corba">
     <pathelement location="${my-src.dir}/openjdk/corba"/>
   </path>
@@ -46,16 +41,6 @@
   </path>
   <path id="classpath-sources-langtools">
     <pathelement location="${my-src.dir}/openjdk/langtools"/>
-  </path>
-  <path id="my-sources1">
-	<path refid="classpath-sources-vm"/>
-	<pathelement location="${my-src.dir}/core"/>
-	<pathelement location="${my-src.dir}/endorsed/nanoxml"/>
-	<pathelement location="${my-src.dir}/vmmagic"/>
-	<pathelement location="${my-src.dir}/mmtk-vm"/>
-  </path>
-  <path id="my-sources">
-	<path refid="my-sources1"/>
   </path>
 
   <macrodef name="ExpandTest">
@@ -72,32 +57,6 @@
     </sequential>
   </macrodef>
 
-  <macrodef name="CreatePlan">
-    <attribute name="package"/>
-    <sequential>
-      <copy tofile="${my-gen-plan.dir}/@{package}/org/mmtk/vm/Plan.java" 
-      	    file="${my-src.dir}/mmtk-vm/org/mmtk/vm/Plan.template">
-        <filterset>
-          <filter token="PKG" value="@{package}"/>
-        </filterset>
-      </copy>
-      <copy tofile="${my-gen-plan.dir}/@{package}/org/mmtk/vm/PlanConstants.java" 
-      	    file="${my-src.dir}/mmtk-vm/org/mmtk/vm/PlanConstants.template">
-        <filterset>
-          <filter token="PKG" value="@{package}"/>
-        </filterset>
-      </copy>
-      <mkdir dir="${my-classes-plan.dir}/@{package}/"/>
-      <jnode.compile destdir="${my-classes-plan.dir}/@{package}/">
-        <src path="${my-gen-plan.dir}/@{package}/"/>
-      	<classpath>
-     		<pathelement location="${jnode-code.jar}"/>
-     		<pathelement location="${mmtk.jar}"/>
-      	</classpath>
-      </jnode.compile>
-    </sequential>
-  </macrodef>
-
   <!-- Initialize all subproject directories -->
   <target name="prepare">
     <mkdir dir="${my-classes.dir}"/>
@@ -107,7 +66,6 @@
   	<copy todir="${my-classes.dir}">
       <fileset dir="${my-src.dir}/classpath/gnu" includes="**/*.properties"/>
       <fileset dir="${my-src.dir}/classpath/java" includes="**/*.properties"/>
-      <fileset dir="${my-src.dir}/classpath/vm" includes="**/*.security"/>
       <fileset dir="${my-src.dir}/classpath/tools" includes="**/*.jav"/>
       <fileset dir="${my-src.dir}/openjdk/java" includes="**/*.jav"/>
       <fileset dir="${my-src.dir}/openjdk/javax" includes="**/*.jav"/>
@@ -115,20 +73,7 @@
       <fileset dir="${my-src.dir}/openjdk/com" includes="**/*.jav"/>
       <fileset dir="${my-src.dir}/openjdk/sun" includes="**/*.jav"/>
       <fileset dir="${my-src.dir}/openjdk/svm" includes="**/*.jav"/>
-      <fileset dir="${my-src.dir}/openjdk/vm" includes="**/*.jav"/>
     </copy>
-
-    <taskdef name="template" classname="org.jnode.ant.taskdefs.TemplateTask" classpathref="cp-jnode"/>
-    <template file="${my-src.dir}/template/org/jnode/vm/VmSystemSettings.java"
-          tofile="${my-gen.dir}/org/jnode/vm/VmSystemSettings.java">
-        <token name="@java.home@" value="${jnode.java.home}"/>
-        <token name="@java.io.tmpdir@" value="${jnode.java.io.tmpdir}"/>
-        <token name="@user.home@" value="${jnode.user.home}"/>
-    </template>
-    <template file="${my-src.dir}/template/org/jnode/security/JNodeSecurityManagerSettings.java"
-          tofile="${my-gen.dir}/org/jnode/security/JNodeSecurityManagerSettings.java">
-        <token name="@jnode.security.enabled@" value="${jnode.security.enabled}"/>
-    </template>
   </target>
 
   <!-- Compile all subproject java files -->
@@ -138,10 +83,6 @@
       <classpath refid="my-cp"/>
     </jnode.compile>
     <parallel >
-      <jnode.compile>
-        <src refid="my-sources" />
-        <classpath refid="my-cp"/>
-      </jnode.compile>
       <jnode.compile>
         <src refid="classpath-sources-corba" />
         <classpath refid="my-cp"/>
@@ -161,8 +102,6 @@
 	    <fileset dir="${my-src.dir}/classpath/gnu" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/classpath/java" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/classpath/javax" excludes="${my-non-resources}"/>
-	    <fileset dir="${my-src.dir}/classpath/ext" excludes="${my-non-resources}"/>
-	    <fileset dir="${my-src.dir}/classpath/vm" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/classpath/tools" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/openjdk/java" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/openjdk/javax" excludes="${my-non-resources}"/>
@@ -170,15 +109,10 @@
 	    <fileset dir="${my-src.dir}/openjdk/com" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/openjdk/sun" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/openjdk/svm" excludes="${my-non-resources}"/>
-	    <fileset dir="${my-src.dir}/openjdk/vm" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/openjdk/corba" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/openjdk/jaxws" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/openjdk/langtools" excludes="${my-non-resources}"/>
 	    <fileset dir="${my-src.dir}/icedtea" excludes="${my-non-resources}"/>
-	    <fileset dir="${my-src.dir}/core" excludes="${my-non-resources}"/>
-	    <fileset dir="${my-src.dir}/endorsed/nanoxml" excludes="${my-non-resources}"/>
-	    <fileset dir="${my-src.dir}/vmmagic" excludes="${my-non-resources}"/>
-	    <fileset dir="${my-src.dir}/mmtk-vm" excludes="${my-non-resources}"/>
     </copy>
 
    </target>

@@ -1,4 +1,4 @@
-<project name="JNode" default="assemble-plugins" basedir=".">
+<project name="JNode" default="classlib" basedir=".">
     <!-- if task is used from this -->
     <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
 	<!-- before including jnode.xml, we must set this property -->
@@ -100,9 +100,6 @@
     <property name="install-plugin-list" value="${basedir}/conf/install-plugin-list.xml"/>
     <property name="system-plugin-list" value="${basedir}/conf/system-plugin-list.xml"/>
     <property name="sources.dist.tar.gz" value="${build.dir}/jnodesources-${jnode-ver}.tar.gz"/>
-    <property name="jnode-x86.iso" value="${cdroms.dir}/jnode-x86.iso"/>
-    <property name="jnode-x86-lite.iso" value="${cdroms.dir}/jnode-x86-lite.iso"/>
-    <property name="jnode-x86_64-lite.iso" value="${cdroms.dir}/jnode-x86_64-lite.iso"/>
 
     <path id="cp">
         <pathelement location="${mmtk.jar}"/>
@@ -197,6 +194,13 @@
         <mkdir dir="${descriptors.dir}"/>
         <mkdir dir="${plugins.dir}"/>
         <mkdir dir="${initjars.dir}"/>
+    </target>
+
+    <target name="classlib" depends="prepare">
+        <!-- pre compile tasks needed for compilation -->
+        <ant target="compile" dir="${root.dir}/core" inheritall="on" inheritrefs="on" />
+        <ant target="pre-compile" dir="${root.dir}/builder" inheritall="on" inheritrefs="on" />
+        <antcall target="openjdk-annotate"/>
     </target>
 
     <!-- Call the assemble target of all subprojects -->
@@ -311,18 +315,6 @@ You can use this build system to perform various tasks,
 by specifying one or more targets on the command line. 
 See the list below for an explanation of all targets.
 			
-x86               Build the JNode bootable image for the X86 32-bit
-                  architecture.
-x86_64            Build the JNode bootable image for the X86 64-bit
-                  architecture (AMD64).
-			
-cd-x86            Build the JNode bootable CD-ROM for the X86
-                  architecture 32 and 64-bit. The CD-ROM also
-                  contains the JNode sources.
-cd-x86-lite       Build the JNode bootable CD-ROM for the X86
-                  32-bit architecture.
-cd-x86_64-lite    Build the JNode bootable CD-ROM for the X86
-                  64-bit architecture.
 <!--
 create-patch      Create a patch file containing the differences
                   between the local sources and the cvs HEAD
@@ -343,32 +335,6 @@ check-plugins     Run tests to check plugin dependencies.
 
 clean             Remove all intermediate build results.
         </echo>
-    </target>
-
-    <!-- Macro used to call the x86 build script -->
-    <macrodef name="x86-build">
-        <attribute name="bits"/>
-        <attribute name="target" default="all"/>
-        <sequential>
-            <ant antfile="build-x86.xml" inheritall="on" inheritrefs="on" target="@{target}">
-                <property name="jnode.bits" value="@{bits}"/>
-            </ant>
-        </sequential>
-    </macrodef>
-
-    <!-- Create the X86 32-bit boot image -->
-    <target name="x86" depends="assemble">
-        <x86-build bits="32"/>
-    </target>
-
-    <!-- Create the X86 64-bit boot image-->
-    <target name="x86_64" depends="assemble">
-        <x86-build bits="64"/>
-    </target>
-
-    <!-- Create the JOP boot image -->
-    <target name="jop" depends="assemble">
-        <ant antfile="build-jop.xml" inheritall="on" inheritrefs="on"/>
     </target>
 
     <!-- Upload a distribution -->
@@ -760,7 +726,7 @@ clean             Remove all intermediate build results.
             </cp-compare>
         </target>
 
-    <target name="openjdk-annotate" depends="assemble-projects">
+    <target name="openjdk-annotate">
         <taskdef name="oj-annotate" classname="org.jnode.ant.taskdefs.AnnotateTask" 
         		classpathref="cp-jnode"/>
 
@@ -829,71 +795,6 @@ clean             Remove all intermediate build results.
             </descriptors>
 		</checkDeps>
 	</target>
-
-    <!-- Define the task that check the rules -->
-    <taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask"
-        classpathref="cp-jnode">
-        <classpath>
-            <pathelement location="${pmd.jar}"/>
-            <pathelement location="${jaxen.jar}"/>
-            <pathelement location="${saxpath.jar}"/>
-            <pathelement location="${xerces.jar}"/>
-            <pathelement location="${xmlParserAPIs.jar}"/>
-        </classpath>
-    </taskdef>
-
-
-    <!-- Macro used to check that the rules are applied in the source code -->
-    <macrodef name="checkProjectRules">
-        <attribute name="projectName"/>
-        <attribute name="webSrcUrl"/>
-        <attribute name="projectSrc"/>
-        <sequential>
-            <property name="nbFailures" value="0"/>
-            <echo message="Scanning @{projectName}."/>
-            <property name="tmp" value="../@{projectSrc}"/>
-            <pmd failuresPropertyName="nbFailures">
-                <formatter type="html" toFile="${reports.dir}/pmd_report-@{projectName}.html"/>
-
-                <ruleset>rulesets/favorites.xml</ruleset>
-                <ruleset>rulesets/basic.xml</ruleset>
-
-                <fileset dir="../@{projectSrc}" includes="**/*.java"/>
-            </pmd>
-            <echo message="There was ${nbFailures} failures in @{projectName}."/>
-        </sequential>
-    </macrodef>
-
-    <target name="checkJNodeRules" depends="prepare">
-        <parallel>
-            <checkProjectRules projectName="distr" webSrcUrl="distr" projectSrc="distr"/>
-            <checkProjectRules projectName="JNode-Builder" webSrcUrl="builder" projectSrc="builder"/>
-            <checkProjectRules projectName="JNode-Core" webSrcUrl="core" projectSrc="core"/>
-            <checkProjectRules projectName="JNode-FS" webSrcUrl="fs" projectSrc="fs"/>
-            <checkProjectRules projectName="JNode-GUI" webSrcUrl="gui" projectSrc="gui"/>
-            <checkProjectRules projectName="JNode-Net" webSrcUrl="net" projectSrc="net"/>
-            <checkProjectRules projectName="JNode-Shell" webSrcUrl="shell" projectSrc="shell"/>
-            <checkProjectRules projectName="JNode-TestUI" webSrcUrl="textui" projectSrc="textui"/>
-        </parallel>
-    </target>
-
-    <!-- Document all plugins -->
-    <target name="document-plugins" depends="assemble-projects">
-        <taskdef name="plugindocumentation" classname="org.jnode.build.documentation.PluginDocumentationTask" classpathref="cp-jnode"/>
-
-        <plugindocumentation
-            destdir="${reports.dir}/plugins"
-            pluginDir="${descriptors.dir}"
-            tree="${jnode.plugin.doc.tree}">
-            <descriptors dir="${descriptors.dir}/">
-                <include name="*.xml"/>
-                <exclude name="*plugin-list.xml"/>
-            </descriptors>
-        </plugindocumentation>
-
-    </target>
-
-
     <!-- Create a patch -->
     <!-- TODO create replacement SVN task
     <target name="create-patch">
