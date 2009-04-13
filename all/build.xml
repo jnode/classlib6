@@ -197,10 +197,19 @@
     </target>
 
     <target name="classlib" depends="prepare">
+        <property name="classlib.jar" value="${root.dir}/all/build/classlib.jar" />
+        <property name="classlib.pack" value="${root.dir}/all/build/classlib.pack.gz" />
         <!-- pre compile tasks needed for compilation -->
         <ant target="compile" dir="${root.dir}/core" inheritall="on" inheritrefs="on" />
         <ant target="pre-compile" dir="${root.dir}/builder" inheritall="on" inheritrefs="on" />
         <antcall target="openjdk-annotate"/>
+        <delete file="${classlib.jar}"/>
+        <delete file="${classlib.pack}"/>
+        <jar compress="0" basedir="${root.dir}/core/build/classes" jarfile="${classlib.jar}"/>
+        <exec executable="pack200">
+            <arg file="${classlib.pack}"/>
+            <arg file="${classlib.jar}"/>
+        </exec>
     </target>
 
     <!-- Call the assemble target of all subprojects -->
@@ -319,10 +328,7 @@ See the list below for an explanation of all targets.
 create-patch      Create a patch file containing the differences
                   between the local sources and the cvs HEAD
                   branch.
--->        	
-boot-files-winNT  Build the JNode boot files for windows NT/2K/XP
-                  used together with NTLDR
-
+-->
 encoding-test     Verify the file encoding of all java source
                   files.
 encoding-fix      Correct the file encoding of all java source
