@@ -41,6 +41,8 @@ package java.io;
 import gnu.java.nio.channels.FileChannelImpl;
 
 import java.nio.channels.FileChannel;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 /* Written using "Java Class Libraries", 2nd edition, ISBN 0-201-31002-3
  * "The Java Language Specification", ISBN 0-201-63451-1
@@ -136,12 +138,19 @@ public class RandomAccessFile implements DataOutput, DataInput, Closeable
         fnfe.initCause(ioe);
         throw fnfe;
       }
-    fd = new FileDescriptor(ch);
-    if ((fdmode & FileChannelImpl.WRITE) != 0)
-    out = new DataOutputStream (new FileOutputStream (fd));
-    else
-      out = null;
-    in = new DataInputStream (new FileInputStream (fd));
+      final int fd_mode = fdmode;
+      AccessController.doPrivileged(new PrivilegedAction() {
+          @Override
+          public Object run() {
+              fd = new FileDescriptor(ch);
+              if ((fd_mode & FileChannelImpl.WRITE) != 0)
+                  out = new DataOutputStream(new FileOutputStream(fd));
+              else
+                  out = null;
+              in = new DataInputStream(new FileInputStream(fd));
+              return null;
+          }
+      });
   }
 
   /**
