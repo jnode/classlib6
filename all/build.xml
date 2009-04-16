@@ -212,6 +212,32 @@
         </exec>
     </target>
 
+    <target name="quickdeploy" depends="classlib">
+
+    </target>
+
+    <target name="deploy">
+        <property name="classlib-src.jar" value="${root.dir}/all/build/classlib-src.jar" />
+        <jar compress="0" jarfile="${classlib-src.jar}" filesonly="true">
+            <fileset dir="${root.dir}/core/src/classlib" includes="**/*.java"/>
+            <fileset dir="${root.dir}/core/src/classpath/gnu" includes="**/*.java"/>
+            <fileset dir="${root.dir}/core/src/classpath/java" includes="**/*.java"/>
+            <fileset dir="${root.dir}/core/src/classpath/javax" includes="**/*.java"/>
+            <fileset dir="${root.dir}/core/src/classpath/tools" includes="**/*.java"/>
+            <fileset dir="${root.dir}/core/src/icedtea" includes="**/*.java"/>
+            <fileset dir="${root.dir}/core/src/openjdk/com" includes="**/*.java"/>
+            <fileset dir="${root.dir}/core/src/openjdk/corba" includes="**/*.java"/>
+            <fileset dir="${root.dir}/core/src/openjdk/java" includes="**/*.java"/>
+            <fileset dir="${root.dir}/core/src/openjdk/javax" includes="**/*.java"/>
+            <fileset dir="${root.dir}/core/src/openjdk/jaxws" includes="**/*.java"/>
+            <fileset dir="${root.dir}/core/src/openjdk/langtools" includes="**/*.java"/>
+            <fileset dir="${root.dir}/core/src/openjdk/org" includes="**/*.java"/>
+            <fileset dir="${root.dir}/core/src/openjdk/sun" includes="**/*.java"/>
+            <fileset dir="${root.dir}/core/src/openjdk/svm" includes="**/*.java"/>
+        </jar>
+        <bzip2 src="${classlib-src.jar}" destfile="${classlib-src.jar}.bz2"/>
+    </target>
+
     <!-- Call the assemble target of all subprojects -->
     <target name="assemble-projects" depends="prepare">
         <!-- pre compile tasks needed for compilation -->
