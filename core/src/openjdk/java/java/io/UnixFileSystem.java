@@ -132,8 +132,8 @@ class UnixFileSystem extends FileSystem {
     }
 
     public String resolve(File f) {
-	if (isAbsolute(f)) return f.getPath();
-	return resolve(System.getProperty("user.dir"), f.getPath());
+	if (isAbsolute(f)) return f.getPath();         //jnode
+	return resolve(AccessController.doPrivileged(new GetPropertyAction("user.dir")), f.getPath());
     }
 
     // Caches for canonicalization results to improve startup performance.
