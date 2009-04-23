@@ -3,8 +3,7 @@
 	<name>builder</name>
 	<comment></comment>
 	<projects>
-		<project>JNode-Core</project>
-		<project>JNode-FS</project>
+		<project>core</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

@@ -3,13 +3,8 @@
 	<name>all</name>
 	<comment></comment>
 	<projects>
-		<project>JNode-Builder</project>
-		<project>JNode-Core</project>
-		<project>JNode-Distr</project>
-		<project>JNode-FS</project>
-		<project>JNode-GUI</project>
-		<project>JNode-Net</project>
-		<project>JNode-Shell</project>
+		<project>builder</project>
+		<project>core</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
