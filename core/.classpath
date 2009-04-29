@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="**/.svn/**" kind="src" path="src/openjdk/vm"/>
-	<classpathentry excluding="nanoxml/" kind="src" path="src/endorsed"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/classlib"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/openjdk/svm"/>
-	<classpathentry excluding="**/.svn/**" kind="src" path="src/emu"/>
 	<classpathentry excluding="**/*-template.java|**/.svn/**" kind="src" path="src/openjdk/sun"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/openjdk/org"/>
 	<classpathentry excluding="**/*-template.java|**/.svn/**" kind="src" path="src/openjdk/com"/>
@@ -15,14 +12,6 @@
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/classpath/tools"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/classpath/java"/>
 	<classpathentry excluding="**/.svn/**" kind="src" path="src/classpath/javax"/>
-	<classpathentry excluding="**/.svn/**" kind="src" path="src/classpath/ext"/>
-	<classpathentry excluding="**/.svn/**" kind="src" path="src/classpath/vm"/>
-	<classpathentry excluding="**/.svn/**" kind="src" path="src/core"/>
-	<classpathentry excluding="**/.svn/**" kind="src" path="src/vmmagic"/>
-	<classpathentry excluding="**/.svn/**" kind="src" path="src/mmtk-vm"/>
-	<classpathentry excluding="**/.svn/**" kind="src" path="src/driver"/>
-	<classpathentry excluding="**/.svn/**" kind="src" path="src/test"/>
-	<classpathentry excluding="**/.svn/**" kind="src" path="src/template"/>
 	<classpathentry kind="lib" path="lib/ant.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.8.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/asm-1.5.3.jar"/>
