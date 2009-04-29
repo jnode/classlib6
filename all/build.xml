@@ -206,10 +206,13 @@
         <delete file="${classlib.jar}"/>
         <delete file="${classlib.pack}"/>
         <jar compress="0" basedir="${root.dir}/core/build/classes" jarfile="${classlib.jar}"/>
+        <echo message="packing..."/>
         <exec executable="pack200">
+            <arg value="-J-Xmx256m"/>
             <arg file="${classlib.pack}"/>
             <arg file="${classlib.jar}"/>
         </exec>
+        <echo message="...done"/>
     </target>
 
     <target name="quickdeploy" depends="classlib">
