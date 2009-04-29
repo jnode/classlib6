@@ -47,16 +47,12 @@ import java.util.Properties;
  * This class is separated out from java.lang.System to simplify bootstrap
  * dependencies and to allow trusted code a simple and efficient mechanism
  * to access the system properties.
+ * <p>
+ * In JNode, we further indirect through 2 'native' methods that are implemented
+ * in JNode specific Java code.
  */
 public class SystemProperties
 {
-    /**
-     * Stores the current system properties. This can be modified by
-     * {@link #setProperties(Properties)}, but will never be null, because
-     * setProperties(null) sucks in the default properties.
-     */
-    private static Properties properties;
-
     /**
      * The default properties. Once the default is stabilized,
      * it should not be modified;
@@ -120,29 +116,35 @@ public class SystemProperties
 
         VMSystemProperties.postInit(defaultProperties);
 
-        // Note that we use clone here and not new.  Some programs assume
-        // that the system properties do not have a parent.
-    properties = (Properties) defaultProperties.clone();
+        try {
+        	// Note that we use clone here and not new.  Some programs assume
+        	// that the system properties do not have a parent.
+        	doSetProperties((Properties) defaultProperties.clone());
+        } catch (UnsatisfiedLinkError ex) {
+        	// This happens if we are running in JNode bootimage builder
+        	// because the JNode implementation of the native method 
+        	// doSetProperties is not available.
+        }
     }
 
     public static String getProperty(String name)
     {
-        return properties.getProperty(name);
+        return doGetProperties().getProperty(name);
     }
 
     public static String getProperty(String name, String defaultValue)
     {
-        return properties.getProperty(name, defaultValue);
+        return doGetProperties().getProperty(name, defaultValue);
     }
 
     public static String setProperty(String name, String value)
     {
-    return (String) properties.setProperty(name, value);
+    return (String) doGetProperties().setProperty(name, value);
     }
 
     public static Properties getProperties()
     {
-        return properties;
+        return doGetProperties();
     }
 
     public static void setProperties(Properties properties)
@@ -154,7 +156,7 @@ public class SystemProperties
             properties = (Properties)defaultProperties.clone();
           }
 
-        SystemProperties.properties = properties;
+        doSetProperties(properties);
     }
 
   /**
@@ -167,7 +169,12 @@ public class SystemProperties
    */
   public static String remove(String name)
   {
-    return (String) properties.remove(name);
+    return (String) doGetProperties().remove(name);
   }
+  
+  private static native Properties doGetProperties();
+  
+  private static native void doSetProperties(Properties props);
+  
 
 }
