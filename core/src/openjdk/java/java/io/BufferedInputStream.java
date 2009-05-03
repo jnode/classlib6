@@ -68,6 +68,8 @@ class BufferedInputStream extends FilterInputStream {
      */
     private static final AtomicReferenceFieldUpdater<BufferedInputStream, byte[]> bufUpdater;
 
+    //jnode
+    //todo: should be cleaned up (possible reason: bug in jnode security subsystem)
     static {
         bufUpdater = java.security.AccessController.doPrivileged(
                 new PrivilegedAction<AtomicReferenceFieldUpdater<BufferedInputStream, byte[]>>() {
