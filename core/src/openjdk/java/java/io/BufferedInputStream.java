@@ -24,6 +24,7 @@
  */
 
 package java.io;
+import java.security.PrivilegedAction;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
 /**
@@ -65,10 +66,18 @@ class BufferedInputStream extends FilterInputStream {
      * of buf[] as primary indicator that this stream is closed. (The
      * "in" field is also nulled out on close.)
      */
-    private static final 
-        AtomicReferenceFieldUpdater<BufferedInputStream, byte[]> bufUpdater = 
-        AtomicReferenceFieldUpdater.newUpdater
-        (BufferedInputStream.class,  byte[].class, "buf");
+    private static final AtomicReferenceFieldUpdater<BufferedInputStream, byte[]> bufUpdater;
+
+    static {
+        bufUpdater = java.security.AccessController.doPrivileged(
+                new PrivilegedAction<AtomicReferenceFieldUpdater<BufferedInputStream, byte[]>>() {
+                    @Override
+                    public AtomicReferenceFieldUpdater<BufferedInputStream, byte[]> run() {
+                        return AtomicReferenceFieldUpdater.newUpdater(
+                                BufferedInputStream.class,  byte[].class, "buf");
+                    }
+                });
+    }
 
     /**
      * The index one greater than the index of the last valid byte in 
