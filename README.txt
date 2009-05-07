@@ -1,6 +1,6 @@
 Welcome to JNode!
 
-Version: $Id$
+Version: $Id: README.txt 4408 2008-08-07 19:36:11Z lsantha $
 
 In this file, you find the instructions needed to setup a JNode development environment.
 

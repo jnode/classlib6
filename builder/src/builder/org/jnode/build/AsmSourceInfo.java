@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: AsmSourceInfo.java 5071 2009-02-28 16:38:38Z fduminy $
  *
  * Copyright (C) 2003-2009 JNode.org
  *

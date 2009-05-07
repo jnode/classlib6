@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: Asm.java 5071 2009-02-28 16:38:38Z fduminy $
  *
  * Copyright (C) 2003-2009 JNode.org
  *
@@ -38,7 +38,7 @@ import org.apache.tools.ant.taskdefs.condition.Os;
  * Description of the Class.
  *
  * @author epr
- * @version $Revision$
+ * @version $Revision: 5071 $
  */
 public class Asm extends MatchingTask {
 
