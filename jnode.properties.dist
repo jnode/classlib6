@@ -108,3 +108,8 @@ jnode.user.home=/jnode/home
 # Custom build tools
 # -----------------------------------------------
 # jnode.enable.mkisofs=true
+
+# -----------------------------------------------
+# main.jnode.dir=${root.dir}/../jnode
+# ftp.user=
+# ftp.pass=

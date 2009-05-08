@@ -196,7 +196,7 @@
         <mkdir dir="${initjars.dir}"/>
     </target>
 
-    <target name="classlib" depends="prepare">
+    <target name="classlib" depends="prepare" description="build and package the classlib">
         <property name="classlib.jar" value="${root.dir}/all/build/classlib.jar" />
         <property name="classlib.pack" value="${root.dir}/all/build/classlib.pack.gz" />
         <!-- pre compile tasks needed for compilation -->
@@ -215,11 +215,7 @@
         <echo message="...done"/>
     </target>
 
-    <target name="quickdeploy" depends="classlib">
-
-    </target>
-
-    <target name="deploy">
+    <target name="classlib-src" depends="prepare" description="package the classlib sources">
         <property name="classlib-src.jar" value="${root.dir}/all/build/classlib-src.jar" />
         <jar compress="0" jarfile="${classlib-src.jar}" filesonly="true">
             <fileset dir="${root.dir}/core/src/classlib" includes="**/*.java"/>
@@ -239,6 +235,121 @@
             <fileset dir="${root.dir}/core/src/openjdk/svm" includes="**/*.java"/>
         </jar>
         <bzip2 src="${classlib-src.jar}" destfile="${classlib-src.jar}.bz2"/>
+    </target>
+
+    <target name="copy" depends="prepare" description="copy the classlib binaries to the local JNode project">
+        <copy file="${root.dir}/all/build/classlib.jar" tofile="${main.jnode.dir}/all/lib/classlib.jar" overwrite="yes"/>
+        <copy file="${root.dir}/all/build/classlib-src.jar" tofile="${main.jnode.dir}/all/lib/classlib-src.jar" overwrite="yes"/>
+    </target>
+
+    <target name="ftp-properties">
+        <property name="ftp.server" value="codemammoth.com"/>
+        <property name="ftp.dir" value="classlib"/>
+        <property name="download.url" value="http://codemammoth.com/jnodeftp"/>
+    </target>
+
+    <target name="upload" depends="prepare,ftp-properties" description="upload the classlib binaries to the FTP server">
+        <fail message="main.jnode.dir not set in jnode.properties">
+            <condition><not><isset property="main.jnode.dir"/></not></condition>
+        </fail>
+        <fail message="ftp.user not set in jnode.properties">
+            <condition><not><isset property="ftp.user"/></not></condition>
+        </fail>
+        <fail message="ftp.pass not set in jnode.properties">
+            <condition><not><isset property="ftp.pass"/></not></condition>
+        </fail>
+        <!-- compute checksum for uploadables -->
+        <checksum algorithm="MD5" property="classlib.md5">
+            <fileset dir="${root.dir}/all/build/">
+                <include name="classlib.pack.gz" />
+            </fileset>
+        </checksum>
+        <checksum algorithm="MD5" property="classlib-src.md5">
+            <fileset dir="${root.dir}/all/build/">
+                <include name="classlib-src.jar.bz2" />
+            </fileset>
+        </checksum>
+        <tstamp>
+            <format property="current" pattern="yyyyMMddhhmmss"/>
+        </tstamp>
+        <property url="${download.url}/${ftp.dir}/ftp.properties"/>
+<!-- Don't reformat this -->
+<echo file="${root.dir}/all/build/ftp.properties">to.remove=${to.keep}
+to.keep=${current}
+</echo>
+        <!-- create the didrectory where we upload the new version -->
+        <ftp action="mkdir"
+            server="${ftp.server}"
+            userid="${ftp.user}"
+            password="${ftp.pass}"
+            remotedir="${ftp.dir}/${current}"
+            verbose="yes"/>
+        <!-- upload files -->
+        <ftp server="${ftp.server}"
+            userid="${ftp.user}"
+            password="${ftp.pass}"
+            remotedir="${ftp.dir}/${current}"
+            verbose="yes">
+            <fileset dir="${root.dir}/all/build/" includes="classlib.pack.gz,classlib-src.jar.bz2"/>
+        </ftp>
+        <!-- upload ftp.properties -->
+        <ftp server="${ftp.server}"
+            userid="${ftp.user}"
+            password="${ftp.pass}"
+            remotedir="${ftp.dir}">
+            <fileset dir="${root.dir}/all/build/" includes="ftp.properties"/>
+        </ftp>
+        <!-- delete outdated files  -->
+        <ftp action="del"
+            server="${ftp.server}"
+            userid="${ftp.user}"
+            password="${ftp.pass}"
+            remotedir="${ftp.dir}"
+            verbose="yes">
+            <fileset>
+                <include name="${to.remove}/**"/>
+            </fileset>
+        </ftp>
+        <!-- delete outdated directory  -->
+        <ftp action="rmdir"
+            server="${ftp.server}"
+            userid="${ftp.user}"
+            password="${ftp.pass}"
+            remotedir="${ftp.dir}"
+            verbose="yes">
+            <fileset>
+                <include name="${to.remove}"/>
+            </fileset>
+        </ftp>
+        <!-- stamp the trunk for the new classlib -->
+<echo file="${main.jnode.dir}/all/lib/ftp.properties">classlib.url=${download.url}/${ftp.dir}/${current}
+classlib.md5=${classlib.md5}
+classlib-src.md5=${classlib-src.md5}</echo>
+    </target>
+
+    <target name="deploy" depends="classlib,classlib-src,upload" description="build and upload"/>
+
+    <target name="quickdeploy" depends="classlib,classlib-src,copy" description="build and copy"/>
+
+    <target name="all" depends="clean,classlib,classlib-src,upload" description="clean build and upload"/>
+
+    <target name="ftp-init" depends="prepare,ftp-properties" description="initialize the FTP server">
+        <!-- create maid directory -->
+        <ftp action="mkdir"
+            server="${ftp.server}"
+            userid="${ftp.user}"
+            password="${ftp.pass}"
+            remotedir="${ftp.dir}"
+            verbose="yes"/>
+        <!-- create ftp.properties -->
+        <echo file="${root.dir}/all/build/ftp.properties">to.remove=${to.keep}${line.separator}to.keep=${current}${line.separator}</echo>
+        <!-- upload ftp.properties -->
+        <ftp server="${ftp.server}"
+            userid="${ftp.user}"
+            password="${ftp.pass}"
+            remotedir="${ftp.dir}">
+            <fileset dir="${root.dir}/all/build/" includes="ftp.properties"/>
+        </ftp>
     </target>
 
     <!-- Call the assemble target of all subprojects -->
@@ -373,7 +484,7 @@ clean             Remove all intermediate build results.
     </target>
 
     <!-- Upload a distribution -->
-    <target name="upload">
+    <!--target name="upload">
         <property name="upload.dir" value="${build.dir}/upload"/>
         <mkdir dir="${upload.dir}"/>
         <gzip src="${jnode-x86.iso}" destfile="${upload.dir}/jnode-x86-${jnode-ver}.iso.gz"/>
@@ -385,15 +496,14 @@ clean             Remove all intermediate build results.
             </fileset>
         </checksum>
         <echo message="FTP upload disabled. Uploadables are in: ${upload.dir}"/>
-        <!--
-        TODO find a way to automatically upload the files 
+        TODO find a way to automatically upload the files
         jsch based scp with sftp fails with an error to sourceforge
         FTP uploads are abandone by sourceforge
         <ftp server="upload.sourceforge.net" remotedir="incoming" passive="yes" newer="yes" verbose="yes" userid="anonymous" password="${user.name}@users.sourceforge.net">
             <fileset dir="${upload.dir}"/>
         </ftp>
-        -->
     </target>
+    -->
 	
 	<!-- Save virtualization etc state across 'clean' -->
 	<target name="save">
