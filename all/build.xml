@@ -238,6 +238,9 @@
     </target>
 
     <target name="copy" depends="prepare" description="copy the classlib binaries to the local JNode project">
+        <fail message="main.jnode.dir not set in jnode.properties">
+            <condition><not><isset property="main.jnode.dir"/></not></condition>
+        </fail>
         <copy file="${root.dir}/all/build/classlib.jar" tofile="${main.jnode.dir}/all/lib/classlib.jar" overwrite="yes"/>
         <copy file="${root.dir}/all/build/classlib-src.jar" tofile="${main.jnode.dir}/all/lib/classlib-src.jar" overwrite="yes"/>
     </target>

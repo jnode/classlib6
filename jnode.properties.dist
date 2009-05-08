@@ -110,6 +110,8 @@ jnode.user.home=/jnode/home
 # jnode.enable.mkisofs=true
 
 # -----------------------------------------------
+# Set these properties for uploading classlib binaries
+# -----------------------------------------------
 # main.jnode.dir=${root.dir}/../jnode
 # ftp.user=
 # ftp.pass=
