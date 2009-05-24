@@ -75,11 +75,14 @@ class BufferedInputStream extends FilterInputStream {
                 new PrivilegedAction<AtomicReferenceFieldUpdater<BufferedInputStream, byte[]>>() {
                     @Override
                     public AtomicReferenceFieldUpdater<BufferedInputStream, byte[]> run() {
-                        return AtomicReferenceFieldUpdater.newUpdater(
-                                BufferedInputStream.class,  byte[].class, "buf");
+                        return createUpdater();
                     }
                 });
     }
+
+	private static final AtomicReferenceFieldUpdater<BufferedInputStream, byte[]> createUpdater() {
+        return AtomicReferenceFieldUpdater.newUpdater(BufferedInputStream.class,  byte[].class, "buf");
+	}
 
     /**
      * The index one greater than the index of the last valid byte in 
