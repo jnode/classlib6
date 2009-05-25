@@ -508,13 +508,8 @@ clean             Remove all intermediate build results.
     </target>
     -->
 	
-	<!-- Save virtualization etc state across 'clean' -->
-	<target name="save">
-	   <copy file="${cdroms.dir}/JNode.nvram" todir="${save.dir}" failonerror="no"/>
-	</target>
-
     <!-- Clean everything files -->
-    <target name="clean" depends="save" description="clean the complete build output">
+    <target name="clean" description="clean the complete build output">
         <jnode.antall target="clean"/>
         <delete dir="${build.dir}" quiet="on"/>
     </target>
