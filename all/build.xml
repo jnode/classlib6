@@ -1,4 +1,4 @@
-<project name="JNode" default="classlib" basedir=".">
+<project name="classlib" default="classlib" basedir=".">
     <!-- if task is used from this -->
     <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
 	<!-- before including jnode.xml, we must set this property -->
@@ -196,16 +196,19 @@
         <mkdir dir="${initjars.dir}"/>
     </target>
 
-    <target name="classlib" depends="prepare" description="build and package the classlib">
+    <target name="classlib" depends="prepare" description="compile and create the classlib JAR file">
         <property name="classlib.jar" value="${root.dir}/all/build/classlib.jar" />
-        <property name="classlib.pack" value="${root.dir}/all/build/classlib.pack.gz" />
         <!-- pre compile tasks needed for compilation -->
         <ant target="compile" dir="${root.dir}/core" inheritall="on" inheritrefs="on" />
         <ant target="pre-compile" dir="${root.dir}/builder" inheritall="on" inheritrefs="on" />
         <antcall target="openjdk-annotate"/>
         <delete file="${classlib.jar}"/>
-        <delete file="${classlib.pack}"/>
         <jar compress="0" basedir="${root.dir}/core/build/classes" jarfile="${classlib.jar}"/>
+    </target>
+
+    <target name="classlib-pack" depends="classlib" description="create the classlib pack file">
+        <property name="classlib.pack" value="${root.dir}/all/build/classlib.pack.gz" />
+        <delete file="${classlib.pack}"/>
         <echo message="packing..."/>
         <exec executable="pack200">
             <arg value="-J-Xmx256m"/>
@@ -215,7 +218,7 @@
         <echo message="...done"/>
     </target>
 
-    <target name="classlib-src" depends="prepare" description="package the classlib sources">
+    <target name="classlib-src" depends="prepare" description="create the classlib source JAR file">
         <property name="classlib-src.jar" value="${root.dir}/all/build/classlib-src.jar" />
         <jar compress="0" jarfile="${classlib-src.jar}" filesonly="true">
             <fileset dir="${root.dir}/core/src/classlib" includes="**/*.java"/>
@@ -234,10 +237,14 @@
             <fileset dir="${root.dir}/core/src/openjdk/sun" includes="**/*.java"/>
             <fileset dir="${root.dir}/core/src/openjdk/svm" includes="**/*.java"/>
         </jar>
+    </target>
+
+    <target name="classlib-src-bz" depends="classlib-src" description="compress the classlib source JAR file">
+        <property name="classlib-src.jar" value="${root.dir}/all/build/classlib-src.jar" />
         <bzip2 src="${classlib-src.jar}" destfile="${classlib-src.jar}.bz2"/>
     </target>
 
-    <target name="copy" depends="prepare" description="copy the classlib binaries to the local JNode project">
+    <target name="copy" depends="prepare" description="copy the classlib JARs to the local JNode project">
         <fail message="main.jnode.dir not set in jnode.properties">
             <condition><not><isset property="main.jnode.dir"/></not></condition>
         </fail>
@@ -330,11 +337,13 @@ classlib.md5=${classlib.md5}
 classlib-src.md5=${classlib-src.md5}</echo>
     </target>
 
-    <target name="deploy" depends="classlib,classlib-src,upload" description="build and upload"/>
+    <target name="deploy" depends="classlib-pack,classlib-src-bz,upload" description="build and upload"/>
 
-    <target name="quickdeploy" depends="classlib,classlib-src,copy" description="build and copy"/>
+    <target name="quick-deploy" depends="classlib,classlib-src,copy" description="build and copy"/>
 
-    <target name="all" depends="clean,classlib,classlib-src,upload" description="clean build and upload"/>
+    <target name="quickdeploy" depends="quick-deploy" description="build and copy"/>
+
+    <target name="all" depends="clean,classlib-pack,classlib-src-bz,upload" description="clean build and upload"/>
 
     <target name="ftp-init" depends="prepare,ftp-properties" description="initialize the FTP server">
         <!-- create maid directory -->
