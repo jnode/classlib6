@@ -31,13 +31,7 @@
     <property name="jnode-builder.jar" value="${build.dir}/descriptors/jnode-builder.jar"/>
     <property name="jnode-configure.jar" value="${build.dir}/descriptors/jnode-configure.jar"/>
     <property name="jnode-core.jar" value="${root.dir}/core/build/classes"/>
-    <property name="jnode-distr.jar" value="${root.dir}/distr/build/classes"/>
-    <property name="jnode-fs.jar" value="${root.dir}/fs/build/classes"/>
-    <property name="jnode-gui.jar" value="${root.dir}/gui/build/classes"/>
     <property name="thinlet.jar" value="${root.dir}/gui/build/classes"/>
-    <property name="jnode-textui.jar" value="${root.dir}/textui/build/classes"/>
-    <property name="jnode-net.jar" value="${root.dir}/net/build/classes"/>
-    <property name="jnode-shell.jar" value="${root.dir}/shell/build/classes"/>
     <property name="jnode-fonts.jar" value="${build.dir}/descriptors/jnode-fonts.jar"/>
   	<property name="jnode-images.jar" value="${build.dir}/descriptors/jnode-images.jar"/>
 
@@ -48,26 +42,10 @@
     <property name="ant.jar" value="${root.dir}/core/lib/ant.jar"/>
     <property name="ant-launcher.jar" value="${root.dir}/core/lib/ant-launcher.jar"/>
     <property name="commons-net.jar" value="${root.dir}/core/lib/commons-net-1.1.0.jar"/>
-    <property name="dnsjava.jar" value="${root.dir}/net/lib/dnsjava-1.6.6.jar"/>
-    <property name="jsch.jar" value="${root.dir}/net/lib/jsch-0.1.24.jar"/>
     <property name="junit.jar" value="${root.dir}/core/lib/junit-4.5.jar"/>
     <property name="mmtk.jar" value="${root.dir}/core/lib/mmtk/mmtk.jar"/>
 	<property name="mauve.jar" value="${root.dir}/core/lib/mauve.jar"/>
-    <property name="edtftpj.jar" value="${root.dir}/fs/lib/edtftpj-1.5.2.jar"/>
-    <property name="jcifs.jar" value="${root.dir}/fs/lib/jcifs-1.2.6.jar"/>
     <property name="ejc.jar" value="${root.dir}/core/lib/ejc-3.1.1.jar"/>
-	<property name="oncrpc.jar" value="${root.dir}/net/lib/oncrpc.jar"/>
-	<property name="telnetd.jar" value="${root.dir}/distr/lib/telnetd.jar" />
-	<property name="commons-logging.jar" value="${root.dir}/distr/lib/commons-logging.jar" />
-	<property name="jetty.jar" value="${root.dir}/distr/lib/jetty-6.1.5.jar" />
-	<property name="jetty-util.jar" value="${root.dir}/distr/lib/jetty-util-6.1.5.jar" />
-    <property name="jsp.jar" value="${root.dir}/distr/lib/jsp-2.1.jar" />
-    <property name="jsp-api.jar" value="${root.dir}/distr/lib/jsp-api-2.1.jar" />
-    <property name="servlet.jar" value="${root.dir}/distr/lib/servlet-api-2.5-6.1.5.jar" />
-    <property name="derby.jar" value="${root.dir}/distr/lib/derby.jar" />
-    <property name="derbynet.jar" value="${root.dir}/distr/lib/derbynet.jar" />
-    <property name="derbytools.jar" value="${root.dir}/distr/lib/derbytools.jar" />
-    <property name="nanoxml-java.jar" value="${root.dir}/shell/lib/nanoxml-2.2.3.jar" />
 
     <property name="iso9660.jar" value="${root.dir}/builder/lib/iso9660.jar" />
     <property name="sabre.jar" value="${root.dir}/builder/lib/sabre.jar" />
@@ -81,8 +59,6 @@
 	<property name="asm-util.jar" value="${root.dir}/core/lib/asm-util-1.5.3.jar"/>
 	
     <property name="log4j.jar" value="${root.dir}/core/lib/log4j-1.2.8.jar"/>
-    <property name="beanshell.jar" value="${root.dir}/shell/lib/bsh-2.0b5.jar"/>
-    <property name="js.jar" value="${root.dir}/shell/lib/rhino1.6r5-jsr223.jar"/>
 
     <!-- libraries needed to check plugin dependencies -->
     <property name="bcel-5.1.jar" value="${root.dir}/builder/lib/bcel-5.1.jar" />	
@@ -131,13 +107,7 @@
     <path id="cp-jnode">
         <pathelement location="${jnode-builder.jar}"/>
         <pathelement location="${jnode-core.jar}"/>
-        <pathelement location="${jnode-distr.jar}"/>
-        <pathelement location="${jnode-fs.jar}"/>
-        <pathelement location="${jnode-shell.jar}"/>
-        <pathelement location="${jnode-net.jar}"/>
-        <pathelement location="${jnode-gui.jar}"/>
         <pathelement location="${thinlet.jar}"/>
-        <pathelement location="${jnode-textui.jar}"/>
 	    <pathelement location="${bcel-5.1.jar}"/>
         <path refid="cp"/>
     </path>
@@ -380,11 +350,6 @@ classlib-src.md5=${classlib-src.md5}</echo>
         	
             <libalias name="jnode-core.jar" alias="${jnode-core.jar}"/>
             <libalias name="jnode-distr.jar" alias="${jnode-distr.jar}"/>
-            <libalias name="jnode-fs.jar" alias="${jnode-fs.jar}"/>
-            <libalias name="jnode-gui.jar" alias="${jnode-gui.jar}"/>
-            <libalias name="jnode-textui.jar" alias="${jnode-textui.jar}"/>
-            <libalias name="jnode-net.jar" alias="${jnode-net.jar}"/>
-            <libalias name="jnode-shell.jar" alias="${jnode-shell.jar}"/>
 
         	<libalias name="jnode-mmtk-genrc.jar" alias="${jnode-mmtk-genrc.jar}"/>
         	<libalias name="jnode-mmtk-ms.jar" alias="${jnode-mmtk-ms.jar}"/>
@@ -596,18 +561,6 @@ clean             Remove all intermediate build results.
                 <pathelement location="${root.dir}/core/src/endorsed/nanoxml"/>
                 <pathelement location="${root.dir}/core/src/test"/>
                 <pathelement location="${root.dir}/core/src/vmmagic"/>
-                <pathelement location="${root.dir}/distr/src/install"/>
-                <pathelement location="${root.dir}/fs/src/fs"/>
-                <pathelement location="${root.dir}/fs/src/fs"/>
-                <pathelement location="${root.dir}/fs/src/driver"/>
-                <pathelement location="${root.dir}/gui/src/awt"/>
-                <pathelement location="${root.dir}/gui/src/driver"/>
-                <pathelement location="${root.dir}/gui/src/desktop"/>
-                <pathelement location="${root.dir}/gui/src/font"/>
-                <pathelement location="${root.dir}/gui/src/thinlet"/>
-                <pathelement location="${root.dir}/net/src/net"/>
-                <pathelement location="${root.dir}/net/src/driver"/>
-                <pathelement location="${root.dir}/shell/src/shell"/>
             </sourcepath>
             <package name="org.jnode.*"/>
             <package name="org.mmtk.*"/>
@@ -716,7 +669,6 @@ clean             Remove all intermediate build results.
         </cp-compare>
     </target>
 
-    <!-- Compare classpath version of jnode with real classpath version -->
     <target name="header-fix" depends="assemble">
         <!-- todo clean up the excludes -->
         <taskdef name="header" classname="org.jnode.ant.taskdefs.HeaderTask" classpathref="cp-jnode"/>
@@ -740,23 +692,6 @@ clean             Remove all intermediate build results.
             <fileset dir="${root.dir}/core/src/mmtk-vm" includes="**/*.java" excludes="org/mmtk/vm/**/*.java"/>
             <fileset dir="${root.dir}/core/src/driver" includes="**/*.java"/>
             <fileset dir="${root.dir}/core/src/test" includes="**/*.java" excludes="org/jnode/test/mauve/**/*.java,org/jtestserver/**/*.java"/>
-            <fileset dir="${root.dir}/distr/src/install" includes="**/*.java"/>
-            <fileset dir="${root.dir}/distr/src/apps" includes="**/*.java"/>
-            <fileset dir="${root.dir}/distr/src/emu" includes="**/*.java"/>
-            <fileset dir="${root.dir}/distr/src/test" includes="**/*.java"/>
-            <fileset dir="${root.dir}/fs/src/fs" includes="**/*.java"/>
-            <fileset dir="${root.dir}/fs/src/driver" includes="**/*.java"/>
-            <fileset dir="${root.dir}/fs/src/test" includes="**/*.java"/>
-            <fileset dir="${root.dir}/gui/src/awt" includes="**/*.java" excludes="org/jnode/awt/font/bdf/**/*.java"/>
-            <fileset dir="${root.dir}/gui/src/desktop" includes="**/*.java"/>
-            <fileset dir="${root.dir}/gui/src/driver" includes="**/*.java"/>
-            <fileset dir="${root.dir}/gui/src/test" includes="**/*.java"/>
-            <fileset dir="${root.dir}/net/src/net" includes="**/*.java"/>
-            <fileset dir="${root.dir}/net/src/driver" includes="**/*.java"/>
-            <fileset dir="${root.dir}/net/src/test" includes="**/*.java"/>
-            <fileset dir="${root.dir}/shell/src/emu" includes="**/*.java"/>
-            <fileset dir="${root.dir}/shell/src/shell" includes="**/*.java"/>
-            <fileset dir="${root.dir}/shell/src/test" includes="**/*.java"/>
         </header>
     </target>
 
@@ -769,24 +704,6 @@ clean             Remove all intermediate build results.
       <taskdef name="hotswap" classname="org.jnode.ant.taskdefs.Hotswap" classpathref="cp-jnode" />
       <hotswap verbose="true" host="${jnode.debugger.host}" port="${jnode.debugger.port}">
         <fileset dir="../core/build/classes/" includes="**/*.class">
-          <date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
-        </fileset>
-        <fileset dir="../distr/build/classes/" includes="**/*.class">
-          <date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
-        </fileset>
-        <fileset dir="../fs/build/classes/" includes="**/*.class">
-          <date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
-        </fileset>
-        <fileset dir="../gui/build/classes/" includes="**/*.class">
-          <date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
-        </fileset>
-        <fileset dir="../net/build/classes/" includes="**/*.class">
-          <date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
-        </fileset>
-        <fileset dir="../shell/build/classes/" includes="**/*.class">
-          <date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
-        </fileset>
-        <fileset dir="../textui/build/classes/" includes="**/*.class">
           <date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
         </fileset>
       </hotswap>
