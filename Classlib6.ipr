@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project relativePaths="true" version="4">
+<project version="4">
   <component name="AntConfiguration">
     <defaultAnt bundledAnt="true" />
     <buildFile url="file://$PROJECT_DIR$/all/build.xml">
@@ -19,6 +19,7 @@
       <map>
         <entry key="check-test-classes" value="true" />
         <entry key="config-file" value="$PROJECT_DIR$/all/jnode_checks.xml" />
+        <entry key="location-0" value="CLASSPATH:/sun_checks.xml:The default CheckStyle rules." />
       </map>
     </option>
   </component>
@@ -38,6 +39,7 @@
             <option name="SMART_TABS" value="false" />
             <option name="LABEL_INDENT_SIZE" value="-4" />
             <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+            <option name="USE_RELATIVE_INDENTS" value="false" />
           </value>
         </option>
         <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="100" />
@@ -47,10 +49,12 @@
         </option>
         <option name="IMPORT_LAYOUT_TABLE">
           <value>
-            <package name="" withSubpackages="true" />
+            <package name="" withSubpackages="true" static="false" />
             <emptyLine />
-            <package name="javax" withSubpackages="false" />
-            <package name="java" withSubpackages="false" />
+            <package name="javax" withSubpackages="false" static="false" />
+            <package name="java" withSubpackages="false" static="false" />
+            <emptyLine />
+            <package name="" withSubpackages="true" static="true" />
           </value>
         </option>
         <option name="CALL_PARAMETERS_WRAP" value="1" />
@@ -63,15 +67,6 @@
         <option name="TERNARY_OPERATION_WRAP" value="1" />
         <option name="ARRAY_INITIALIZER_WRAP" value="1" />
         <option name="ASSIGNMENT_WRAP" value="1" />
-        <ADDITIONAL_INDENT_OPTIONS fileType="">
-          <option name="INDENT_SIZE" value="2" />
-          <option name="CONTINUATION_INDENT_SIZE" value="8" />
-          <option name="TAB_SIZE" value="2" />
-          <option name="USE_TAB_CHARACTER" value="false" />
-          <option name="SMART_TABS" value="false" />
-          <option name="LABEL_INDENT_SIZE" value="0" />
-          <option name="LABEL_INDENT_ABSOLUTE" value="false" />
-        </ADDITIONAL_INDENT_OPTIONS>
         <ADDITIONAL_INDENT_OPTIONS fileType="groovy">
           <option name="INDENT_SIZE" value="2" />
           <option name="CONTINUATION_INDENT_SIZE" value="8" />
@@ -80,6 +75,7 @@
           <option name="SMART_TABS" value="false" />
           <option name="LABEL_INDENT_SIZE" value="0" />
           <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+          <option name="USE_RELATIVE_INDENTS" value="false" />
         </ADDITIONAL_INDENT_OPTIONS>
         <ADDITIONAL_INDENT_OPTIONS fileType="gsp">
           <option name="INDENT_SIZE" value="2" />
@@ -89,6 +85,7 @@
           <option name="SMART_TABS" value="false" />
           <option name="LABEL_INDENT_SIZE" value="0" />
           <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+          <option name="USE_RELATIVE_INDENTS" value="false" />
         </ADDITIONAL_INDENT_OPTIONS>
         <ADDITIONAL_INDENT_OPTIONS fileType="java">
           <option name="INDENT_SIZE" value="4" />
@@ -98,6 +95,7 @@
           <option name="SMART_TABS" value="false" />
           <option name="LABEL_INDENT_SIZE" value="-4" />
           <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+          <option name="USE_RELATIVE_INDENTS" value="false" />
         </ADDITIONAL_INDENT_OPTIONS>
         <ADDITIONAL_INDENT_OPTIONS fileType="js">
           <option name="INDENT_SIZE" value="4" />
@@ -107,6 +105,7 @@
           <option name="SMART_TABS" value="false" />
           <option name="LABEL_INDENT_SIZE" value="0" />
           <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+          <option name="USE_RELATIVE_INDENTS" value="false" />
         </ADDITIONAL_INDENT_OPTIONS>
         <ADDITIONAL_INDENT_OPTIONS fileType="jsp">
           <option name="INDENT_SIZE" value="4" />
@@ -116,6 +115,27 @@
           <option name="SMART_TABS" value="false" />
           <option name="LABEL_INDENT_SIZE" value="0" />
           <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+          <option name="USE_RELATIVE_INDENTS" value="false" />
+        </ADDITIONAL_INDENT_OPTIONS>
+        <ADDITIONAL_INDENT_OPTIONS fileType="scala">
+          <option name="INDENT_SIZE" value="2" />
+          <option name="CONTINUATION_INDENT_SIZE" value="2" />
+          <option name="TAB_SIZE" value="2" />
+          <option name="USE_TAB_CHARACTER" value="false" />
+          <option name="SMART_TABS" value="false" />
+          <option name="LABEL_INDENT_SIZE" value="0" />
+          <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+          <option name="USE_RELATIVE_INDENTS" value="false" />
+        </ADDITIONAL_INDENT_OPTIONS>
+        <ADDITIONAL_INDENT_OPTIONS fileType="sql">
+          <option name="INDENT_SIZE" value="2" />
+          <option name="CONTINUATION_INDENT_SIZE" value="8" />
+          <option name="TAB_SIZE" value="4" />
+          <option name="USE_TAB_CHARACTER" value="false" />
+          <option name="SMART_TABS" value="false" />
+          <option name="LABEL_INDENT_SIZE" value="0" />
+          <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+          <option name="USE_RELATIVE_INDENTS" value="false" />
         </ADDITIONAL_INDENT_OPTIONS>
         <ADDITIONAL_INDENT_OPTIONS fileType="xml">
           <option name="INDENT_SIZE" value="4" />
@@ -125,6 +145,17 @@
           <option name="SMART_TABS" value="false" />
           <option name="LABEL_INDENT_SIZE" value="0" />
           <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+          <option name="USE_RELATIVE_INDENTS" value="false" />
+        </ADDITIONAL_INDENT_OPTIONS>
+        <ADDITIONAL_INDENT_OPTIONS fileType="yml">
+          <option name="INDENT_SIZE" value="2" />
+          <option name="CONTINUATION_INDENT_SIZE" value="8" />
+          <option name="TAB_SIZE" value="4" />
+          <option name="USE_TAB_CHARACTER" value="false" />
+          <option name="SMART_TABS" value="false" />
+          <option name="LABEL_INDENT_SIZE" value="0" />
+          <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+          <option name="USE_RELATIVE_INDENTS" value="false" />
         </ADDITIONAL_INDENT_OPTIONS>
       </value>
     </option>
@@ -132,7 +163,6 @@
   </component>
   <component name="CompilerConfiguration">
     <option name="DEFAULT_COMPILER" value="Javac" />
-    <option name="DEPLOY_AFTER_MAKE" value="0" />
     <resourceExtensions>
       <entry name=".+\.(properties|xml|html|dtd|tld)" />
       <entry name=".+\.(gif|png|jpeg|jpg)" />
@@ -148,6 +178,7 @@
       <entry name="?*.jpeg" />
       <entry name="?*.jpg" />
     </wildcardResourcePatterns>
+    <annotationProcessing enabled="false" useClasspath="true" />
   </component>
   <component name="CopyrightManager" default="">
     <module2copyright />
@@ -182,18 +213,6 @@
     <option name="OUTPUT_DIRECTORY" />
   </component>
   <component name="IdProvider" IDEtalkID="435AAC2234C36B0F2257FA7F02C447FB" />
-  <component name="InspectionProjectProfileManager">
-    <option name="PROJECT_PROFILE" value="Project Default" />
-    <option name="USE_PROJECT_LEVEL_SETTINGS" value="false" />
-    <scopes />
-    <profiles>
-      <profile version="1.0" is_locked="false">
-        <option name="myName" value="Project Default" />
-        <option name="myLocal" value="false" />
-      </profile>
-    </profiles>
-    <list size="0" />
-  </component>
   <component name="JavacSettings">
     <option name="DEBUGGING_INFO" value="true" />
     <option name="GENERATE_NO_WARNINGS" value="false" />
@@ -348,19 +367,21 @@
     </group>
   </component>
   <component name="ProjectDetails">
-    <option name="projectName" value="JNode" />
+    <option name="projectName" value="Classlib6" />
   </component>
-  <component name="ProjectFileVersion" converted="true" />
   <component name="ProjectKey">
-    <option name="state" value="https://jnode.svn.sourceforge.net/svnroot/jnode/classlib6/JNode.ipr" />
+    <option name="state" value="https://jnode.svn.sourceforge.net/svnroot/jnode/classlib6/Classlib6.ipr" />
   </component>
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/all/all.iml" filepath="$PROJECT_DIR$/all/all.iml" />
       <module fileurl="file://$PROJECT_DIR$/builder/builder.iml" filepath="$PROJECT_DIR$/builder/builder.iml" />
+      <module fileurl="file:///media/sdb5/ext/devel/classlib6/classlib6.iml" filepath="/media/sdb5/ext/devel/classlib6/classlib6.iml" />
       <module fileurl="file://$PROJECT_DIR$/core/core.iml" filepath="$PROJECT_DIR$/core/core.iml" />
-      <module fileurl="file://$PROJECT_DIR$/jnode.iml" filepath="$PROJECT_DIR$/jnode.iml" />
     </modules>
+  </component>
+  <component name="ProjectResources">
+    <default-html-doctype>http://www.w3.org/1999/xhtml</default-html-doctype>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6 - jnode" project-jdk-type="JavaSDK" />
   <component name="ResourceManagerContainer">
@@ -383,6 +404,20 @@
         <entry key="$PROJECT_DIR$">
           <value>
             <SvnBranchConfiguration>
+              <option name="branchMap">
+                <map>
+                  <entry key="https://jnode.svn.sourceforge.net/svnroot/jnode/branches">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                  <entry key="https://jnode.svn.sourceforge.net/svnroot/jnode/tags">
+                    <value>
+                      <list />
+                    </value>
+                  </entry>
+                </map>
+              </option>
               <option name="branchUrls">
                 <list>
                   <option value="https://jnode.svn.sourceforge.net/svnroot/jnode/branches" />
@@ -390,6 +425,20 @@
                 </list>
               </option>
               <option name="trunkUrl" value="https://jnode.svn.sourceforge.net/svnroot/jnode/trunk" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/all">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="trunkUrl" value="https://jnode.svn.sourceforge.net/svnroot/jnode/classlib6/all" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/core">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="trunkUrl" value="https://jnode.svn.sourceforge.net/svnroot/jnode/classlib6/core" />
             </SvnBranchConfiguration>
           </value>
         </entry>
@@ -411,39 +460,10 @@
         <root url="jar://$PROJECT_DIR$/core/lib/ant-nodeps.jar!/" />
         <root url="jar://$PROJECT_DIR$/core/lib/ant-trax.jar!/" />
         <root url="jar://$PROJECT_DIR$/core/lib/ant.jar!/" />
-        <root url="jar://$PROJECT_DIR$/core/lib/asm.jar!/" />
-        <root url="jar://$PROJECT_DIR$/core/lib/cglib-2.1.jar!/" />
-        <root url="jar://$PROJECT_DIR$/core/lib/gnu-crypto.jar!/" />
-        <root url="jar://$PROJECT_DIR$/core/lib/javax-crypto.jar!/" />
-        <root url="jar://$PROJECT_DIR$/core/lib/javax-security.jar!/" />
-        <root url="jar://$PROJECT_DIR$/core/lib/jmock-1.0.1.jar!/" />
-        <root url="jar://$PROJECT_DIR$/core/lib/jmock-cglib-1.0.1.jar!/" />
-        <root url="jar://$PROJECT_DIR$/core/lib/junit.jar!/" />
         <root url="jar://$PROJECT_DIR$/core/lib/log4j-1.2.8.jar!/" />
-        <root url="jar://$PROJECT_DIR$/core/lib/nanoxml-lite-2.2.3.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
-    </library>
-    <library name="shell">
-      <CLASSES>
-        <root url="jar://$PROJECT_DIR$/shell/lib/bsh-2.0b1.jar!/" />
-      </CLASSES>
-      <JAVADOC />
-      <SOURCES />
-    </library>
-    <library name="distr">
-      <CLASSES>
-        <root url="file://$PROJECT_DIR$/distr/lib" />
-        <root url="file://$PROJECT_DIR$/distr/lib" />
-        <root url="file://$PROJECT_DIR$/distr/lib" />
-      </CLASSES>
-      <JAVADOC />
-      <SOURCES>
-        <root url="file://$PROJECT_DIR$/decompiled" />
-        <root url="file://$PROJECT_DIR$/distr/decompiled" />
-      </SOURCES>
-      <jarDirectory url="file://$PROJECT_DIR$/distr/lib" recursive="false" />
     </library>
   </component>
 </project>
