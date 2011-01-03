@@ -344,6 +344,7 @@ classlib-src.md5=${classlib-src.md5}</echo>
     <!-- Assemble all plugins -->
     <target name="assemble-plugins" depends="assemble-projects,openjdk-annotate">
         <!-- Now assemble all plugins -->
+        <!--
         <taskdef name="plugin" classname="org.jnode.build.PluginTask" classpathref="cp-jnode"/>
         <plugin todir="${plugins.dir}" tmpdir="${build.dir}/tmp/plugins" pluginDir="${descriptors.dir}">
         	<packager userApplicationsDir="${user.applications.dir}" pathRefId="cp"/>
@@ -397,11 +398,13 @@ classlib-src.md5=${classlib-src.md5}</echo>
                 <exclude name="*plugin-list.xml"/>
             </descriptors>
         </plugin>
+        -->
     </target>
 
     <!-- Assemble all default initjars -->
     <target name="assemble-default-initjars" depends="assemble-plugins" unless="no.default.initjars">
         <!-- Build all default initjar's -->
+        <!--
         <taskdef name="initjars" classname="org.jnode.build.InitJarsBuilder" classpathref="cp-jnode"/>
         <initjars destdir="${initjars.dir}"
             pluginDir="${plugins.dir}"
@@ -413,11 +416,13 @@ classlib-src.md5=${classlib-src.md5}</echo>
                 <include name="*plugin-list.xml"/>
             </fileset>
         </initjars>
+        -->
     </target>
 
     <!-- Assemble all custom initjars -->
     <target name="assemble-custom-initjars" depends="assemble-plugins" if="custom.plugin-list.dir">
         <!-- Build all custom initjar's -->
+        <!--
         <taskdef name="initjars" classname="org.jnode.build.InitJarsBuilder" classpathref="cp-jnode"/>
         <initjars destdir="${initjars.dir}"
             pluginDir="${plugins.dir}"
@@ -426,6 +431,7 @@ classlib-src.md5=${classlib-src.md5}</echo>
                 <include name="*plugin-list.xml"/>
             </fileset>
         </initjars>
+        -->
     </target>
 
     <!-- Assemble all subprojects, plugins and initjars -->
@@ -766,9 +772,11 @@ clean             Remove all intermediate build results.
                     </fileset>
                 </vmsources>
                 <vmspecificsources>
+                    <!--
                     <fileset dir="${root.dir}/core/src/openjdk/vm">
                         <patternset refid="cp-includes-pattern"/>
                        </fileset>
+                       -->
                 </vmspecificsources>
                 <classpathsources>
                     <fileset dir="${root.dir}/../openjdk/jdk/src/share/classes/">
@@ -779,11 +787,11 @@ clean             Remove all intermediate build results.
                         <patternset refid="cp-includes-pattern"/>
                         <patternset refid="cp-sources-pattern"/>
                     </fileset>
-                    <fileset dir="${root.dir}/../openjdk/jaxp/src/share/classes/">
+                    <fileset dir="${root.dir}/../openjdk/jaxp/src/">
                         <patternset refid="cp-includes-pattern"/>
                         <patternset refid="cp-sources-pattern"/>
                     </fileset>
-                    <fileset dir="${root.dir}/../openjdk/jaxws/src/share/classes/">
+                    <fileset dir="${root.dir}/../openjdk/jaxws/src/">
                         <patternset refid="cp-includes-pattern"/>
                         <patternset refid="cp-sources-pattern"/>
                     </fileset>

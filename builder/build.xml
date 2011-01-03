@@ -55,7 +55,7 @@
   <target name="compile" depends="prepare">
     <jnode.compile>
       <src path="${my-src.dir}/builder"/>
-      <src path="${my-gen.dir}"/>
+      <!--src path="${my-gen.dir}"/-->
       <classpath refid="my-cp"/>
     </jnode.compile>
   </target>
