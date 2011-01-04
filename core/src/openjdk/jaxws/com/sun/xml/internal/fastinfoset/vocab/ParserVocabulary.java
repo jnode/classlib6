@@ -27,7 +27,6 @@
 
 
 
-
 package com.sun.xml.internal.fastinfoset.vocab;
 
 import com.sun.xml.internal.fastinfoset.EncodingConstants;
