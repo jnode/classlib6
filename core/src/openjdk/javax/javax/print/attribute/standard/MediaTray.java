@@ -21,7 +21,8 @@
  * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
  * or visit www.oracle.com if you need additional information or have any
  * questions.
- */package javax.print.attribute.standard;
+ */
+package javax.print.attribute.standard;
 
 import java.util.Locale;
 

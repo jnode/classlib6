@@ -23,6 +23,7 @@
  * questions.
  */
 
+
 package javax.print.attribute;
 
 import java.io.Serializable;
