@@ -64,4 +64,3 @@ public @interface RequestWrapper {
   public String className() default "";
 
 }
-

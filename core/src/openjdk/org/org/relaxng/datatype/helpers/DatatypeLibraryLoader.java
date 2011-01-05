@@ -149,7 +149,6 @@ public class DatatypeLibraryLoader implements DatatypeLibraryFactory {
 	    Enumeration getResources(String resName) {
 	      try {
 	  	    return cl.getResources(resName);
-
 	      }
 	      catch (IOException e) {
 		return new Singleton(null);

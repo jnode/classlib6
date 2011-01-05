@@ -75,4 +75,3 @@ public @interface ResponseWrapper {
   public String className() default "";
 
 }
-

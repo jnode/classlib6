@@ -137,5 +137,3 @@ public abstract class AttachmentUnmarshaller {
      */
     public boolean isXOPPackage() { return false; } 
 }
-
-

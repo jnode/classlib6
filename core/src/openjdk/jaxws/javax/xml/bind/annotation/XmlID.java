@@ -88,11 +88,8 @@ import static java.lang.annotation.RetentionPolicy.*;
  * @author Sekhar Vajjhala, Sun Microsystems, Inc.
  * @see XmlIDREF
  * @since JAXB2.0
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 
 @Retention(RUNTIME) @Target({FIELD, METHOD})
 public @interface XmlID { }
-
-
-

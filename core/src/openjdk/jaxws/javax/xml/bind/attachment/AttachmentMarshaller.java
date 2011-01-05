@@ -197,4 +197,3 @@ public abstract class AttachmentMarshaller {
     */
     public abstract String addSwaRefAttachment(DataHandler data);
 }
-

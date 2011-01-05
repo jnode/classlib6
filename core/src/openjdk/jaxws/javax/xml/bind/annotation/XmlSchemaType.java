@@ -105,6 +105,3 @@ public @interface XmlSchemaType {
     static final class DEFAULT {}
 
 }
-
-
-

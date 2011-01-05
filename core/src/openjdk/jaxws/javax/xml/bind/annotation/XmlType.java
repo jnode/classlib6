@@ -380,7 +380,7 @@ import java.lang.annotation.Target;
  * @see XmlValue
  * @see XmlSchema
  * @since JAXB2.0
- * @version $Revision: 1.19 $
+ * @version $Revision: 1.20 $
  */
 
 @Retention(RUNTIME) @Target({TYPE})
@@ -451,5 +451,3 @@ public @interface XmlType {
      */
     String factoryMethod() default "";
 }
-
-

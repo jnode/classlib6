@@ -22,6 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
 package sun.java2d.loops;
 
 import sun.java2d.loops.GraphicsPrimitive;
