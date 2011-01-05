@@ -22,11 +22,10 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
 /*
  * @(#)$Id: EncoderFactory.java,v 1.3 2005/09/10 19:07:33 kohsuke Exp $
  */
-
-
 package com.sun.codemodel.internal.util;
 
 import java.lang.reflect.Constructor;

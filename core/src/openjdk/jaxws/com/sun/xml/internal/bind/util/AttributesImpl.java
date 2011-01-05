@@ -653,5 +653,3 @@ public class AttributesImpl implements Attributes
 }
 
 // end of AttributesImpl.java
-
-

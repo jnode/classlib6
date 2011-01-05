@@ -22,6 +22,8 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
+
 package com.sun.xml.internal.xsom.impl.parser;
 
 import com.sun.xml.internal.xsom.XSAttGroupDecl;
@@ -253,4 +255,3 @@ public abstract class DelayedRef implements Patch {
         public XSIdentityConstraint get() { return (XSIdentityConstraint)super._get(); }
     }
 }
-

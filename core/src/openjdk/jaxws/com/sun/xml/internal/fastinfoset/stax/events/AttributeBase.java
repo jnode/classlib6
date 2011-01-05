@@ -26,7 +26,6 @@
  */
 
 
-
 package com.sun.xml.internal.fastinfoset.stax.events;
 
 import javax.xml.namespace.QName;
@@ -138,4 +137,3 @@ public class AttributeBase extends EventBase implements Attribute
     
     
 }
-

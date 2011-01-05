@@ -27,7 +27,6 @@
 
 
 
-
 package com.sun.xml.internal.fastinfoset.stax.events ;
 
 import com.sun.xml.internal.fastinfoset.org.apache.xerces.util.XMLChar;

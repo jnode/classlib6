@@ -22,11 +22,6 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-/*
- * @(#)$Id: WhitespaceStripper.java,v 1.2 2005/04/29 19:56:57 kohsuke Exp $
- */
-
-
 package com.sun.tools.internal.xjc.reader.internalizer;
 
 import com.sun.xml.internal.bind.WhiteSpaceProcessor;

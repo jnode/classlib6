@@ -22,6 +22,8 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
+
 package com.sun.xml.internal.xsom.visitor;
 
 import com.sun.xml.internal.xsom.XSContentType;
@@ -39,4 +41,3 @@ public interface XSContentTypeFunction<T> {
     T particle( XSParticle particle );
     T empty( XSContentType empty );
 }
-

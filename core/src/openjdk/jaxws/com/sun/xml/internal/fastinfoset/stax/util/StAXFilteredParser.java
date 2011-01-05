@@ -26,7 +26,6 @@
  */
 
 
-
 package com.sun.xml.internal.fastinfoset.stax.util;
 
 import javax.xml.stream.XMLStreamException;

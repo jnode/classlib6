@@ -27,7 +27,6 @@
 
 
 
-
 package com.sun.xml.internal.fastinfoset.stax.factory;
 
 import javax.xml.namespace.QName;

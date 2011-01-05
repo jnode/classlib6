@@ -58,4 +58,3 @@ public abstract class EncodingMap {
     System.err.println(getJavaName(args[0]));
   }
 }
-  

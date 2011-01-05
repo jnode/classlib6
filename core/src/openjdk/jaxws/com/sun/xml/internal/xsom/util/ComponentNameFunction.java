@@ -22,6 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
 package com.sun.xml.internal.xsom.util;
 
 import com.sun.xml.internal.xsom.XSAnnotation;
@@ -47,7 +48,6 @@ import com.sun.xml.internal.xsom.visitor.XSFunction;
  * Extract the name of the components.
  * 
  * @author <ul><li>Ryan Shoemaker, Sun Microsystems, Inc.</li></ul>
- * @version $Revision: 1.4 $
  */
 public class ComponentNameFunction implements XSFunction<String> {
 

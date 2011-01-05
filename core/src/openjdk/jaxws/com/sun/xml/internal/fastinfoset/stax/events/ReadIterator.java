@@ -27,7 +27,6 @@
 
 
 
-
 package com.sun.xml.internal.fastinfoset.stax.events;
 
 import java.util.Iterator;

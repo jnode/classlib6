@@ -68,4 +68,3 @@ public class ChoicePattern extends BinaryPattern {
   }
 
 }
-

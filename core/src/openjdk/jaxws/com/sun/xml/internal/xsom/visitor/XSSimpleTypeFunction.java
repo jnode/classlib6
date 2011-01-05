@@ -22,6 +22,8 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
+
 package com.sun.xml.internal.xsom.visitor;
 
 import com.sun.xml.internal.xsom.XSListSimpleType;
@@ -40,4 +42,3 @@ public interface XSSimpleTypeFunction<T> {
     T unionSimpleType( XSUnionSimpleType type );
     T restrictionSimpleType( XSRestrictionSimpleType type );
 }
-

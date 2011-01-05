@@ -26,7 +26,6 @@
  */
 
 
-
 package com.sun.xml.internal.fastinfoset.alphabet;
 
 import com.sun.xml.internal.fastinfoset.EncodingConstants;

@@ -25,7 +25,6 @@
  * THIS FILE WAS MODIFIED BY SUN MICROSYSTEMS, INC.
  */
 
-
 package com.sun.xml.internal.fastinfoset.stax.events;
 
 import javax.xml.stream.XMLStreamConstants;

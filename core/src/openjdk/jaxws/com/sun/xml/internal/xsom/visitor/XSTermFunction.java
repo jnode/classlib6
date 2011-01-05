@@ -22,6 +22,8 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
+
 package com.sun.xml.internal.xsom.visitor;
 
 import com.sun.xml.internal.xsom.XSElementDecl;
@@ -42,4 +44,3 @@ public interface XSTermFunction<T> {
     T modelGroup( XSModelGroup group );
     T elementDecl( XSElementDecl decl );
 }
-

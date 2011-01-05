@@ -22,6 +22,8 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
+
 package com.sun.xml.internal.xsom.parser;
 
 import org.xml.sax.ContentHandler;
@@ -78,4 +80,3 @@ public abstract class AnnotationParser {
      */
     public abstract Object getResult( Object existing );
 }
-

@@ -25,7 +25,6 @@
  * THIS FILE WAS MODIFIED BY SUN MICROSYSTEMS, INC.
  */
 
-
 package com.sun.xml.internal.org.jvnet.fastinfoset.sax;
 
 import java.io.IOException;

@@ -26,7 +26,6 @@
  */
 
 
-
 package com.sun.xml.internal.fastinfoset.stax.events ;
 
 import javax.xml.stream.events.EntityDeclaration;

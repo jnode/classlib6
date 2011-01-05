@@ -22,6 +22,8 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
+
 package com.sun.xml.internal.xsom.impl.parser;
 
 import org.xml.sax.SAXException;
@@ -35,4 +37,3 @@ import org.xml.sax.SAXException;
 public interface Patch {
     void run() throws SAXException;
 }
-

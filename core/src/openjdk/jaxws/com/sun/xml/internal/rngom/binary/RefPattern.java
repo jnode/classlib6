@@ -128,4 +128,3 @@ public class RefPattern extends Pattern {
     return name;
   }
 }
-

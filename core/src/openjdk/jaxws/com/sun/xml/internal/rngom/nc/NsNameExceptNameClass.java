@@ -65,4 +65,3 @@ public class NsNameExceptNameClass extends NameClass {
     return true;
   }
 }
-
