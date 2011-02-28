@@ -25,6 +25,7 @@ import com.sun.org.apache.xerces.internal.impl.xs.SubstitutionGroupHandler;
 import com.sun.org.apache.xerces.internal.impl.xs.XMLSchemaException;
 
 import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  * XSEmptyCM is a derivative of the abstract content model base class that
@@ -56,20 +57,6 @@ public class XSEmptyCM  implements XSCMValidator {
     //
     // XSCMValidator methods
     //
-    
-    /**
-     * This method is only implemented by <code>XSDFACM</code>.
-     */
-    public Object getUserData() {
-        return null;
-    }
-
-    /**
-     * This method is only implemented by <code>XSDFACM</code>.
-     */
-    public int getOneTransitionCounter() {
-        throw new UnsupportedOperationException();
-    }
     
     /**
      * This methods to be called on entering a first element whose type
@@ -147,4 +134,8 @@ public class XSEmptyCM  implements XSCMValidator {
         return EMPTY;
     }
     
+    public ArrayList checkMinMaxBounds() {
+        return null;
+    }
+
 } // class XSEmptyCM

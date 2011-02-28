@@ -217,14 +217,14 @@ public class AbstractDOMParser extends AbstractXMLDocumentParser {
     protected int fDeferredEntityDecl;
 
     /** Character buffer */
-    protected final StringBuffer fStringBuffer = new StringBuffer (50);
+    protected final StringBuilder fStringBuilder = new StringBuilder (50);
 
     // internal subset
 
     /** Internal subset buffer. */
-    protected StringBuffer fInternalSubset;
+    protected StringBuilder fInternalSubset;
 
-    // deferred expansion data
+    // deferred expansion datfInternalSubseta
 
     protected boolean              fDeferNodeExpansion;
     protected boolean              fNamespaceAware;
@@ -414,7 +414,7 @@ public class AbstractDOMParser extends AbstractXMLDocumentParser {
         fCurrentNode = null;
 
         // reset string buffer
-        fStringBuffer.setLength (0);
+        fStringBuilder.setLength (0);
 
         // reset state information
         fRoot.clear();
@@ -1148,14 +1148,14 @@ public class AbstractDOMParser extends AbstractXMLDocumentParser {
                     // collect all the data into the string buffer.
                     if (fFirstChunk) {
                         if (fDocumentImpl != null) {
-                            fStringBuffer.append (((TextImpl)child).removeData ());
+                            fStringBuilder.append (((TextImpl)child).removeData ());
                         } else {
-                            fStringBuffer.append (((Text)child).getData ());
+                            fStringBuilder.append (((Text)child).getData ());
                             ((Text)child).setNodeValue (null);
                         }
                         fFirstChunk = false;
                     }
-                    fStringBuffer.append (value);
+                    fStringBuilder.append (value);
                 }
                 else {
                     fFirstChunk = true;
@@ -1750,7 +1750,7 @@ public class AbstractDOMParser extends AbstractXMLDocumentParser {
             fBaseURIStack.push (locator.getBaseSystemId ());
         }
         if (fDeferNodeExpansion || fDocumentImpl != null) {
-            fInternalSubset = new StringBuffer (1024);
+            fInternalSubset = new StringBuilder (1024);
         }
     } // startDTD(XMLLocator)
 
@@ -2526,18 +2526,18 @@ public class AbstractDOMParser extends AbstractXMLDocumentParser {
 
         Node child = fCurrentNode.getLastChild ();
         if (child != null) {
-            if (fStringBuffer.length () > 0) {
+            if (fStringBuilder.length () > 0) {
                 // REVISIT: should this check be performed?
                 if (child.getNodeType () == Node.TEXT_NODE) {
                     if (fDocumentImpl != null) {
-                        ((TextImpl)child).replaceData (fStringBuffer.toString ());
+                        ((TextImpl)child).replaceData (fStringBuilder.toString ());
                     }
                     else {
-                        ((Text)child).setData (fStringBuffer.toString ());
+                        ((Text)child).setData (fStringBuilder.toString ());
                     }
                 }
                 // reset string buffer
-                fStringBuffer.setLength (0);
+                fStringBuilder.setLength (0);
             }
 
             if (fDOMFilter !=null && !fInEntityRef) {

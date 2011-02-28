@@ -68,7 +68,7 @@ public class DeferredDocumentImpl
     // protected
 
     /** Chunk shift. */
-    protected static final int CHUNK_SHIFT = 11;           // 2^11 = 2k
+    protected static final int CHUNK_SHIFT = 8;           // 2^8 = 256
 
     /** Chunk size. */
     protected static final int CHUNK_SIZE = (1 << CHUNK_SHIFT);
@@ -77,7 +77,7 @@ public class DeferredDocumentImpl
     protected static final int CHUNK_MASK = CHUNK_SIZE - 1;
 
     /** Initial chunk size. */
-    protected static final int INITIAL_CHUNK_COUNT = (1 << (16 - CHUNK_SHIFT));   // 2^16 = 64k
+    protected static final int INITIAL_CHUNK_COUNT = (1 << (13 - CHUNK_SHIFT));   // 32
 
     //
     // Data
@@ -132,7 +132,7 @@ public class DeferredDocumentImpl
     //
     // private data
     //
-    private transient final StringBuffer fBufferStr = new StringBuffer();
+    private transient final StringBuilder fBufferStr = new StringBuilder();
     private transient final Vector fStrChunks = new Vector();
 
     //
@@ -430,8 +430,6 @@ public class DeferredDocumentImpl
 		// get element's last attribute
 		int lastAttrNodeIndex = getChunkIndex(fNodeExtra, elementChunk, elementIndex);
 		if (lastAttrNodeIndex != 0) {
-			int lastAttrChunk = lastAttrNodeIndex >> CHUNK_SHIFT;
-			int lastAttrIndex = lastAttrNodeIndex & CHUNK_MASK;
 			// add link from new attribute to last attribute
 			setChunkIndex(fNodePrevSib, lastAttrNodeIndex, attrChunk, attrIndex);
 		}
@@ -1877,7 +1875,7 @@ public class DeferredDocumentImpl
         while (start <= end) {
 
             // is this the one we're looking for?
-            int middle = (start + end) / 2;
+            int middle = (start + end) >>> 1;
             int value  = values[middle];
             if (DEBUG_IDS) {
                 System.out.print("  value: "+value+", target: "+target+" // ");
@@ -1945,11 +1943,17 @@ public class DeferredDocumentImpl
         if (value == -1) {
             return clearChunkIndex(data, chunk, index);
         }
-        int ovalue = data[chunk][index];
-        if (ovalue == -1) {
-            data[chunk][CHUNK_SIZE]++;
+        int [] dataChunk = data[chunk];
+        // Re-create chunk if it was deleted.
+        if (dataChunk == null) {
+            createChunk(data, chunk);
+            dataChunk = data[chunk];
         }
-        data[chunk][index] = value;
+        int ovalue = dataChunk[index];
+        if (ovalue == -1) {
+            dataChunk[CHUNK_SIZE]++;
+        }
+        dataChunk[index] = value;
         return ovalue;
     }
     private final String setChunkValue(Object data[][], Object value,
@@ -1957,12 +1961,18 @@ public class DeferredDocumentImpl
         if (value == null) {
             return clearChunkValue(data, chunk, index);
         }
-        String ovalue = (String) data[chunk][index];
+        Object [] dataChunk = data[chunk];
+        // Re-create chunk if it was deleted.
+        if (dataChunk == null) {
+            createChunk(data, chunk);
+            dataChunk = data[chunk];
+        }
+        String ovalue = (String) dataChunk[index];
         if (ovalue == null) {
-            RefCount c = (RefCount) data[chunk][CHUNK_SIZE];
+            RefCount c = (RefCount) dataChunk[CHUNK_SIZE];
             c.fCount++;
         }
-        data[chunk][index] = value;
+        dataChunk[index] = value;
         return ovalue;
     }
 

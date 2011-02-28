@@ -21,7 +21,6 @@
 package com.sun.org.apache.xerces.internal.jaxp.validation;
 
 import java.lang.ref.SoftReference;
-import java.util.Locale;
 import java.io.IOException;
 
 import javax.xml.transform.Result;
@@ -155,7 +154,7 @@ final class StreamValidatorHelper implements ValidatorHelper {
             }
             return;
         }
-        throw new IllegalArgumentException(JAXPValidationMessageFormatter.formatMessage(Locale.getDefault(), 
+        throw new IllegalArgumentException(JAXPValidationMessageFormatter.formatMessage(fComponentManager.getLocale(),
                 "SourceResultMismatch", 
                 new Object [] {source.getClass().getName(), result.getClass().getName()}));
     }

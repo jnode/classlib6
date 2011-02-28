@@ -1,5 +1,5 @@
 /*
- * Portions Copyright 2003-2005 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2003, 2005, Oracle and/or its affiliates. All rights reserved.
  */
 
 /*
@@ -1943,6 +1943,7 @@ implements XMLDTDScanner, XMLComponent, XMLEntityHandler {
                 if (fEntityScanner.skipChar('?')) {
                     fStringBuffer.clear();
                     scanPI(fStringBuffer);
+                    fMarkUpDepth--; // we're done with this decl
                 }
                 else if (fEntityScanner.skipChar('!')) {
                     if (fEntityScanner.skipChar('-')) {

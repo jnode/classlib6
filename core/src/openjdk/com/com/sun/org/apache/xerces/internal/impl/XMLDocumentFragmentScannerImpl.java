@@ -1,5 +1,5 @@
 /*
- * Portions Copyright 2003-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2003, 2006, Oracle and/or its affiliates. All rights reserved.
  */
 
 /*
@@ -253,6 +253,7 @@ public class XMLDocumentFragmentScannerImpl
     protected boolean fHasExternalDTD;
     
     /** Standalone. */
+    protected boolean fStandaloneSet;
     protected boolean fStandalone;
     protected String fVersion;
     
@@ -579,6 +580,7 @@ public class XMLDocumentFragmentScannerImpl
         fCurrentElement = null;
         fElementStack.clear();
         fHasExternalDTD = false;
+        fStandaloneSet = false;
         fStandalone = false;
         fInScanContent = false;
         //skipping algorithm
@@ -624,6 +626,7 @@ public class XMLDocumentFragmentScannerImpl
         fElementStack.clear();
         //fElementStack2.clear();
         fHasExternalDTD = false;
+        fStandaloneSet = false;
         fStandalone = false;
         //fReplaceEntityReferences = true;
         //fSupportExternalEntities = true;
@@ -934,7 +937,8 @@ public class XMLDocumentFragmentScannerImpl
         String standalone = fStrings[2];
         fDeclaredEncoding = encoding;
         // set standalone
-        fStandalone = standalone != null && standalone.equals("yes");
+        fStandaloneSet = standalone != null;
+        fStandalone = fStandaloneSet && standalone.equals("yes");
         ///xxx see where its used.. this is not used anywhere. it may be useful for entity to store this information
         //but this information is only related with Document Entity.
         fEntityManager.setStandalone(fStandalone);
@@ -1459,6 +1463,10 @@ public class XMLDocumentFragmentScannerImpl
         return fAttributes;
     }
     
+    /** return if standalone is set */
+    public boolean standaloneSet(){
+        return fStandaloneSet;
+    }
     /** return if the doucment is standalone */
     public boolean isStandAlone(){
         return fStandalone ;
@@ -3048,8 +3056,8 @@ public class XMLDocumentFragmentScannerImpl
                                     }
                                 }
                                 String target = fSymbolTable.addSymbol(fStringBuffer.ch, fStringBuffer.offset, fStringBuffer.length);
-                                fStringBuffer.clear();
-                                scanPIData(target, fStringBuffer);
+                                fContentBuffer.clear();
+                                scanPIData(target, fContentBuffer);
                             }
                             
                             // standard text declaration

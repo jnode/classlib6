@@ -47,6 +47,9 @@ public class XMLConfigurationException
     /** Exception type: identifier not supported. */
     public static final short NOT_SUPPORTED = 1;
 
+    /** Exception type: feature-change not allowed. */
+    public static final short NOT_ALLOWED = 2;
+    
     //
     // Data
     //

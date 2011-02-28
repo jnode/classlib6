@@ -1,12 +1,12 @@
 /*
- * Copyright 2002-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2002, 2006, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Sun designates this
+ * published by the Free Software Foundation.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the LICENSE file that accompanied this code.
+ * by Oracle in the LICENSE file that accompanied this code.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -18,11 +18,10 @@
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
- * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
- * CA 95054 USA or visit www.sun.com if you need additional information or
- * have any questions.
+ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ * or visit www.oracle.com if you need additional information or have any
+ * questions.
  */
-
 package com.sun.jmx.remote.internal;
 
 import java.io.IOException;
@@ -34,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
+import java.security.AccessControlContext;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import javax.security.auth.Subject;
@@ -54,6 +54,9 @@ import com.sun.jmx.remote.util.EnvHelp;
 
 
 public abstract class ClientNotifForwarder {
+
+    private final AccessControlContext acc;
+
     public ClientNotifForwarder(Map env) {
 	this(null, env);
     }
@@ -87,6 +90,8 @@ public abstract class ClientNotifForwarder {
 	    this.command = command;
 	    if (thread == null) {
 		thread = new Thread() {
+
+                    @Override
 		    public void run() {
 			while (true) {
 			    Runnable r;
@@ -130,6 +135,7 @@ public abstract class ClientNotifForwarder {
 
 	this.defaultClassLoader = defaultClassLoader;
 	this.executor = ex;
+        this.acc = AccessController.getContext();
     }
 
     /**
@@ -390,28 +396,85 @@ public abstract class ClientNotifForwarder {
 	setState(TERMINATED);
     }
 
-// -------------------------------------------------
-// private classes
-// -------------------------------------------------
+
+    // -------------------------------------------------
+    // private classes
+    // -------------------------------------------------
     //
+
     private class NotifFetcher implements Runnable {
+
+        private volatile boolean alreadyLogged = false;
+
+        private void logOnce(String msg, SecurityException x) {
+            if (alreadyLogged) return;
+            // Log only once.
+            logger.config("setContextClassLoader",msg);
+            if (x != null) logger.fine("setContextClassLoader", x);
+            alreadyLogged = true;
+        }
+
+        // Set new context class loader, returns previous one.
+        private final ClassLoader setContextClassLoader(final ClassLoader loader) {
+            final AccessControlContext ctxt = ClientNotifForwarder.this.acc;
+            // if ctxt is null, log a config message and throw a
+            // SecurityException.
+            if (ctxt == null) {
+                logOnce("AccessControlContext must not be null.",null);
+                throw new SecurityException("AccessControlContext must not be null");
+            }
+            return AccessController.doPrivileged(
+                new PrivilegedAction<ClassLoader>() {
+                    public ClassLoader run() {
+                        try {
+                            // get context class loader - may throw
+                            // SecurityException - though unlikely.
+                            final ClassLoader previous =
+                                Thread.currentThread().getContextClassLoader();
+
+                            // if nothing needs to be done, break here...
+                            if (loader == previous) return previous;
+
+                            // reset context class loader - may throw
+                            // SecurityException
+                            Thread.currentThread().setContextClassLoader(loader);
+                            return previous;
+                        } catch (SecurityException x) {
+                            logOnce("Permission to set ContextClassLoader missing. " +
+                                    "Notifications will not be dispatched. " +
+                                    "Please check your Java policy configuration: " +
+                                    x, x);
+                            throw x;
+                        }
+                    }
+                }, ctxt);
+        }
+
 	public void run() {
+            final ClassLoader previous;
+            if (defaultClassLoader != null) {
+                previous = setContextClassLoader(defaultClassLoader);
+            } else {
+                previous = null;
+            }
+            try {
+                doRun();
+            } finally {
+                if (defaultClassLoader != null) {
+                    setContextClassLoader(previous);
+                }
+            }
+        }
+
+        private void doRun() {
             synchronized (ClientNotifForwarder.this) {
 		currentFetchThread = Thread.currentThread();
 
-                if (state == STARTING)
+                if (state == STARTING) {
                     setState(STARTED);
             }
-
-	    if (defaultClassLoader != null) {
-		AccessController.doPrivileged(new PrivilegedAction<Void>() {
-			public Void run() {
-			    Thread.currentThread().
-				setContextClassLoader(defaultClassLoader);
-			    return null;
-			}
-		    });
 	    }
+
 
 	    NotificationResult nr = null;
 	    if (!shouldStop() && (nr = fetchNotifs()) != null) {
@@ -445,8 +508,9 @@ public abstract class ClientNotifForwarder {
 			// check if an mbean unregistration notif
 			if (!listenerID.equals(mbeanRemovedNotifID)) {
 			    final ClientListenerInfo li = infoList.get(listenerID);
-			    if (li != null) 
-				listeners.put(listenerID,li);
+                            if (li != null) {
+                                listeners.put(listenerID, li);
+                            }
 			    continue;
 			}
 			final Notification notif = tn.getNotification();
@@ -787,9 +851,7 @@ public abstract class ClientNotifForwarder {
     private long clientSequenceNumber = -1;
     private final int maxNotifications;
     private final long timeout;
-
     private Integer mbeanRemovedNotifID = null;
-
     private Thread currentFetchThread;
 
     // admin stuff

@@ -61,8 +61,10 @@
 
 package com.sun.org.apache.xerces.internal.impl.dtd.models;
 
-import com.sun.org.apache.xerces.internal.xni.QName;
+import java.util.HashMap;
+
 import com.sun.org.apache.xerces.internal.impl.dtd.XMLContentSpec;
+import com.sun.org.apache.xerces.internal.xni.QName;
 
 /**
 
@@ -219,7 +221,7 @@ public class DFAContentModel
     // temp variables
 
     /** Temporary qualified name. */
-    private QName fQName = new QName();
+    private final QName fQName = new QName();
 
     //
     // Constructors
@@ -635,7 +637,7 @@ public class DFAContentModel
 	     * a large content model such as, "(t001+|t002+|.... |t500+)".
 	     */
 
-	java.util.Hashtable stateTable = new java.util.Hashtable();
+        HashMap stateTable = new HashMap();
 
 	    /* Optimization(Jan, 2001) */
 
@@ -760,12 +762,9 @@ public class DFAContentModel
                         int[][] newTransTable = new int[newSize][];
 
                         // Copy over all of the existing content
-                        for (int expIndex = 0; expIndex < curArraySize; expIndex++)
-                        {
-                            newToDo[expIndex] = statesToDo[expIndex];
-                            newFinalFlags[expIndex] = fFinalStateFlags[expIndex];
-                            newTransTable[expIndex] = fTransTable[expIndex];
-                        }
+                        System.arraycopy(statesToDo, 0, newToDo, 0, curArraySize);
+                        System.arraycopy(fFinalStateFlags, 0, newFinalFlags, 0, curArraySize);
+                        System.arraycopy(fTransTable, 0, newTransTable, 0, curArraySize);
 
                         // Store the new array size
                         curArraySize = newSize;

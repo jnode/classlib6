@@ -89,14 +89,23 @@ public class CMNodeFactory {
     }//reset()
     
     public CMNode getCMLeafNode(int type, Object leaf, int id, int position) {
+        nodeCountCheck();
         return new XSCMLeaf(type, leaf, id, position) ;
     }
     
+    public CMNode getCMRepeatingLeafNode(int type, Object leaf,
+            int minOccurs, int maxOccurs, int id, int position) {
+        nodeCountCheck();
+        return new XSCMRepeatingLeaf(type, leaf, minOccurs, maxOccurs, id, position);
+    }
+
     public CMNode getCMUniOpNode(int type, CMNode childNode) {
+        nodeCountCheck();
         return new XSCMUniOp(type, childNode) ;
     }
     
     public CMNode getCMBinOpNode(int type, CMNode leftNode, CMNode rightNode) {
+        nodeCountCheck() ;
         return new XSCMBinOp(type, leftNode, rightNode) ;
     }
     

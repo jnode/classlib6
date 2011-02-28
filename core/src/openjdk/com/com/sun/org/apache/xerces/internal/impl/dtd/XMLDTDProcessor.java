@@ -61,11 +61,12 @@
 
 package com.sun.org.apache.xerces.internal.impl.dtd;
 
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Locale;
+import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.Vector;
 
 import com.sun.org.apache.xerces.internal.impl.Constants;
 import com.sun.org.apache.xerces.internal.impl.XMLErrorReporter;
@@ -138,6 +139,10 @@ public class XMLDTDProcessor
     protected static final String WARN_ON_DUPLICATE_ATTDEF = 
         Constants.XERCES_FEATURE_PREFIX +Constants.WARN_ON_DUPLICATE_ATTDEF_FEATURE; 
         
+    /** Feature identifier: warn on undeclared element referenced in content model. */
+    protected static final String WARN_ON_UNDECLARED_ELEMDEF =
+        Constants.XERCES_FEATURE_PREFIX + Constants.WARN_ON_UNDECLARED_ELEMDEF_FEATURE;
+
 	protected static final String PARSER_SETTINGS = 
 			Constants.XERCES_FEATURE_PREFIX + Constants.PARSER_SETTINGS;
 
@@ -165,12 +170,14 @@ public class XMLDTDProcessor
     private static final String[] RECOGNIZED_FEATURES = {
         VALIDATION,
         WARN_ON_DUPLICATE_ATTDEF,
+        WARN_ON_UNDECLARED_ELEMDEF,
         NOTIFY_CHAR_REFS,
     };
 
     /** Feature defaults. */
     private static final Boolean[] FEATURE_DEFAULTS = {
         null,
+        Boolean.FALSE,
         Boolean.FALSE,
         null,
     };
@@ -208,6 +215,9 @@ public class XMLDTDProcessor
     /** warn on duplicate attribute definition, this feature works only when validation is true */
     protected boolean fWarnDuplicateAttdef;
         
+    /** warn on undeclared element referenced in content model, this feature only works when valiation is true */
+    protected boolean fWarnOnUndeclaredElemdef;
+
     // properties
 
     /** Symbol table. */
@@ -267,31 +277,31 @@ public class XMLDTDProcessor
     // temporary variables
 
     /** Temporary entity declaration. */
-    private XMLEntityDecl fEntityDecl = new XMLEntityDecl();
+    private final XMLEntityDecl fEntityDecl = new XMLEntityDecl();
 
     /** Notation declaration hash. */
-    private Hashtable fNDataDeclNotations = new Hashtable();
+    private final HashMap fNDataDeclNotations = new HashMap();
 
     /** DTD element declaration name. */
     private String fDTDElementDeclName = null;
 
     /** Mixed element type "hash". */
-    private Vector fMixedElementTypes = new Vector();
+    private final ArrayList fMixedElementTypes = new ArrayList();
 
     /** Element declarations in DTD. */
-    private Vector fDTDElementDecls = new Vector();
+    private final ArrayList fDTDElementDecls = new ArrayList();
 
     // to check for duplicate ID or ANNOTATION attribute declare in
     // ATTLIST, and misc VCs
 
     /** ID attribute names. */
-    private Hashtable fTableOfIDAttributeNames;
+    private HashMap fTableOfIDAttributeNames;
 
     /** NOTATION attribute names. */
-    private Hashtable fTableOfNOTATIONAttributeNames;
+    private HashMap fTableOfNOTATIONAttributeNames;
 
     /** NOTATION enumeration values. */
-    private Hashtable fNotationEnumVals;
+    private HashMap fNotationEnumVals;
 
     //
     // Constructors
@@ -357,8 +367,15 @@ public class XMLDTDProcessor
 
         try {
             fWarnDuplicateAttdef = componentManager.getFeature(WARN_ON_DUPLICATE_ATTDEF);
-        } catch (XMLConfigurationException e) {
+        }
+        catch (XMLConfigurationException e) {
             fWarnDuplicateAttdef = false;
+        }
+        try {
+            fWarnOnUndeclaredElemdef = componentManager.getFeature(WARN_ON_UNDECLARED_ELEMDEF);
+        }
+        catch (XMLConfigurationException e) {
+            fWarnOnUndeclaredElemdef = false;
         }
 
         // get needed components
@@ -402,12 +419,12 @@ public class XMLDTDProcessor
         if (fValidation) {
 
             if (fNotationEnumVals == null) {
-                fNotationEnumVals = new Hashtable();
+                fNotationEnumVals = new HashMap();
             }
             fNotationEnumVals.clear();
 
-            fTableOfIDAttributeNames = new Hashtable();
-            fTableOfNOTATIONAttributeNames = new Hashtable();
+            fTableOfIDAttributeNames = new HashMap();
+            fTableOfNOTATIONAttributeNames = new HashMap();
         }
 
     }
@@ -680,7 +697,7 @@ public class XMLDTDProcessor
 
         // initialize state
         fNDataDeclNotations.clear();
-        fDTDElementDecls.removeAllElements();
+        fDTDElementDecls.clear();
 
         // the grammar bucket's DTDGrammar will now be the
         // one we want, whether we're constructing it or not.
@@ -816,7 +833,7 @@ public class XMLDTDProcessor
                                            XMLErrorReporter.SEVERITY_ERROR);
             }
             else {
-                fDTDElementDecls.addElement(name);
+                fDTDElementDecls.add(name);
             }
         }
 
@@ -966,7 +983,7 @@ public class XMLDTDProcessor
                         //we should not report an error, when there is duplicate attribute definition for given element type
                         //according to XML 1.0 spec, When more than one definition is provided for the same attribute of a given
                         //element type, the first declaration is binding and later declaration are *ignored*. So processor should 
-                        //ignore the second declarations, however an application would be warned of the duplicate attribute defintion 
+                        //ignore the second declarations, however an application would be warned of the duplicate attribute definition
                         // if http://apache.org/xml/features/validation/warn-on-duplicate-attdef feature is set to true, Application behavior may differ on the basis of error or 
                         //warning thrown. - nb.
 
@@ -1322,16 +1339,16 @@ public class XMLDTDProcessor
             if(fGrammarPool != null)
                 fGrammarPool.cacheGrammars(XMLGrammarDescription.XML_DTD, new Grammar[] {fDTDGrammar});
         }
-        // check VC: Notation declared,  in the production of NDataDecl
         if (fValidation) {
             DTDGrammar grammar = (fDTDGrammar != null? fDTDGrammar: fGrammarBucket.getActiveGrammar());
 
             // VC : Notation Declared. for external entity declaration [Production 76].
-            Enumeration entities = fNDataDeclNotations.keys();
-            while (entities.hasMoreElements()) {
-                String entity = (String) entities.nextElement();
-                String notation = (String) fNDataDeclNotations.get(entity);
+            Iterator entities = fNDataDeclNotations.entrySet().iterator();
+            while (entities.hasNext()) {
+                Map.Entry entry = (Map.Entry) entities.next();
+                String notation = (String) entry.getValue();
                 if (grammar.getNotationDeclIndex(notation) == -1) {
+                    String entity = (String) entry.getKey();
                     fErrorReporter.reportError(XMLMessageFormatter.XML_DOMAIN,
                                                "MSG_NOTATION_NOT_DECLARED_FOR_UNPARSED_ENTITYDECL",
                                                new Object[]{entity, notation},
@@ -1341,11 +1358,12 @@ public class XMLDTDProcessor
 
             // VC: Notation Attributes:
             //     all notation names in the (attribute) declaration must be declared.
-            Enumeration notationVals = fNotationEnumVals.keys();
-            while (notationVals.hasMoreElements()) {
-                String notation = (String) notationVals.nextElement();
-                String attributeName = (String) fNotationEnumVals.get(notation);
+            Iterator notationVals = fNotationEnumVals.entrySet().iterator();
+            while (notationVals.hasNext()) {
+                Map.Entry entry = (Map.Entry) notationVals.next();
+                String notation = (String) entry.getKey();
                 if (grammar.getNotationDeclIndex(notation) == -1) {
+                    String attributeName = (String) entry.getValue();
                     fErrorReporter.reportError(XMLMessageFormatter.XML_DOMAIN,
                                                "MSG_NOTATION_NOT_DECLARED_FOR_NOTATIONTYPE_ATTRIBUTE",
                                                new Object[]{attributeName, notation},
@@ -1355,12 +1373,13 @@ public class XMLDTDProcessor
             
             // VC: No Notation on Empty Element
             // An attribute of type NOTATION must not be declared on an element declared EMPTY.
-            Enumeration elementsWithNotations = fTableOfNOTATIONAttributeNames.keys();
-            while (elementsWithNotations.hasMoreElements()) {
-                String elementName = (String) elementsWithNotations.nextElement();
+            Iterator elementsWithNotations = fTableOfNOTATIONAttributeNames.entrySet().iterator();
+            while (elementsWithNotations.hasNext()) {
+                Map.Entry entry = (Map.Entry) elementsWithNotations.next();
+                String elementName = (String) entry.getKey();
                 int elementIndex = grammar.getElementDeclIndex(elementName);
                 if (grammar.getContentSpecType(elementIndex) == XMLElementDecl.TYPE_EMPTY) {
-                    String attributeName = (String) fTableOfNOTATIONAttributeNames.get(elementName);
+                    String attributeName = (String) entry.getValue();
                     fErrorReporter.reportError(XMLMessageFormatter.XML_DOMAIN,
                                                "NoNotationOnEmptyElement",
                                                new Object[]{elementName, attributeName},
@@ -1368,8 +1387,14 @@ public class XMLDTDProcessor
                 }
             }
 
-            fTableOfIDAttributeNames = null;//should be safe to release these references
+            // should be safe to release these references
+            fTableOfIDAttributeNames = null;
             fTableOfNOTATIONAttributeNames = null;
+
+            // check whether each element referenced in a content model is declared
+            if (fWarnOnUndeclaredElemdef) {
+                checkDeclaredElements(grammar);
+            }
         }
 
         // call handlers
@@ -1420,7 +1445,7 @@ public class XMLDTDProcessor
 
         if (fValidation) {
             fDTDElementDeclName = elementName;
-            fMixedElementTypes.removeAllElements();
+            fMixedElementTypes.clear();
         }
 
         // call handlers
@@ -1537,7 +1562,7 @@ public class XMLDTDProcessor
                                            XMLErrorReporter.SEVERITY_ERROR);
             }
             else {
-                fMixedElementTypes.addElement(elementName);
+                fMixedElementTypes.add(elementName);
             }
         }
 
@@ -1653,8 +1678,6 @@ public class XMLDTDProcessor
      */
     private boolean normalizeDefaultAttrValue(XMLString value) {
 
-        int oldLength = value.length;
-
         boolean skipSpace = true; // skip leading spaces
         int current = value.offset;
         int end = value.offset + value.length;
@@ -1690,7 +1713,6 @@ public class XMLDTDProcessor
         return false;
     }
 
-    
     protected boolean isValidNmtoken(String nmtoken) {
         return XMLChar.isValidNmtoken(nmtoken);
     } // isValidNmtoken(String):  boolean
@@ -1698,4 +1720,60 @@ public class XMLDTDProcessor
     protected boolean isValidName(String name) {
         return XMLChar.isValidName(name);
     } // isValidName(String):  boolean
+
+    /**
+     * Checks that all elements referenced in content models have
+     * been declared. This method calls out to the error handler
+     * to indicate warnings.
+     */
+    private void checkDeclaredElements(DTDGrammar grammar) {
+        int elementIndex = grammar.getFirstElementDeclIndex();
+        XMLContentSpec contentSpec = new XMLContentSpec();
+        while (elementIndex >= 0) {
+            int type = grammar.getContentSpecType(elementIndex);
+            if (type == XMLElementDecl.TYPE_CHILDREN || type == XMLElementDecl.TYPE_MIXED) {
+                checkDeclaredElements(grammar,
+                        elementIndex,
+                        grammar.getContentSpecIndex(elementIndex),
+                        contentSpec);
+            }
+            elementIndex = grammar.getNextElementDeclIndex(elementIndex);
+        }
+    }
+
+    /**
+     * Does a recursive (if necessary) check on the specified element's
+     * content spec to make sure that all children refer to declared
+     * elements.
+     */
+    private void checkDeclaredElements(DTDGrammar grammar, int elementIndex,
+            int contentSpecIndex, XMLContentSpec contentSpec) {
+        grammar.getContentSpec(contentSpecIndex, contentSpec);
+        if (contentSpec.type == XMLContentSpec.CONTENTSPECNODE_LEAF) {
+            String value = (String) contentSpec.value;
+            if (value != null && grammar.getElementDeclIndex(value) == -1) {
+                fErrorReporter.reportError(XMLMessageFormatter.XML_DOMAIN,
+                        "UndeclaredElementInContentSpec",
+                        new Object[]{grammar.getElementDeclName(elementIndex).rawname, value},
+                        XMLErrorReporter.SEVERITY_WARNING);
+            }
+        }
+        // It's not a leaf, so we have to recurse its left and maybe right
+        // nodes. Save both values before we recurse and trash the node.
+        else if ((contentSpec.type == XMLContentSpec.CONTENTSPECNODE_CHOICE)
+                || (contentSpec.type == XMLContentSpec.CONTENTSPECNODE_SEQ)) {
+            final int leftNode = ((int[])contentSpec.value)[0];
+            final int rightNode = ((int[])contentSpec.otherValue)[0];
+            //  Recurse on both children.
+            checkDeclaredElements(grammar, elementIndex, leftNode, contentSpec);
+            checkDeclaredElements(grammar, elementIndex, rightNode, contentSpec);
+        }
+        else if (contentSpec.type == XMLContentSpec.CONTENTSPECNODE_ZERO_OR_MORE
+                || contentSpec.type == XMLContentSpec.CONTENTSPECNODE_ZERO_OR_ONE
+                || contentSpec.type == XMLContentSpec.CONTENTSPECNODE_ONE_OR_MORE) {
+            final int leftNode = ((int[])contentSpec.value)[0];
+            checkDeclaredElements(grammar, elementIndex, leftNode, contentSpec);
+        }
+    }
+
 } // class XMLDTDProcessor

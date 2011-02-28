@@ -22,7 +22,7 @@
  */
 package com.sun.org.apache.xml.internal.utils;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 
 import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.parsers.ParserConfigurationException;
@@ -44,7 +44,7 @@ public class XMLReaderManager {
                              "http://xml.org/sax/features/namespace-prefixes";
     private static final XMLReaderManager m_singletonManager =
                                                      new XMLReaderManager();
-
+    private static final String property = "org.xml.sax.driver";
     /**
      * Parser factory to be used to construct XMLReader objects
      */
@@ -58,7 +58,7 @@ public class XMLReaderManager {
     /**
      * Keeps track of whether an XMLReader object is in use.
      */
-    private Hashtable m_inUse;
+    private HashMap m_inUse;
 
     /**
      * Hidden constructor
@@ -81,7 +81,6 @@ public class XMLReaderManager {
      */
     public synchronized XMLReader getXMLReader() throws SAXException {
         XMLReader reader;
-        boolean readerInUse;
 
         if (m_readers == null) {
             // When the m_readers.get() method is called for the first time
@@ -90,7 +89,7 @@ public class XMLReaderManager {
         }
 
         if (m_inUse == null) {
-            m_inUse = new Hashtable();
+            m_inUse = new HashMap();
         }
 
         // If the cached reader for this thread is in use, construct a new
@@ -98,9 +97,11 @@ public class XMLReaderManager {
         // instance of the class set in the 'org.xml.sax.driver' property
         reader = (XMLReader) m_readers.get();
         boolean threadHasReader = (reader != null);
-        String factory = SecuritySupport.getInstance().getSystemProperty("org.xml.sax.driver");
-        if (!threadHasReader || m_inUse.get(reader) == Boolean.TRUE ||
-                !reader.getClass().getName().equals(factory)) {
+        String factory = SecuritySupport.getInstance().getSystemProperty(property);
+        if (threadHasReader && m_inUse.get(reader) != Boolean.TRUE &&
+                ( factory == null || reader.getClass().getName().equals(factory))) {
+            m_inUse.put(reader, Boolean.TRUE);
+        } else {
             try {
                 try {
                     // According to JAXP 1.2 specification, if a SAXSource
@@ -108,6 +109,7 @@ public class XMLReaderManager {
                     // TransformerFactory creates a reader via the
                     // XMLReaderFactory if setXMLReader is not used
                     reader = XMLReaderFactory.createXMLReader();
+
                 } catch (Exception e) {
                    try {
                         // If unable to create an instance, let's try to use
@@ -143,8 +145,6 @@ public class XMLReaderManager {
                 m_readers.set(reader);
                 m_inUse.put(reader, Boolean.TRUE);
             }
-        } else {
-            m_inUse.put(reader, Boolean.TRUE);
         }
 
         return reader;

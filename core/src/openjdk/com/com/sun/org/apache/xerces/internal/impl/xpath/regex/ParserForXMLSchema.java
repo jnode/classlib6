@@ -37,7 +37,7 @@ class ParserForXMLSchema extends RegexParser {
         //this.setLocale(Locale.getDefault());
     }
     public ParserForXMLSchema(Locale locale) {
-        //this.setLocale(locale);
+        super(locale);
     }
 
     Token processCaret() throws ParseException {
@@ -162,8 +162,8 @@ class ParserForXMLSchema extends RegexParser {
      * c-c-subtraction  ::= (positive-c-group | negative-c-group) subtraction
      * subtraction      ::= '-' c-c-expression
      * c-range          ::= single-range | from-to-range
-     * single-range     ::= multi-c-escape | category-c-escape | block-c-escape | <any XML char>
-     * cc-normal-c      ::= <any character except [, ], \>
+     * single-range     ::= multi-c-escape | category-c-escape | block-c-escape | &lt;any XML char&gt;
+     * cc-normal-c      ::= &lt;any character except [, ], \&gt;
      * from-to-range    ::= cc-normal-c '-' cc-normal-c
      *
      * @param useNrage Ignored.
@@ -250,20 +250,27 @@ class ParserForXMLSchema extends RegexParser {
                 if (type == T_CHAR) {
                     if (c == '[')  throw this.ex("parser.cc.6", this.offset-2);
                     if (c == ']')  throw this.ex("parser.cc.7", this.offset-2);
-                    if (c == '-' && this.chardata == ']' && firstloop)  throw this.ex("parser.cc.8", this.offset-2);	// if regex = '[-]' then invalid
+                    if (c == '-' && this.chardata != ']' && !firstloop)  throw this.ex("parser.cc.8", this.offset-2);	// if regex = '[-]' then invalid
                 }
-                if(c == '-' && this.chardata == '-' && this.read() != T_BACKSOLIDUS && !wasDecoded) {
-                	throw this.ex("parser.cc.8", this.offset-2);
-                }
-                if (this.read() != T_CHAR || this.chardata != '-') { // Here is no '-'.
+                if (this.read() != T_CHAR || this.chardata != '-' || c == '-' && firstloop) { // Here is no '-'.
+                    if (!this.isSet(RegularExpression.IGNORE_CASE) || c > 0xffff) {
                     tok.addRange(c, c);
+                    }
+                    else {
+                        addCaseInsensitiveChar(tok, c);
+                    }
                 } else {                        // Found '-'
                                                 // Is this '-' is a from-to token??
                     this.next(); // Skips '-'
                     if ((type = this.read()) == T_EOF)  throw this.ex("parser.cc.2", this.offset);
                                                 // c '-' ']' -> '-' is a single-range.
                     if(type == T_CHAR && this.chardata == ']') {				// if - is at the last position of the group
+                        if (!this.isSet(RegularExpression.IGNORE_CASE) || c > 0xffff) {
                     	tok.addRange(c, c);
+                        }
+                        else {
+                            addCaseInsensitiveChar(tok, c);
+                        }
                     	tok.addRange('-', '-');
                     }
                     else if (type == T_XMLSCHEMA_CC_SUBTRACTION) {
@@ -281,7 +288,13 @@ class ParserForXMLSchema extends RegexParser {
                         this.next();
 
                         if (c > rangeend)  throw this.ex("parser.ope.3", this.offset-1);
+                        if (!this.isSet(RegularExpression.IGNORE_CASE) ||
+                                (c > 0xffff && rangeend > 0xffff)) {
                         tok.addRange(c, rangeend);
+                    }
+                        else {
+                            addCaseInsensitiveCharRange(tok, c, rangeend);
+                        }
                     }
                 }
             }

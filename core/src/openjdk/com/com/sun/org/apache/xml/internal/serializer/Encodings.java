@@ -27,14 +27,12 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
-import java.lang.reflect.Method;
+import java.io.BufferedWriter;
 import java.net.URL;
 import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Properties;
 import java.util.StringTokenizer;
-import java.security.PrivilegedAction;
-import java.security.AccessController;
 
 
 /**
@@ -43,6 +41,7 @@ import java.security.AccessController;
  * to override encoding names and provide the last printable character
  * for each encoding.
  *
+ * @version $Revision: 1.9 $ $Date: 2009/12/01 22:17:31 $
  * @author <a href="mailto:arkin@intalio.com">Assaf Arkin</a>
  */
 
@@ -85,9 +84,9 @@ public final class Encodings extends Object
             {
                 try
                 {
-                    return new OutputStreamWriter(
+                    return new BufferedWriter(new OutputStreamWriter(
                         output,
-                        _encodings[i].javaName);
+                        _encodings[i].javaName));
                 }
                 catch (java.lang.IllegalArgumentException iae) // java 1.1.8
                 {
@@ -103,7 +102,7 @@ public final class Encodings extends Object
 
         try
         {
-            return new OutputStreamWriter(output, encoding);
+            return new BufferedWriter(new OutputStreamWriter(output, encoding));
         }
         catch (java.lang.IllegalArgumentException iae) // java 1.1.8
         {
@@ -306,7 +305,6 @@ public final class Encodings extends Object
      */
     private static EncodingInfo[] loadEncodingInfo()
     {
-        URL url = null;
         try
         {
             String urlString = null;
@@ -321,7 +319,7 @@ public final class Encodings extends Object
             }
 
             if (urlString != null && urlString.length() > 0) {
-                url = new URL(urlString);
+                URL url = new URL(urlString);
                 is = url.openStream();
             }
 
@@ -460,7 +458,7 @@ public final class Encodings extends Object
         return codePoint;
     }
 
-    private static final Hashtable _encodingTableKeyJava = new Hashtable();
-    private static final Hashtable _encodingTableKeyMime = new Hashtable();
+    private static final HashMap _encodingTableKeyJava = new HashMap();
+    private static final HashMap _encodingTableKeyMime = new HashMap();
     private static final EncodingInfo[] _encodings = loadEncodingInfo();
 }

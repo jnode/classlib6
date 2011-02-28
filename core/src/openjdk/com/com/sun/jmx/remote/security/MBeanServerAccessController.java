@@ -1,12 +1,12 @@
 /*
- * Copyright 2003-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2003, 2006, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Sun designates this
+ * published by the Free Software Foundation.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the LICENSE file that accompanied this code.
+ * by Oracle in the LICENSE file that accompanied this code.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -18,9 +18,9 @@
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
- * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
- * CA 95054 USA or visit www.sun.com if you need additional information or
- * have any questions.
+ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ * or visit www.oracle.com if you need additional information or have any
+ * questions.
  */
 
 package com.sun.jmx.remote.security;
@@ -111,6 +111,22 @@ public abstract class MBeanServerAccessController
      */
     protected abstract void checkWrite();
 
+    /**
+     * Check if the caller can create the named class.  The default
+     * implementation of this method calls {@link #checkWrite()}.
+     */
+    protected void checkCreate(String className) {
+        checkWrite();
+    }
+
+    /**
+     * Check if the caller can unregister the named MBean.  The default
+     * implementation of this method calls {@link #checkWrite()}.
+     */
+    protected void checkUnregister(ObjectName name) {
+        checkWrite();
+    }
+
     //--------------------------------------------
     //--------------------------------------------
     //
@@ -148,7 +164,7 @@ public abstract class MBeanServerAccessController
     }
 
     /**
-     * Call <code>checkWrite()</code>, then forward this method to the
+     * Call <code>checkCreate(className)</code>, then forward this method to the
      * wrapped object.
      */
     public ObjectInstance createMBean(String className, ObjectName name)
@@ -158,7 +174,7 @@ public abstract class MBeanServerAccessController
 	MBeanRegistrationException,
 	MBeanException,
 	NotCompliantMBeanException {
-	checkWrite();
+        checkCreate(className);
 	SecurityManager sm = System.getSecurityManager();
 	if (sm == null) {
 	    Object object = getMBeanServer().instantiate(className);
@@ -170,7 +186,7 @@ public abstract class MBeanServerAccessController
     }
 
     /**
-     * Call <code>checkWrite()</code>, then forward this method to the
+     * Call <code>checkCreate(className)</code>, then forward this method to the
      * wrapped object.
      */
     public ObjectInstance createMBean(String className, ObjectName name,
@@ -181,7 +197,7 @@ public abstract class MBeanServerAccessController
 	MBeanRegistrationException,
 	MBeanException,
 	NotCompliantMBeanException {
-	checkWrite();
+        checkCreate(className);
 	SecurityManager sm = System.getSecurityManager();
 	if (sm == null) {
 	    Object object = getMBeanServer().instantiate(className,
@@ -196,7 +212,7 @@ public abstract class MBeanServerAccessController
     }
 
     /**
-     * Call <code>checkWrite()</code>, then forward this method to the
+     * Call <code>checkCreate(className)</code>, then forward this method to the
      * wrapped object.
      */
     public ObjectInstance createMBean(String className,
@@ -209,7 +225,7 @@ public abstract class MBeanServerAccessController
 	MBeanException,
 	NotCompliantMBeanException,
 	InstanceNotFoundException {
-	checkWrite();
+        checkCreate(className);
 	SecurityManager sm = System.getSecurityManager();
 	if (sm == null) {
 	    Object object = getMBeanServer().instantiate(className,
@@ -222,7 +238,7 @@ public abstract class MBeanServerAccessController
     }
 
     /**
-     * Call <code>checkWrite()</code>, then forward this method to the
+     * Call <code>checkCreate(className)</code>, then forward this method to the
      * wrapped object.
      */
     public ObjectInstance createMBean(String className,
@@ -237,7 +253,7 @@ public abstract class MBeanServerAccessController
 	MBeanException,
 	NotCompliantMBeanException,
 	InstanceNotFoundException {
-	checkWrite();
+        checkCreate(className);
 	SecurityManager sm = System.getSecurityManager();
 	if (sm == null) {
 	    Object object = getMBeanServer().instantiate(className,
@@ -394,45 +410,45 @@ public abstract class MBeanServerAccessController
     }
 
     /**
-     * Call <code>checkWrite()</code>, then forward this method to the
+     * Call <code>checkCreate(className)</code>, then forward this method to the
      * wrapped object.
      */
     public Object instantiate(String className)
 	throws ReflectionException, MBeanException {
-	checkWrite();
+        checkCreate(className);
 	return getMBeanServer().instantiate(className);
     }
 
     /**
-     * Call <code>checkWrite()</code>, then forward this method to the
+     * Call <code>checkCreate(className)</code>, then forward this method to the
      * wrapped object.
      */
     public Object instantiate(String className,
 			      Object params[],
 			      String signature[]) 
 	throws ReflectionException, MBeanException {
-	checkWrite();
+        checkCreate(className);
 	return getMBeanServer().instantiate(className, params, signature);
     }
 
     /**
-     * Call <code>checkWrite()</code>, then forward this method to the
+     * Call <code>checkCreate(className)</code>, then forward this method to the
      * wrapped object.
      */
     public Object instantiate(String className, ObjectName loaderName)
 	throws ReflectionException, MBeanException, InstanceNotFoundException {
-	checkWrite();
+        checkCreate(className);
 	return getMBeanServer().instantiate(className, loaderName);
     }
 
     /**
-     * Call <code>checkWrite()</code>, then forward this method to the
+     * Call <code>checkCreate(className)</code>, then forward this method to the
      * wrapped object.
      */
     public Object instantiate(String className, ObjectName loaderName,
 			      Object params[], String signature[])
 	throws ReflectionException, MBeanException, InstanceNotFoundException {
-	checkWrite();
+        checkCreate(className);
 	return getMBeanServer().instantiate(className, loaderName,
 					    params, signature);
     }
@@ -579,12 +595,12 @@ public abstract class MBeanServerAccessController
     }
 
     /**
-     * Call <code>checkWrite()</code>, then forward this method to the
+     * Call <code>checkUnregister()</code>, then forward this method to the
      * wrapped object.
      */
     public void unregisterMBean(ObjectName name)
 	throws InstanceNotFoundException, MBeanRegistrationException {
-	checkWrite();
+        checkUnregister(name);
 	getMBeanServer().unregisterMBean(name);
     }
 

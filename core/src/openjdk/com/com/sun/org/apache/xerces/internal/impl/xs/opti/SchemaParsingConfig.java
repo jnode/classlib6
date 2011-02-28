@@ -24,10 +24,14 @@ import java.io.IOException;
 import java.util.Locale;
 
 import com.sun.org.apache.xerces.internal.impl.Constants;
+import com.sun.org.apache.xerces.internal.impl.XML11DTDScannerImpl;
+import com.sun.org.apache.xerces.internal.impl.XML11NSDocumentScannerImpl;
 import com.sun.org.apache.xerces.internal.impl.XMLDTDScannerImpl;
+import com.sun.org.apache.xerces.internal.impl.XMLEntityHandler;
 import com.sun.org.apache.xerces.internal.impl.XMLEntityManager;
 import com.sun.org.apache.xerces.internal.impl.XMLErrorReporter;
 import com.sun.org.apache.xerces.internal.impl.XMLNSDocumentScannerImpl;
+import com.sun.org.apache.xerces.internal.impl.XMLVersionDetector;
 import com.sun.org.apache.xerces.internal.impl.dv.DTDDVFactory;
 import com.sun.org.apache.xerces.internal.impl.msg.XMLMessageFormatter;
 import com.sun.org.apache.xerces.internal.impl.validation.ValidationManager;
@@ -44,23 +48,24 @@ import com.sun.org.apache.xerces.internal.xni.parser.XMLDTDScanner;
 import com.sun.org.apache.xerces.internal.xni.parser.XMLDocumentScanner;
 import com.sun.org.apache.xerces.internal.xni.parser.XMLInputSource;
 import com.sun.org.apache.xerces.internal.xni.parser.XMLPullParserConfiguration;
-import org.w3c.dom.Document;
-
 
 /**
  * @xerces.internal  
  * 
  * @author Rahul Srivastava, Sun Microsystems Inc.
  *
- * @version $Id: SchemaParsingConfig.java,v 1.2.6.1 2005/09/08 11:08:58 sunithareddy Exp $
+ * @version $Id: SchemaParsingConfig.java,v 1.6 2010/07/23 02:09:29 joehw Exp $
  */
 public class SchemaParsingConfig extends BasicParserConfiguration 
-implements XMLPullParserConfiguration {
+    implements XMLPullParserConfiguration {
     
     //
     // Constants
     //
     
+    protected final static String XML11_DATATYPE_VALIDATOR_FACTORY =
+        "com.sun.org.apache.xerces.internal.impl.dv.dtd.XML11DTDDVFactoryImpl";
+
     // feature identifiers
     
     /** Feature identifier: warn on duplicate attribute definition. */
@@ -94,18 +99,16 @@ implements XMLPullParserConfiguration {
     protected static final String NOTIFY_CHAR_REFS =
         Constants.XERCES_FEATURE_PREFIX + Constants.NOTIFY_CHAR_REFS_FEATURE;
     
-    
     /** Feature identifier: expose schema normalized value */
     protected static final String NORMALIZE_DATA =
         Constants.XERCES_FEATURE_PREFIX + Constants.SCHEMA_NORMALIZED_VALUE;
-    
     
     /** Feature identifier: send element default value via characters() */
     protected static final String SCHEMA_ELEMENT_DEFAULT =
         Constants.XERCES_FEATURE_PREFIX + Constants.SCHEMA_ELEMENT_DEFAULT;
     
     /** Feature identifier: generate synthetic annotations. */
-    protected static final String GENERATE_SYNTHETIC_ANNOTATION = 
+    protected static final String GENERATE_SYNTHETIC_ANNOTATIONS =
         Constants.XERCES_FEATURE_PREFIX + Constants.GENERATE_SYNTHETIC_ANNOTATIONS_FEATURE;
     
     
@@ -150,6 +153,10 @@ implements XMLPullParserConfiguration {
     protected static final String SCHEMA_VALIDATOR =
         Constants.XERCES_PROPERTY_PREFIX + Constants.SCHEMA_VALIDATOR_PROPERTY;
     
+    /** Property identifier: locale. */
+    protected static final String LOCALE =
+        Constants.XERCES_PROPERTY_PREFIX + Constants.LOCALE_PROPERTY;
+
     
     // debugging
     
@@ -160,35 +167,61 @@ implements XMLPullParserConfiguration {
     // Data
     //
     
-    // components (non-configurable)
+    //
+    // XML 1.0 components
+    //
+
+    /** The XML 1.0 Datatype validator factory. */
+    protected final DTDDVFactory fDatatypeValidatorFactory;
+
+    /** The XML 1.0 Document scanner. */
+    protected final XMLNSDocumentScannerImpl fNamespaceScanner;
+
+    /** The XML 1.0 DTD scanner. */
+    protected final XMLDTDScannerImpl fDTDScanner;
+
+    //
+    // XML 1.1 components
+    //
+
+    /** The XML 1.1 Datatype validator factory. */
+    protected DTDDVFactory fXML11DatatypeFactory = null;
+
+    /** The XML 1.1 Document scanner. */
+    protected XML11NSDocumentScannerImpl fXML11NSDocScanner = null;
+
+    /** The XML 1.1 DTD scanner. **/
+    protected XML11DTDScannerImpl fXML11DTDScanner = null;
+
+    // common components (non-configurable)
+
+    /** Current Datatype validator factory. */
+    protected DTDDVFactory fCurrentDVFactory;
+
+    /** Current scanner */
+    protected XMLDocumentScanner fCurrentScanner;
+
+    /** Current DTD scanner. */
+    protected XMLDTDScanner fCurrentDTDScanner;
     
     /** Grammar pool. */
     protected XMLGrammarPool fGrammarPool;
     
-    /** Datatype validator factory. */
-    protected DTDDVFactory fDatatypeValidatorFactory;
+    /** XML version detector. */
+    protected final XMLVersionDetector fVersionDetector;
     
-    // components (configurable)
+    // common components (configurable)
     
     /** Error reporter. */
-    protected XMLErrorReporter fErrorReporter;
+    protected final XMLErrorReporter fErrorReporter;
     
     /** Entity manager. */
-    protected XMLEntityManager fEntityManager;
-    
-    /** Document scanner. */
-    protected XMLDocumentScanner fScanner;
+    protected final XMLEntityManager fEntityManager;
     
     /** Input Source */
     protected XMLInputSource fInputSource;
     
-    /** DTD scanner. */
-    protected XMLDTDScanner fDTDScanner;
-    
-    
-    protected SchemaDOMParser fSchemaDOMParser;
-    
-    protected ValidationManager fValidationManager;
+    protected final ValidationManager fValidationManager;
     // state
     
     /** Locator */
@@ -201,6 +234,15 @@ implements XMLPullParserConfiguration {
      */
     protected boolean fParseInProgress = false;
     
+    /**
+     * fConfigUpdated is set to true if there has been any change to the configuration settings,
+     * i.e a feature or a property was changed.
+     */
+    protected boolean fConfigUpdated = false;
+
+    /** Flag indiciating whether XML11 components have been initialized. */
+    private boolean f11Initialized = false;
+
     //
     // Constructors
     //
@@ -257,7 +299,7 @@ implements XMLPullParserConfiguration {
             PARSER_SETTINGS, WARN_ON_DUPLICATE_ATTDEF,   WARN_ON_UNDECLARED_ELEMDEF,
             ALLOW_JAVA_ENCODINGS,       CONTINUE_AFTER_FATAL_ERROR,
             LOAD_EXTERNAL_DTD,          NOTIFY_BUILTIN_REFS,
-            NOTIFY_CHAR_REFS, GENERATE_SYNTHETIC_ANNOTATION
+            NOTIFY_CHAR_REFS, GENERATE_SYNTHETIC_ANNOTATIONS
         };
         addRecognizedFeatures(recognizedFeatures);
         fFeatures.put(PARSER_SETTINGS, Boolean.TRUE);
@@ -270,7 +312,7 @@ implements XMLPullParserConfiguration {
         fFeatures.put(LOAD_EXTERNAL_DTD, Boolean.TRUE);
         fFeatures.put(NOTIFY_BUILTIN_REFS, Boolean.FALSE);
         fFeatures.put(NOTIFY_CHAR_REFS, Boolean.FALSE);
-        fFeatures.put(GENERATE_SYNTHETIC_ANNOTATION, Boolean.FALSE);
+        fFeatures.put(GENERATE_SYNTHETIC_ANNOTATIONS, Boolean.FALSE);
         
         // add default recognized properties
         final String[] recognizedProperties = {
@@ -283,12 +325,13 @@ implements XMLPullParserConfiguration {
             XMLGRAMMAR_POOL,   
             DATATYPE_VALIDATOR_FACTORY,
             VALIDATION_MANAGER,
-            GENERATE_SYNTHETIC_ANNOTATION
+            GENERATE_SYNTHETIC_ANNOTATIONS,
+            LOCALE
         };
         addRecognizedProperties(recognizedProperties);
         
         fGrammarPool = grammarPool;
-        if(fGrammarPool != null){
+        if (fGrammarPool != null) {
             setProperty(XMLGRAMMAR_POOL, fGrammarPool);
         }
         
@@ -301,22 +344,23 @@ implements XMLPullParserConfiguration {
         fProperties.put(ERROR_REPORTER, fErrorReporter);
         addComponent(fErrorReporter);
         
-        fScanner = new XMLNSDocumentScannerImpl();
-        fProperties.put(DOCUMENT_SCANNER, fScanner);
-        addComponent((XMLComponent)fScanner);
+        fNamespaceScanner = new XMLNSDocumentScannerImpl();
+        fProperties.put(DOCUMENT_SCANNER, fNamespaceScanner);
+        addRecognizedParamsAndSetDefaults(fNamespaceScanner);
         
         fDTDScanner = new XMLDTDScannerImpl();
         fProperties.put(DTD_SCANNER, fDTDScanner);
-        addComponent((XMLComponent)fDTDScanner);
+        addRecognizedParamsAndSetDefaults(fDTDScanner);
         
-        
-        fDatatypeValidatorFactory = DTDDVFactory.getInstance();;
+        fDatatypeValidatorFactory = DTDDVFactory.getInstance();
         fProperties.put(DATATYPE_VALIDATOR_FACTORY,
                 fDatatypeValidatorFactory);
         
         fValidationManager = new ValidationManager();
         fProperties.put(VALIDATION_MANAGER, fValidationManager);
         
+        fVersionDetector = new XMLVersionDetector();
+
         // add message formatters
         if (fErrorReporter.getMessageFormatter(XMLMessageFormatter.XML_DOMAIN) == null) {
             XMLMessageFormatter xmft = new XMLMessageFormatter();
@@ -344,6 +388,126 @@ implements XMLPullParserConfiguration {
     // Public methods
     //
     
+    /**
+     * Returns the state of a feature.
+     *
+     * @param featureId The feature identifier.
+     * @return true if the feature is supported
+     *
+     * @throws XMLConfigurationException Thrown for configuration error.
+     *                                   In general, components should
+     *                                   only throw this exception if
+     *                                   it is <strong>really</strong>
+     *                                   a critical error.
+     */
+    public boolean getFeature(String featureId)
+        throws XMLConfigurationException {
+        // make this feature special
+        if (featureId.equals(PARSER_SETTINGS)) {
+            return fConfigUpdated;
+        }
+        return super.getFeature(featureId);
+
+    } // getFeature(String):boolean
+
+    /**
+     * Set the state of a feature.
+     *
+     * Set the state of any feature in a SAX2 parser.  The parser
+     * might not recognize the feature, and if it does recognize
+     * it, it might not be able to fulfill the request.
+     *
+     * @param featureId The unique identifier (URI) of the feature.
+     * @param state The requested state of the feature (true or false).
+     *
+     * @exception com.sun.org.apache.xerces.internal.xni.parser.XMLConfigurationException If the
+     *            requested feature is not known.
+     */
+    public void setFeature(String featureId, boolean state)
+        throws XMLConfigurationException {
+
+        fConfigUpdated = true;
+
+        // forward to every XML 1.0 component
+        fNamespaceScanner.setFeature(featureId, state);
+        fDTDScanner.setFeature(featureId, state);
+
+        // forward to every XML 1.1 component
+        if (f11Initialized) {
+            try {
+                fXML11DTDScanner.setFeature(featureId, state);
+            }
+            // ignore the exception.
+            catch (Exception e) {}
+            try {
+                fXML11NSDocScanner.setFeature(featureId, state);
+            }
+            // ignore the exception
+            catch (Exception e) {}
+        }
+
+        // save state if noone "objects"
+        super.setFeature(featureId, state);
+
+    } // setFeature(String,boolean)
+
+    /**
+     * Returns the value of a property.
+     *
+     * @param propertyId The property identifier.
+     * @return the value of the property
+     *
+     * @throws XMLConfigurationException Thrown for configuration error.
+     *                                   In general, components should
+     *                                   only throw this exception if
+     *                                   it is <strong>really</strong>
+     *                                   a critical error.
+     */
+    public Object getProperty(String propertyId)
+        throws XMLConfigurationException {
+        if (LOCALE.equals(propertyId)) {
+            return getLocale();
+        }
+        return super.getProperty(propertyId);
+    }
+
+    /**
+     * setProperty
+     *
+     * @param propertyId
+     * @param value
+     */
+    public void setProperty(String propertyId, Object value)
+        throws XMLConfigurationException {
+
+        fConfigUpdated = true;
+        if (LOCALE.equals(propertyId)) {
+            setLocale((Locale) value);
+        }
+
+        // forward to every XML 1.0 component
+        fNamespaceScanner.setProperty(propertyId, value);
+        fDTDScanner.setProperty(propertyId, value);
+
+        // forward to every XML 1.1 component
+        if (f11Initialized) {
+            try {
+                fXML11DTDScanner.setProperty(propertyId, value);
+            }
+            // ignore the exception.
+            catch (Exception e) {}
+            try {
+                fXML11NSDocScanner.setProperty(propertyId, value);
+            }
+            // ignore the exception
+            catch (Exception e) {}
+        }
+
+        // store value if noone "objects"
+        super.setProperty(propertyId, value);
+
+    } // setProperty(String,Object)
+
     /**
      * Set the locale to use for messages.
      *
@@ -406,11 +570,34 @@ implements XMLPullParserConfiguration {
     public boolean parse(boolean complete) throws XNIException, IOException {
         //
         // reset and configure pipeline and set InputSource.
-        if (fInputSource !=null) {
+        if (fInputSource != null) {
             try {
-                // resets and sets the pipeline.
+                fValidationManager.reset();
+                fVersionDetector.reset(this);
                 reset();
-                fScanner.setInputSource(fInputSource);
+
+                short version = fVersionDetector.determineDocVersion(fInputSource);
+                // XML 1.0
+                if (version == Constants.XML_VERSION_1_0) {
+                    configurePipeline();
+                    resetXML10();
+                }
+                // XML 1.1
+                else if (version == Constants.XML_VERSION_1_1) {
+                    initXML11Components();
+                    configureXML11Pipeline();
+                    resetXML11();
+                }
+                // Unrecoverable error reported during version detection
+                else {
+                   return false;
+                }
+
+                // mark configuration as fixed
+                fConfigUpdated = false;
+
+                // resets and sets the pipeline.
+                fVersionDetector.startDocumentParsing((XMLEntityHandler) fCurrentScanner, version);
                 fInputSource = null;
             } 
             catch (XNIException ex) {
@@ -436,7 +623,7 @@ implements XMLPullParserConfiguration {
         }
         
         try {
-            return fScanner.scanDocument(complete);
+            return fCurrentScanner.scanDocument(complete);
         } 
         catch (XNIException ex) {
             if (PRINT_EXCEPTION_STACK_TRACE)
@@ -533,36 +720,83 @@ implements XMLPullParserConfiguration {
      */
     public void reset() throws XNIException {
         
-        // set handlers
-        if (fSchemaDOMParser == null)
-            fSchemaDOMParser = new SchemaDOMParser(this);
-        fDocumentHandler = fSchemaDOMParser;
-        fDTDHandler = fSchemaDOMParser;
-        fDTDContentModelHandler = fSchemaDOMParser;
-        
-        // configure the pipeline and initialize the components
-        configurePipeline();
+        // initialize the common components
         super.reset();
         
     } // reset()
     
-    /** Configures the pipeline. */
+    /** Configures the XML 1.0 pipeline. */
     protected void configurePipeline() {
         
+        if (fCurrentDVFactory != fDatatypeValidatorFactory) {
+            fCurrentDVFactory = fDatatypeValidatorFactory;
+            // use XML 1.0 datatype library
+            setProperty(DATATYPE_VALIDATOR_FACTORY, fCurrentDVFactory);
+        }
+
         // setup document pipeline
-        fScanner.setDocumentHandler(fDocumentHandler);
-        fDocumentHandler.setDocumentSource(fScanner);
-        fLastComponent = fScanner;
+        if (fCurrentScanner != fNamespaceScanner) {
+            fCurrentScanner = fNamespaceScanner;
+            setProperty(DOCUMENT_SCANNER, fCurrentScanner);
+        }
+        fNamespaceScanner.setDocumentHandler(fDocumentHandler);
+        if (fDocumentHandler != null) {
+            fDocumentHandler.setDocumentSource(fNamespaceScanner);
+        }
+        fLastComponent = fNamespaceScanner;
         
         // setup dtd pipeline
-        if (fDTDScanner != null) {
-            fDTDScanner.setDTDHandler(fDTDHandler);
-            fDTDScanner.setDTDContentModelHandler(fDTDContentModelHandler);
+        if (fCurrentDTDScanner != fDTDScanner) {
+            fCurrentDTDScanner = fDTDScanner;
+            setProperty(DTD_SCANNER, fCurrentDTDScanner);
         }
-        
+            fDTDScanner.setDTDHandler(fDTDHandler);
+        if (fDTDHandler != null) {
+            fDTDHandler.setDTDSource(fDTDScanner);
+        }
+            fDTDScanner.setDTDContentModelHandler(fDTDContentModelHandler);
+        if (fDTDContentModelHandler != null) {
+            fDTDContentModelHandler.setDTDContentModelSource(fDTDScanner);
+        }
         
     } // configurePipeline()
     
+    /** Configures the XML 1.1 pipeline. */
+    protected void configureXML11Pipeline() {
+
+        if (fCurrentDVFactory != fXML11DatatypeFactory) {
+            fCurrentDVFactory = fXML11DatatypeFactory;
+            // use XML 1.1 datatype library
+            setProperty(DATATYPE_VALIDATOR_FACTORY, fCurrentDVFactory);
+        }
+
+        // setup document pipeline
+        if (fCurrentScanner != fXML11NSDocScanner) {
+            fCurrentScanner = fXML11NSDocScanner;
+            setProperty(DOCUMENT_SCANNER, fCurrentScanner);
+        }
+        fXML11NSDocScanner.setDocumentHandler(fDocumentHandler);
+        if (fDocumentHandler != null) {
+            fDocumentHandler.setDocumentSource(fXML11NSDocScanner);
+        }
+        fLastComponent = fXML11NSDocScanner;
+
+        // setup dtd pipeline
+        if (fCurrentDTDScanner != fXML11DTDScanner) {
+            fCurrentDTDScanner = fXML11DTDScanner;
+            setProperty(DTD_SCANNER, fCurrentDTDScanner);
+        }
+        fXML11DTDScanner.setDTDHandler(fDTDHandler);
+        if (fDTDHandler != null) {
+            fDTDHandler.setDTDSource(fXML11DTDScanner);
+        }
+        fXML11DTDScanner.setDTDContentModelHandler(fDTDContentModelHandler);
+        if (fDTDContentModelHandler != null) {
+            fDTDContentModelHandler.setDTDContentModelSource(fXML11DTDScanner);
+        }
+
+    } // configureXML11Pipeline()
+
     // features and properties
     
     /**
@@ -694,20 +928,104 @@ implements XMLPullParserConfiguration {
         
     } // checkProperty(String)
     
+    /**
+     * Adds all of the component's recognized features and properties
+     * to the list of default recognized features and properties, and
+     * sets default values on the configuration for features and
+     * properties which were previously absent from the configuration.
+     *
+     * @param component The component whose recognized features
+     * and properties will be added to the configuration
+     */
+    private void addRecognizedParamsAndSetDefaults(XMLComponent component) {
+
+        // register component's recognized features
+        String[] recognizedFeatures = component.getRecognizedFeatures();
+        addRecognizedFeatures(recognizedFeatures);
+
+        // register component's recognized properties
+        String[] recognizedProperties = component.getRecognizedProperties();
+        addRecognizedProperties(recognizedProperties);
+
+        // set default values
+        if (recognizedFeatures != null) {
+            for (int i = 0; i < recognizedFeatures.length; ++i) {
+                String featureId = recognizedFeatures[i];
+                Boolean state = component.getFeatureDefault(featureId);
+                if (state != null) {
+                    // Do not overwrite values already set on the configuration.
+                    if (!fFeatures.containsKey(featureId)) {
+                        fFeatures.put(featureId, state);
+                        // For newly added components who recognize this feature
+                        // but did not offer a default value, we need to make
+                        // sure these components will get an opportunity to read
+                        // the value before parsing begins.
+                        fConfigUpdated = true;
+                    }
+                }
+            }
+        }
+        if (recognizedProperties != null) {
+            for (int i = 0; i < recognizedProperties.length; ++i) {
+                String propertyId = recognizedProperties[i];
+                Object value = component.getPropertyDefault(propertyId);
+                if (value != null) {
+                    // Do not overwrite values already set on the configuration.
+                    if (!fProperties.containsKey(propertyId)) {
+                        fProperties.put(propertyId, value);
+                        // For newly added components who recognize this property
+                        // but did not offer a default value, we need to make
+                        // sure these components will get an opportunity to read
+                        // the value before parsing begins.
+                        fConfigUpdated = true;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Reset all XML 1.0 components before parsing
+     */
+    protected final void resetXML10() throws XNIException {
+        // Reset XML 1.0 components
+        fNamespaceScanner.reset(this);
+        fDTDScanner.reset(this);
+    } // resetXML10()
     
+    /**
+     * Reset all XML 1.1 components before parsing
+     */
+    protected final void resetXML11() throws XNIException {
+        // Reset XML 1.1 components
+        fXML11NSDocScanner.reset(this);
+        fXML11DTDScanner.reset(this);
+    } // resetXML11()
     
     //
     // other methods
     //
     
-    /** Returns the Document object. */
-    public Document getDocument() {
-        return fSchemaDOMParser.getDocument();
-    }
-    
     /** */
     public void resetNodePool() {
         // REVISIT: to implement: introduce a node pool to reuse DTM nodes.
         //          reset this pool here.
+    }
+
+    private void initXML11Components() {
+        if (!f11Initialized) {
+            // create datatype factory
+            fXML11DatatypeFactory = DTDDVFactory.getInstance(XML11_DATATYPE_VALIDATOR_FACTORY);
+
+            // setup XML 1.1 DTD pipeline
+            fXML11DTDScanner = new XML11DTDScannerImpl();
+            addRecognizedParamsAndSetDefaults(fXML11DTDScanner);
+
+            // setup XML 1.1. document pipeline - namespace aware
+            fXML11NSDocScanner = new XML11NSDocumentScannerImpl();
+            addRecognizedParamsAndSetDefaults(fXML11NSDocScanner);
+
+            f11Initialized = true;
+        }
     }
 }

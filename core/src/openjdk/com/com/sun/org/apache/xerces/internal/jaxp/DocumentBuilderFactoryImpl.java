@@ -193,6 +193,11 @@ public class DocumentBuilderFactoryImpl extends DocumentBuilderFactory {
         throws ParserConfigurationException {
         // If this is the secure processing feature, save it then return.
         if (name.equals(XMLConstants.FEATURE_SECURE_PROCESSING)) {
+            if (System.getSecurityManager() != null && (!value)) {
+                throw new ParserConfigurationException(
+                        SAXMessageFormatter.formatMessage(null, 
+                        "jaxp-secureprocessing-feature", null));
+            }
             fSecureProcess = value;
             return;
         }

@@ -369,6 +369,7 @@ public abstract class ParentNode
             // Prevent cycles in the tree
             // newChild cannot be ancestor of this Node,
             // and actually cannot be this
+            if (ownerDocument.ancestorChecking) {
             boolean treeSafe = true;
             for (NodeImpl a = this; treeSafe && a != null; a = a.parentNode())
             {
@@ -378,6 +379,7 @@ public abstract class ParentNode
                 throw new DOMException(DOMException.HIERARCHY_REQUEST_ERR, 
                             DOMMessageFormatter.formatMessage(DOMMessageFormatter.DOM_DOMAIN, "HIERARCHY_REQUEST_ERR", null));
             }
+        }
         }
 
         // notify document

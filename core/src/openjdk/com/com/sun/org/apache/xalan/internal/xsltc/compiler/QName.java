@@ -60,7 +60,9 @@ final class QName {
     }
 
     public boolean equals(Object other) {
-	return (this == other);
+	return (this == other)
+	           || (other instanceof QName
+	                   && _stringRep.equals(((QName) other).getStringRep()));
     }
 
     public String getLocalPart() {
@@ -80,7 +82,6 @@ final class QName {
     }
 
     public String dump() {
-	return new String("QName: " + _namespace + "(" + _prefix + "):" 
-	    + _localname);
+	return "QName: " + _namespace + "(" + _prefix + "):" + _localname;
     }
 }

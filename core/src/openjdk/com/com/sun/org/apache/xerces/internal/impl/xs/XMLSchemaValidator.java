@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Stack;
 import java.util.Vector;
+import java.util.ArrayList;
 
 import com.sun.org.apache.xerces.internal.impl.Constants;
 import com.sun.org.apache.xerces.internal.impl.RevalidationHandler;
@@ -79,6 +80,7 @@ import com.sun.org.apache.xerces.internal.xs.XSObjectList;
 import com.sun.org.apache.xerces.internal.xs.XSTypeDefinition;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
+import com.sun.org.apache.xerces.internal.parsers.XMLParser;
 
 /**
  * The XML Schema validator. The validator implements a document
@@ -173,6 +175,9 @@ public class XMLSchemaValidator
     protected static final String PARSER_SETTINGS =
             Constants.XERCES_FEATURE_PREFIX + Constants.PARSER_SETTINGS;
 
+    protected static final String REPORT_WHITESPACE =
+            Constants.SUN_SCHEMA_FEATURE_PREFIX + Constants.SUN_REPORT_IGNORED_ELEMENT_CONTENT_WHITESPACE;
+
     // property identifiers
 
     /** Property identifier: symbol table. */
@@ -229,7 +234,6 @@ public class XMLSchemaValidator
             VALIDATE_ANNOTATIONS,
             HONOUR_ALL_SCHEMALOCATIONS,
             USE_GRAMMAR_POOL_ONLY};
-
 
     /** Feature defaults. */
     private static final Boolean[] FEATURE_DEFAULTS = { null,
@@ -313,6 +317,9 @@ public class XMLSchemaValidator
     protected boolean fEntityRef = false;
     protected boolean fInCDATA = false;
 
+    // Did we see only whitespace in element content?
+    protected boolean fSawOnlyWhitespaceInElementContent = false;
+    
     // properties
 
     /** Symbol table. */
@@ -461,6 +468,8 @@ public class XMLSchemaValidator
 
     protected XMLDocumentSource fDocumentSource;
 
+    boolean reportWhitespace = false;
+            
     //
     // XMLComponent methods
     //
@@ -562,6 +571,17 @@ public class XMLSchemaValidator
     /** Sets the document handler to receive information about the document. */
     public void setDocumentHandler(XMLDocumentHandler documentHandler) {
         fDocumentHandler = documentHandler;
+
+        // Init reportWhitespace for this handler
+        if (documentHandler instanceof XMLParser) {
+            try {
+                reportWhitespace = 
+                    ((XMLParser) documentHandler).getFeature(REPORT_WHITESPACE);
+            }
+            catch (Exception e) {
+                reportWhitespace = false;
+            }
+        }
     } // setDocumentHandler(XMLDocumentHandler)
 
     /** Returns the document handler */
@@ -738,8 +758,16 @@ public class XMLSchemaValidator
      * @throws XNIException Thrown by handler to signal an error.
      */
     public void characters(XMLString text, Augmentations augs) throws XNIException {
-
         text = handleCharacters(text);
+        
+        if (fSawOnlyWhitespaceInElementContent) {
+            fSawOnlyWhitespaceInElementContent = false;
+            if (!reportWhitespace) {
+                ignorableWhitespace(text, augs);
+                return;
+            }
+        }
+
         // call handlers
         if (fDocumentHandler != null) {
             if (fNormalizeData && fUnionType) {
@@ -770,7 +798,6 @@ public class XMLSchemaValidator
      * @throws XNIException Thrown by handler to signal an error.
      */
     public void ignorableWhitespace(XMLString text, Augmentations augs) throws XNIException {
-
         handleIgnorableWhitespace(text);
         // call handlers
         if (fDocumentHandler != null) {
@@ -1571,6 +1598,7 @@ public class XMLSchemaValidator
 
         // When it's a complex type with element-only content, we need to
         // find out whether the content contains any non-whitespace character.
+        fSawOnlyWhitespaceInElementContent = false;
         if (fCurrentType != null
             && fCurrentType.getTypeCategory() == XSTypeDefinition.COMPLEX_TYPE) {
             XSComplexTypeDecl ctype = (XSComplexTypeDecl) fCurrentType;
@@ -1581,6 +1609,7 @@ public class XMLSchemaValidator
                         fSawCharacters = true;
                         break;
                     }
+                    fSawOnlyWhitespaceInElementContent = !fSawCharacters;
                 }
             }
         }
@@ -3133,30 +3162,18 @@ public class XMLSchemaValidator
                     reportSchemaError(
                         "cvc-complex-type.2.4.b",
                         new Object[] { element.rawname, expected });
-                }
-                
+                } else {
                 // Constant space algorithm for a{n,m} for n > 1 and m <= unbounded
-                // After the DFA has completed, check that the number of transitions
-                // is within minOccurs and maxOccurs, unless maxOccurs is set to
-                // unbounded in which case only minOccurs is checked. Uses the user 
-                // data stored in the validator, which was originally copied from 
-                // the content model node.
-                Object userData = fCurrentCM.getUserData();
-                if (userData instanceof int[]) {
-                    int minOccurs = ((int[]) userData)[0];
-                    int maxOccurs = ((int[]) userData)[1];
-                    int n = fCurrentCM.getOneTransitionCounter();
-                    if (n < minOccurs) {
-                        String expected = expectedStr(fCurrentCM.whatCanGoHere(fCurrCMState));
+                    // After the DFA has completed, check minOccurs and maxOccurs
+                    // for all elements and wildcards in this content model where
+                    // a{n,m} is subsumed to a* or a+
+                    ArrayList errors = fCurrentCM.checkMinMaxBounds();
+                    if (errors != null) {
+                        for (int i = 0; i < errors.size(); i += 2) {
                         reportSchemaError(
-                            "cvc-complex-type.2.4.b",
-                            new Object[] { element.rawname, expected });                        
+                                (String) errors.get(i),
+                                new Object[] { element.rawname, errors.get(i + 1) });
                     }
-                    if (maxOccurs != SchemaSymbols.OCCURRENCE_UNBOUNDED && n > maxOccurs) {
-                        String expected = expectedStr(fCurrentCM.whatCanGoHere(fCurrCMState));
-                        reportSchemaError(
-                            "cvc-complex-type.2.4.d",
-                            new Object[] { expected });                                                
                     }
                 }
             }
@@ -3434,34 +3451,19 @@ public class XMLSchemaValidator
                 return;
             }
 
-            // do we have enough values?
+            // Validation Rule: Identity-constraint Satisfied
+            // 4.2 If the {identity-constraint category} is key, then all of the following must be true:
+            // 4.2.1 The target node set and the qualified node set are equal, that is, every member of the
+            // target node set is also a member of the qualified node set and vice versa.
+            //
+            // If the IDC is a key check whether we have all the fields.
             if (fValuesCount != fFieldCount) {
-                switch (fIdentityConstraint.getCategory()) {
-                    case IdentityConstraint.IC_UNIQUE :
-                        {
-                            String code = "UniqueNotEnoughValues";
-                            String ename = fIdentityConstraint.getElementName();
-                            reportSchemaError(code, new Object[] { ename });
-                            break;
-                        }
-                    case IdentityConstraint.IC_KEY :
-                        {
+                if (fIdentityConstraint.getCategory() == IdentityConstraint.IC_KEY) {
                             String code = "KeyNotEnoughValues";
                             UniqueOrKey key = (UniqueOrKey) fIdentityConstraint;
                             String ename = fIdentityConstraint.getElementName();
                             String kname = key.getIdentityConstraintName();
                             reportSchemaError(code, new Object[] { ename, kname });
-                            break;
-                        }
-                    case IdentityConstraint.IC_KEYREF :
-                        {
-                            String code = "KeyRefNotEnoughValues";
-                            KeyRef keyref = (KeyRef) fIdentityConstraint;
-                            String ename = fIdentityConstraint.getElementName();
-                            String kname = (keyref.getKey()).getIdentityConstraintName();
-                            reportSchemaError(code, new Object[] { ename, kname });
-                            break;
-                        }
                 }
                 return;
             }

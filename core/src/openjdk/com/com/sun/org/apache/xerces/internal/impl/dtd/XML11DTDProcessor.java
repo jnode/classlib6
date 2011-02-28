@@ -61,12 +61,15 @@
 
 package com.sun.org.apache.xerces.internal.impl.dtd;
 
+import com.sun.org.apache.xerces.internal.impl.Constants;
+import com.sun.org.apache.xerces.internal.impl.XML11DTDScannerImpl;
+import com.sun.org.apache.xerces.internal.impl.XMLDTDScannerImpl;
+import com.sun.org.apache.xerces.internal.impl.XMLEntityManager;
 import com.sun.org.apache.xerces.internal.impl.XMLErrorReporter;
 import com.sun.org.apache.xerces.internal.util.SymbolTable;
 import com.sun.org.apache.xerces.internal.util.XML11Char;
 import com.sun.org.apache.xerces.internal.xni.grammars.XMLGrammarPool;
 import com.sun.org.apache.xerces.internal.xni.parser.XMLEntityResolver;
-
 
 /**
  * This class extends XMLDTDProcessor by giving it
@@ -113,4 +116,13 @@ public class XML11DTDProcessor extends XMLDTDLoader{
         return XML11Char.isXML11ValidName(name);
     } // isValidNmtoken(String):  boolean
     
+    protected XMLDTDScannerImpl createDTDScanner(SymbolTable symbolTable,
+            XMLErrorReporter errorReporter, XMLEntityManager entityManager) {
+        return new XML11DTDScannerImpl(symbolTable, errorReporter, entityManager);
+    } // createDTDScanner(SymbolTable, XMLErrorReporter, XMLEntityManager) : XMLDTDScannerImpl
+
+    protected short getScannerVersion() {
+        return Constants.XML_VERSION_1_1;
+    } // getScannerVersion() : short
+
 } // class XML11DTDProcessor

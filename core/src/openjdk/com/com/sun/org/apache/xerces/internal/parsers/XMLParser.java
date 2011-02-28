@@ -27,6 +27,9 @@ import com.sun.org.apache.xerces.internal.xni.XNIException;
 import com.sun.org.apache.xerces.internal.xni.parser.XMLInputSource;
 import com.sun.org.apache.xerces.internal.xni.parser.XMLParserConfiguration;
 
+import org.xml.sax.SAXNotSupportedException;
+import org.xml.sax.SAXNotRecognizedException;
+
 /**
  * Base class of all XML-related parsers.
  * <p>
@@ -79,6 +82,15 @@ public abstract class XMLParser {
     // Constructors
     //
 
+    /**
+     * Query the state of a feature.
+     */
+    public boolean getFeature(String featureId) 
+            throws SAXNotSupportedException, SAXNotRecognizedException {
+        return fConfiguration.getFeature(featureId);
+
+    }
+    
     /**
      * Default Constructor.
      */

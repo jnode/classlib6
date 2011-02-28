@@ -20,6 +20,8 @@
 
 package com.sun.org.apache.xerces.internal.impl.dv;
 
+import java.util.Locale;
+
 /**
  * ValidationContext has all the information required for the
  * validation of: id, idref, entity, notation, qname
@@ -58,4 +60,8 @@ public interface ValidationContext {
 
     // qname
     public String getURI(String prefix);
+
+    // Locale
+    public Locale getLocale();
+
 }

@@ -847,7 +847,10 @@ public class ErrorMessages_ko extends ListResourceBundle {
          * stylesheet (see above).
          */
         {ErrorMsg.RUNTIME_ERROR_KEY,
-        "Translet \uc624\ub958:"}
+        "Translet \uc624\ub958:"},
+
+		{ErrorMsg.JAXP_SECUREPROCESSING_FEATURE,
+        "FEATURE_SECURE_PROCESSING: \ubcf4\uc548 \uad00\ub9ac\uc790\uac00 \uc788\uc73c\uba74 \uc774 \uae30\ub2a5\uc744 False\ub85c \uc124\uc815\ud560 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4."}
     };
     }
 }

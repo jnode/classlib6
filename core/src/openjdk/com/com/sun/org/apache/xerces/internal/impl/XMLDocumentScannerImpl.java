@@ -1,5 +1,5 @@
 /*
- * Portions Copyright 2003-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2003, 2006, Oracle and/or its affiliates. All rights reserved.
  */
 
 /*
@@ -280,7 +280,7 @@ public class XMLDocumentScannerImpl
         fDisallowDoctype = !((Boolean)propertyManager.getProperty(XMLInputFactory.SUPPORT_DTD)).booleanValue();
         
         // xerces features
-        fLoadExternalDTD = true ;
+        fLoadExternalDTD = !((Boolean)propertyManager.getProperty(Constants.ZEPHYR_PROPERTY_PREFIX + Constants.IGNORE_EXTERNAL_DTD)).booleanValue();
         setScannerState(XMLEvent.START_DOCUMENT);
         setDriver(fXMLDeclDriver);
         fSeenInternalSubset = false;
@@ -714,6 +714,7 @@ public class XMLDocumentScannerImpl
         setScannerState(SCANNER_STATE_PROLOG);
         setDriver(fPrologDriver);
         fEntityManager.setEntityHandler(XMLDocumentScannerImpl.this);
+        fReadingDTD=false;
     }
     
     /** Returns the scanner state name. */
@@ -779,8 +780,8 @@ public class XMLDocumentScannerImpl
                         }
                         String target = fSymbolTable.addSymbol(fStringBuffer.ch, fStringBuffer.offset, fStringBuffer.length);
                         //this function should fill the data.. and set the fEvent object to this event.
-                        fStringBuffer.clear() ;
-                        scanPIData(target, fStringBuffer);
+                        fContentBuffer.clear() ;
+                        scanPIData(target, fContentBuffer);
                         //REVISIT:where else we can set this value to 'true'
                         fEntityManager.fCurrentEntity.mayReadChunks = true;
                         //return PI event since PI was encountered
@@ -937,6 +938,7 @@ public class XMLDocumentScannerImpl
                             reportFatalError("AlreadySeenDoctype", null);
                         }
                         fSeenDoctypeDecl = true;
+                        
                         // scanDoctypeDecl() sends XNI doctypeDecl event that
                         // in SAX is converted to startDTD() event.
                         if (scanDoctypeDecl(fDisallowDoctype)) {
@@ -953,7 +955,6 @@ public class XMLDocumentScannerImpl
                             //return fDisallowDoctype ? next() : dtdEvent;
                         }
                         
-                        /** xxx:check this part again
                         if(fSeenDoctypeDecl){
                             Entity entity = fEntityScanner.getCurrentEntity();
                             if(entity instanceof Entity.ScannedEntity){
@@ -961,7 +962,6 @@ public class XMLDocumentScannerImpl
                             }
                             fReadingDTD = false;
                         }
-                         */
                         
                         // handle external subset
                         if (fDoctypeSystemId != null) {
@@ -1145,6 +1145,7 @@ public class XMLDocumentScannerImpl
                                 
                                 setEndDTDScanState();
                                     return true;
+                            
                                 }
                             break;
                         }

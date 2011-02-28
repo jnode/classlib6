@@ -847,7 +847,10 @@ public class ErrorMessages_de extends ListResourceBundle {
          * stylesheet (see above).
          */
         {ErrorMsg.RUNTIME_ERROR_KEY,
-        "Translet-Fehler:"}
+        "Translet-Fehler:"},
+
+		{ErrorMsg.JAXP_SECUREPROCESSING_FEATURE,
+        "FEATURE_SECURE_PROCESSING: Diese Funktion kann nicht auf \"false\" gesetzt werden, wenn der Security Manager pr\u00e4sent ist."}
     };
     }
 }

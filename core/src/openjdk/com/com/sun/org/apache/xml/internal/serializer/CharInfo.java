@@ -28,7 +28,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.security.AccessController;
@@ -54,7 +54,7 @@ import com.sun.org.apache.xml.internal.serializer.utils.WrappedRuntimeException;
 final class CharInfo
 {
     /** Given a character, lookup a String to output (e.g. a decorated entity reference). */
-    private Hashtable m_charToString = new Hashtable();
+    private HashMap m_charToString = new HashMap();
 
     /**
      * The name of the HTML entities file.
@@ -360,15 +360,13 @@ final class CharInfo
      */
     private void defineEntity(String name, char value)
     {
-        StringBuffer sb = new StringBuffer("&");
+        StringBuilder sb = new StringBuilder("&");
         sb.append(name);
         sb.append(';');
         String entityString = sb.toString();
         
         defineChar2StringMapping(entityString, value);
     }
-
-    private CharKey m_charKey = new CharKey();
 
     /**
      * Map a character to a String. For example given
@@ -392,11 +390,11 @@ final class CharInfo
      * @return The String that the character is mapped to, or null if not found.
      * @xsl.usage internal
      */
-    synchronized String getOutputStringForChar(char value)
+    String getOutputStringForChar(char value)
     {
-        // CharKey m_charKey = new CharKey(); //Alternative to synchronized
-        m_charKey.setChar(value);
-        return (String) m_charToString.get(m_charKey);
+        CharKey charKey = new CharKey(); 
+        charKey.setChar(value);
+        return (String) m_charToString.get(charKey);
     }
     
     /**
@@ -536,7 +534,7 @@ final class CharInfo
     }
 
     /** Table of user-specified char infos. */
-    private static Hashtable m_getCharInfoCache = new Hashtable();
+    private static HashMap m_getCharInfoCache = new HashMap();
 
     /**
      * Returns the array element holding the bit value for the

@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Locale;
 import java.util.Stack;
 import java.util.Vector;
 
@@ -175,6 +176,10 @@ public class XSDHandler {
     private static final String SECURE_PROCESSING =
         Constants.XERCES_PROPERTY_PREFIX + Constants.SECURITY_MANAGER_PROPERTY;
    
+    /** Property identifier: locale. */
+    protected static final String LOCALE =
+        Constants.XERCES_PROPERTY_PREFIX + Constants.LOCALE_PROPERTY;
+
     protected static final boolean DEBUG_NODE_POOL = false;
     
     // Data
@@ -657,6 +662,9 @@ public class XSDHandler {
         /** Set error handler. **/
         XMLErrorHandler errorHandler = fErrorReporter.getErrorHandler();
         fAnnotationValidator.setProperty(ERROR_HANDLER, (errorHandler != null) ? errorHandler : new DefaultErrorHandler());
+        /** Set locale. **/
+        Locale locale = fErrorReporter.getLocale();
+        fAnnotationValidator.setProperty(LOCALE, locale);
     }
 
     /**
@@ -1804,7 +1812,8 @@ public class XSDHandler {
                 }
                 
                 fSchemaParser.parse(schemaSource);
-                schemaElement = fSchemaParser.getDocument2() == null ? null: DOMUtil.getRoot(fSchemaParser.getDocument2());
+                Document schemaDocument = fSchemaParser.getDocument();
+                schemaElement = schemaDocument != null ? DOMUtil.getRoot(schemaDocument) : null;
                 
                 // now we need to store the mapping information from system id
                 // to the document. also from the document to the system id.
@@ -1926,17 +1935,18 @@ public class XSDHandler {
         }
         
         // reset traversers
+        Locale locale = fErrorReporter.getLocale();
         fAttributeChecker.reset(fSymbolTable);
-        fAttributeGroupTraverser.reset(fSymbolTable, fValidateAnnotations);
-        fAttributeTraverser.reset(fSymbolTable, fValidateAnnotations);
-        fComplexTypeTraverser.reset(fSymbolTable, fValidateAnnotations);
-        fElementTraverser.reset(fSymbolTable, fValidateAnnotations);
-        fGroupTraverser.reset(fSymbolTable, fValidateAnnotations);
-        fKeyrefTraverser.reset(fSymbolTable, fValidateAnnotations);
-        fNotationTraverser.reset(fSymbolTable, fValidateAnnotations);
-        fSimpleTypeTraverser.reset(fSymbolTable, fValidateAnnotations);
-        fUniqueOrKeyTraverser.reset(fSymbolTable, fValidateAnnotations);
-        fWildCardTraverser.reset(fSymbolTable, fValidateAnnotations);
+        fAttributeGroupTraverser.reset(fSymbolTable, fValidateAnnotations, locale);
+        fAttributeTraverser.reset(fSymbolTable, fValidateAnnotations, locale);
+        fComplexTypeTraverser.reset(fSymbolTable, fValidateAnnotations, locale);
+        fElementTraverser.reset(fSymbolTable, fValidateAnnotations, locale);
+        fGroupTraverser.reset(fSymbolTable, fValidateAnnotations, locale);
+        fKeyrefTraverser.reset(fSymbolTable, fValidateAnnotations, locale);
+        fNotationTraverser.reset(fSymbolTable, fValidateAnnotations, locale);
+        fSimpleTypeTraverser.reset(fSymbolTable, fValidateAnnotations, locale);
+        fUniqueOrKeyTraverser.reset(fSymbolTable, fValidateAnnotations, locale);
+        fWildCardTraverser.reset(fSymbolTable, fValidateAnnotations, locale);
         
         fRedefinedRestrictedAttributeGroupRegistry.clear();
         fRedefinedRestrictedGroupRegistry.clear();
@@ -1972,12 +1982,19 @@ public class XSDHandler {
             XMLErrorHandler currErrorHandler = fErrorReporter.getErrorHandler();
             // Setting a parser property can be much more expensive
             // than checking its value.  Don't set the ERROR_HANDLER
-            // property unless it's actually changed.
+            // or LOCALE properties unless they've actually changed.
             if (currErrorHandler != fSchemaParser.getProperty(ERROR_HANDLER)) {
                 fSchemaParser.setProperty(ERROR_HANDLER, (currErrorHandler != null) ? currErrorHandler : new DefaultErrorHandler());
                 if (fAnnotationValidator != null) {
                     fAnnotationValidator.setProperty(ERROR_HANDLER, (currErrorHandler != null) ? currErrorHandler : new DefaultErrorHandler());
             	}
+            }
+            Locale currentLocale = fErrorReporter.getLocale();
+            if (currentLocale != fSchemaParser.getProperty(LOCALE)) {
+                fSchemaParser.setProperty(LOCALE, currentLocale);
+                if (fAnnotationValidator != null) {
+                    fAnnotationValidator.setProperty(LOCALE, currentLocale);
+                }
             }
         } catch (XMLConfigurationException e) {
         }

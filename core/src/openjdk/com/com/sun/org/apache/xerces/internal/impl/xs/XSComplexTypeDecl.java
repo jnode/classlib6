@@ -75,7 +75,7 @@ public class XSComplexTypeDecl implements XSComplexTypeDefinition, TypeInfo {
     XSParticleDecl fParticle = null;
 
     // if there is a particle, the content model corresponding to that particle
-    XSCMValidator fCMValidator = null;
+    volatile XSCMValidator fCMValidator = null;
 
     // list of annotations affiliated with this type
     XSObjectListImpl fAnnotations = null;
@@ -152,10 +152,13 @@ public class XSComplexTypeDecl implements XSComplexTypeDefinition, TypeInfo {
         fMiscFlags |= CT_IS_ANONYMOUS;
     }
 
-    public synchronized XSCMValidator getContentModel(CMBuilder cmBuilder) {
+    public XSCMValidator getContentModel(CMBuilder cmBuilder) {
         if (fCMValidator == null)
+            synchronized (this) {
+                if (fCMValidator == null) {
             fCMValidator = cmBuilder.getContentModel(this);
-
+                }
+            }
         return fCMValidator;
     }
 
@@ -167,12 +170,12 @@ public class XSComplexTypeDecl implements XSComplexTypeDefinition, TypeInfo {
     }
 
     public String toString() {
-        StringBuffer str = new StringBuffer();
+        StringBuilder str = new StringBuilder(192);
         appendTypeInfo(str);
         return str.toString();
     }
 
-    void appendTypeInfo(StringBuffer str) {
+    void appendTypeInfo(StringBuilder str) {
         String contentType[] = {"EMPTY", "SIMPLE", "ELEMENT", "MIXED"};
         String derivedBy[] = {"EMPTY", "EXTENSION", "RESTRICTION"};
 

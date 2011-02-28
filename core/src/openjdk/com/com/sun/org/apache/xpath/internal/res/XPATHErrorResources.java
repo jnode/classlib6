@@ -318,6 +318,7 @@ public static final String ER_IGNORABLE_WHITESPACE_NOT_HANDLED =
   public static final String ER_FEATURE_UNKNOWN = "ER_FEATURE_UNKNOWN";
   public static final String ER_GETTING_NULL_FEATURE = "ER_GETTING_NULL_FEATURE";
   public static final String ER_GETTING_UNKNOWN_FEATURE = "ER_GETTING_UNKNOWN_FEATURE";
+  public static final String ER_SECUREPROCESSING_FEATURE = "ER_SECUREPROCESSING_FEATURE";
   public static final String ER_NULL_XPATH_FUNCTION_RESOLVER = "ER_NULL_XPATH_FUNCTION_RESOLVER";
   public static final String ER_NULL_XPATH_VARIABLE_RESOLVER = "ER_NULL_XPATH_VARIABLE_RESOLVER";
   //END: Keys needed for exception messages of  JAXP 1.3 XPath API implementation 
@@ -820,6 +821,9 @@ public static final String ER_IGNORABLE_WHITESPACE_NOT_HANDLED =
   { ER_GETTING_UNKNOWN_FEATURE,
        "Trying to get the unknown feature \"{0}\":{1}#getFeature({0})"},
 
+  {ER_SECUREPROCESSING_FEATURE,
+        "FEATURE_SECURE_PROCESSING: Cannot set the feature to false when security manager is present: {1}#setFeature({0},{2})"},
+               
   /** Field ER_NULL_XPATH_FUNCTION_RESOLVER                       */
 
   { ER_NULL_XPATH_FUNCTION_RESOLVER,

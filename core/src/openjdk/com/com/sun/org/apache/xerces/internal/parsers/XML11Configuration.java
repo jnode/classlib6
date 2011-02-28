@@ -255,6 +255,10 @@ public class XML11Configuration extends ParserConfigurationSettings
     protected static final String JAXP_SCHEMA_SOURCE =
         Constants.JAXP_PROPERTY_PREFIX + Constants.SCHEMA_SOURCE;
 
+    /** Property identifier: locale. */
+    protected static final String LOCALE =
+        Constants.XERCES_PROPERTY_PREFIX + Constants.LOCALE_PROPERTY;
+
     // debugging
 
     /** Set to true and recompile to print exception stack trace. */
@@ -500,7 +504,10 @@ public class XML11Configuration extends ParserConfigurationSettings
             	//       validator is constructed dynamically, its recognized
             	//       properties might not have been set and it would cause a
             	//       not-recognized exception to be thrown. -Ac
-            	SCHEMA_LOCATION, SCHEMA_NONS_LOCATION, };
+            	SCHEMA_LOCATION,
+                SCHEMA_NONS_LOCATION,
+                LOCALE,
+        };
         addRecognizedProperties(recognizedProperties);
 		
 		if (symbolTable == null) {
@@ -770,6 +777,7 @@ public class XML11Configuration extends ParserConfigurationSettings
             try {
 				fValidationManager.reset();
                 fVersionDetector.reset(this);
+                fConfigUpdated = true;
                 resetCommon();
 
                 short version = fVersionDetector.determineDocVersion(fInputSource);
@@ -897,6 +905,26 @@ public class XML11Configuration extends ParserConfigurationSettings
 	} // setFeature(String,boolean)
 	
 	/**
+     * Returns the value of a property.
+     *
+     * @param propertyId The property identifier.
+     * @return the value of the property
+     *
+     * @throws XMLConfigurationException Thrown for configuration error.
+     *                                   In general, components should
+     *                                   only throw this exception if
+     *                                   it is <strong>really</strong>
+     *                                   a critical error.
+     */
+    public Object getProperty(String propertyId)
+        throws XMLConfigurationException {
+        if (LOCALE.equals(propertyId)) {
+            return getLocale();
+        }
+        return super.getProperty(propertyId);
+    }
+
+	/**
 	 * setProperty
 	 * 
 	 * @param propertyId 
@@ -905,6 +933,9 @@ public class XML11Configuration extends ParserConfigurationSettings
 	public void setProperty(String propertyId, Object value)
 		throws XMLConfigurationException {
 		fConfigUpdated = true;
+		if (LOCALE.equals(propertyId)) {
+		    setLocale((Locale) value);
+		}
 		// forward to every XML 1.0 component
 		int count = fComponents.size();
 		for (int i = 0; i < count; i++) {

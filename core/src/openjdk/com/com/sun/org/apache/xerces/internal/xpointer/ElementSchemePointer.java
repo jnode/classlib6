@@ -305,6 +305,7 @@ class ElementSchemePointer implements XPointerPart {
         //     
         if (fIsResolveElement) {
             // start
+            fWasOnlyEmptyElementFound = false;
             if (event == XPointerPart.EVENT_ELEMENT_START) {
                 fCurrentChildSequence[fCurrentChildDepth] = fCurrentChildPosition;
                 fCurrentChildDepth++;

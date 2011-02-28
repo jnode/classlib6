@@ -31,6 +31,7 @@ import com.sun.org.apache.xerces.internal.impl.xs.XSParticleDecl;
  * @xerces.internal 
  *
  * @author Neil Graham, IBM
+ * @version $$
  */
 public class XSCMUniOp extends CMNode {
     // -------------------------------------------------------------------
@@ -87,6 +88,18 @@ public class XSCMUniOp extends CMNode {
         toSet.setTo(fChild.lastPos());
     }
 
+    /**
+     * Allows the user to set arbitrary data on this content model
+     * node. This is used by the a{n,m} optimization that runs
+     * in constant space. For convenience, set user data in
+     * children node too.
+     */
+    @Override
+    public void setUserData(Object userData) {
+        super.setUserData(userData);
+        fChild.setUserData(userData);
+    }
+
 
     // -------------------------------------------------------------------
     //  Private data members
@@ -97,3 +110,4 @@ public class XSCMUniOp extends CMNode {
     // -------------------------------------------------------------------
     private CMNode  fChild;
 } // XSCMUniOp
+

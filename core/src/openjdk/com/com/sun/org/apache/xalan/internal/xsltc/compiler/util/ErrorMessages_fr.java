@@ -847,7 +847,10 @@ public class ErrorMessages_fr extends ListResourceBundle {
          * stylesheet (see above).
          */
         {ErrorMsg.RUNTIME_ERROR_KEY,
-        "Erreurs de translet :"}
+        "Erreurs de translet :"},
+		
+		{ErrorMsg.JAXP_SECUREPROCESSING_FEATURE,
+        "FEATURE_SECURE_PROCESSING: Impossible de d\u00e9finir la valeur False pour la fonction lorsque le gestionnaire de s\u00e9curit\u00e9 est pr\u00e9sent."}
     };
     }
 }

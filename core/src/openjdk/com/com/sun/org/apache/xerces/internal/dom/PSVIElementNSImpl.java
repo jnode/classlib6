@@ -257,6 +257,7 @@ public class PSVIElementNSImpl extends ElementNSImpl implements ElementPSVI {
         this.fItemValueTypes = elem.getItemValueTypes();
         this.fMemberType = elem.getMemberTypeDefinition();
         this.fSpecified = elem.getIsSchemaSpecified();
+        this.fNil = elem.getNil();
     }
 
     /* (non-Javadoc)

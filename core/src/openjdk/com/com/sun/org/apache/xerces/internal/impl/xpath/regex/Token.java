@@ -32,7 +32,7 @@ import java.util.Hashtable;
  */
 class Token implements java.io.Serializable {
 
-    private static final long serialVersionUID = 4049923761862293040L;
+    private static final long serialVersionUID = 8484976002585487481L;
 
     static final boolean COUNTTOKENS = true;
     static int tokens = 0;
@@ -60,7 +60,7 @@ class Token implements java.io.Serializable {
 
     static final int UTF16_MAX = 0x10ffff;
 
-    int type;
+    final int type;
 
     static Token token_dot;
     static Token token_0to9;
@@ -441,35 +441,15 @@ class Token implements java.io.Serializable {
             }
             return FC_TERMINAL;
 
-          case DOT:                             // ****
-            if (isSet(options, RegularExpression.SINGLE_LINE)) {
-                return FC_CONTINUE;             // **** We can not optimize.
-            } else {
-                return FC_CONTINUE;
-                /*
-                result.addRange(0, RegularExpression.LINE_FEED-1);
-                result.addRange(RegularExpression.LINE_FEED+1, RegularExpression.CARRIAGE_RETURN-1);
-                result.addRange(RegularExpression.CARRIAGE_RETURN+1,
-                                RegularExpression.LINE_SEPARATOR-1);
-                result.addRange(RegularExpression.PARAGRAPH_SEPARATOR+1, UTF16_MAX);
-                return 1;
-                */
-            }
+          case DOT:
+              return FC_ANY;
 
           case RANGE:
-            if (isSet(options, RegularExpression.IGNORE_CASE)) {
-                result.mergeRanges(((RangeToken)this).getCaseInsensitiveToken());
-            } else {
                 result.mergeRanges(this);
-            }
             return FC_TERMINAL;
 
           case NRANGE:                          // ****
-            if (isSet(options, RegularExpression.IGNORE_CASE)) {
-                result.mergeRanges(Token.complementRanges(((RangeToken)this).getCaseInsensitiveToken()));
-            } else {
                 result.mergeRanges(Token.complementRanges(this));
-            }
             return FC_TERMINAL;
 
           case INDEPENDENT:
@@ -821,7 +801,7 @@ class Token implements java.io.Serializable {
                         type = CHAR_SYMBOL;
                         break;
                       default:
-                        throw new RuntimeException("com.sun.org.apache.xerces.internal.utils.regex.Token#getRange(): Unknown Unicode category: "+type);
+                        throw new RuntimeException("org.apache.xerces.utils.regex.Token#getRange(): Unknown Unicode category: "+type);
                     }
                     ranges[type].addRange(i, i);
                 } // for all characters
@@ -1048,8 +1028,7 @@ class Token implements java.io.Serializable {
         base_char.subtractRanges(Token.getRange("C", true));
 
         Token virama = Token.createRange();
-        for (int i = 0;  i < Token.viramaString.length();  i ++) {
-            int ch = viramaString.charAt(i);
+        for (int i = 0;  i < Token.viramaString.length(); i++) {
             virama.addRange(i, i);
         }
 
@@ -1096,10 +1075,10 @@ class Token implements java.io.Serializable {
      */
     static class StringToken extends Token implements java.io.Serializable {
 
-        private static final long serialVersionUID = 3257288015452780086L;
+        private static final long serialVersionUID = -4614366944218504172L;
         
         String string;
-        int refNumber;
+        final int refNumber;
 
         StringToken(int type, String str, int n) {
             super(type);
@@ -1127,10 +1106,10 @@ class Token implements java.io.Serializable {
      */
     static class ConcatToken extends Token implements java.io.Serializable {
 
-        private static final long serialVersionUID = 4050760502994940212L;
+        private static final long serialVersionUID = 8717321425541346381L;
         
-        Token child;
-        Token child2;
+        final Token child;
+        final Token child2;
         
         ConcatToken(Token t1, Token t2) {
             super(Token.CONCAT);
@@ -1162,9 +1141,9 @@ class Token implements java.io.Serializable {
      */
     static class CharToken extends Token implements java.io.Serializable {
 
-        private static final long serialVersionUID = 3257284751277569842L;
+        private static final long serialVersionUID = -4394272816279496989L;
         
-        int chardata;
+        final int chardata;
 
         CharToken(int type, int ch) {
             super(type);
@@ -1226,11 +1205,11 @@ class Token implements java.io.Serializable {
      */
     static class ClosureToken extends Token implements java.io.Serializable {
 
-        private static final long serialVersionUID = 3545230349706932537L;
+        private static final long serialVersionUID = 1308971930673997452L;
         
         int min;
         int max;
-        Token child;
+        final Token child;
 
         ClosureToken(int type, Token tok) {
             super(type);
@@ -1295,10 +1274,10 @@ class Token implements java.io.Serializable {
      */
     static class ParenToken extends Token implements java.io.Serializable {
 
-        private static final long serialVersionUID = 3257572797621219636L;
+        private static final long serialVersionUID = -5938014719827987704L;
         
-        Token child;
-        int parennumber;
+        final Token child;
+        final int parennumber;
 
         ParenToken(int type, Token tok, int paren) {
             super(type);
@@ -1353,12 +1332,12 @@ class Token implements java.io.Serializable {
      */
     static class ConditionToken extends Token implements java.io.Serializable {
 
-        private static final long serialVersionUID = 3761408607870399794L;
+        private static final long serialVersionUID = 4353765277910594411L;
         
-        int refNumber;
-        Token condition;
-        Token yes;
-        Token no;
+        final int refNumber;
+        final Token condition;
+        final Token yes;
+        final Token no;
         ConditionToken(int refno, Token cond, Token yespat, Token nopat) {
             super(Token.CONDITION);
             this.refNumber = refno;
@@ -1399,11 +1378,11 @@ class Token implements java.io.Serializable {
      */
     static class ModifierToken extends Token implements java.io.Serializable {
 
-        private static final long serialVersionUID = 3258689892778324790L;
+        private static final long serialVersionUID = -9114536559696480356L;
         
-        Token child;
-        int add;
-        int mask;
+        final Token child;
+        final int add;
+        final int mask;
 
         ModifierToken(Token tok, int add, int mask) {
             super(Token.MODIFIERGROUP);
@@ -1442,7 +1421,7 @@ class Token implements java.io.Serializable {
      */
     static class UnionToken extends Token implements java.io.Serializable {
 
-        private static final long serialVersionUID = 3256723987530003507L;
+        private static final long serialVersionUID = -2568843945989489861L;
         
         Vector children;
 

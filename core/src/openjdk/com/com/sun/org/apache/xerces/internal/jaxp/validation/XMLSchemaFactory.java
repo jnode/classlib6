@@ -23,7 +23,6 @@ package com.sun.org.apache.xerces.internal.jaxp.validation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.util.Locale;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
@@ -132,11 +131,11 @@ public final class XMLSchemaFactory extends SchemaFactory {
      */
     public boolean isSchemaLanguageSupported(String schemaLanguage) {
         if (schemaLanguage == null) {
-            throw new NullPointerException(JAXPValidationMessageFormatter.formatMessage(Locale.getDefault(), 
+            throw new NullPointerException(JAXPValidationMessageFormatter.formatMessage(fXMLSchemaLoader.getLocale(),
                     "SchemaLanguageNull", null));
         }
         if (schemaLanguage.length() == 0) {
-            throw new IllegalArgumentException(JAXPValidationMessageFormatter.formatMessage(Locale.getDefault(), 
+            throw new IllegalArgumentException(JAXPValidationMessageFormatter.formatMessage(fXMLSchemaLoader.getLocale(),
                     "SchemaLanguageLengthZero", null));
         }
         // only W3C XML Schema 1.0 is supported 
@@ -188,7 +187,7 @@ public final class XMLSchemaFactory extends SchemaFactory {
                 SAXSource saxSource = (SAXSource) source;
                 InputSource inputSource = saxSource.getInputSource();
                 if (inputSource == null) {
-                    throw new SAXException(JAXPValidationMessageFormatter.formatMessage(Locale.getDefault(), 
+                    throw new SAXException(JAXPValidationMessageFormatter.formatMessage(fXMLSchemaLoader.getLocale(),
                             "SAXSourceNullInputSource", null));
                 }
                 xmlInputSources[i] = new SAXInputSource(saxSource.getXMLReader(), inputSource);
@@ -200,11 +199,11 @@ public final class XMLSchemaFactory extends SchemaFactory {
                 xmlInputSources[i] = new DOMInputSource(node, systemID);
             }
             else if (source == null) {
-                throw new NullPointerException(JAXPValidationMessageFormatter.formatMessage(Locale.getDefault(), 
+                throw new NullPointerException(JAXPValidationMessageFormatter.formatMessage(fXMLSchemaLoader.getLocale(),
                         "SchemaSourceArrayMemberNull", null));
             }
             else {
-                throw new IllegalArgumentException(JAXPValidationMessageFormatter.formatMessage(Locale.getDefault(), 
+                throw new IllegalArgumentException(JAXPValidationMessageFormatter.formatMessage(fXMLSchemaLoader.getLocale(),
                         "SchemaFactorySourceUnrecognized", 
                         new Object [] {source.getClass().getName()}));
             }
@@ -249,7 +248,7 @@ public final class XMLSchemaFactory extends SchemaFactory {
     public boolean getFeature(String name) 
         throws SAXNotRecognizedException, SAXNotSupportedException {
         if (name == null) {
-            throw new NullPointerException(JAXPValidationMessageFormatter.formatMessage(Locale.getDefault(), 
+            throw new NullPointerException(JAXPValidationMessageFormatter.formatMessage(fXMLSchemaLoader.getLocale(),
                     "FeatureNameNull", null));
         }
         if (name.equals(XMLConstants.FEATURE_SECURE_PROCESSING)) {
@@ -262,12 +261,12 @@ public final class XMLSchemaFactory extends SchemaFactory {
             String identifier = e.getIdentifier();
             if (e.getType() == XMLConfigurationException.NOT_RECOGNIZED) {
                 throw new SAXNotRecognizedException(
-                        SAXMessageFormatter.formatMessage(Locale.getDefault(), 
+                        SAXMessageFormatter.formatMessage(fXMLSchemaLoader.getLocale(),
                         "feature-not-recognized", new Object [] {identifier}));
             }
             else {
                 throw new SAXNotSupportedException(
-                        SAXMessageFormatter.formatMessage(Locale.getDefault(), 
+                        SAXMessageFormatter.formatMessage(fXMLSchemaLoader.getLocale(),
                         "feature-not-supported", new Object [] {identifier}));
             }
         }
@@ -276,7 +275,7 @@ public final class XMLSchemaFactory extends SchemaFactory {
     public Object getProperty(String name) 
         throws SAXNotRecognizedException, SAXNotSupportedException {
         if (name == null) {
-            throw new NullPointerException(JAXPValidationMessageFormatter.formatMessage(Locale.getDefault(), 
+            throw new NullPointerException(JAXPValidationMessageFormatter.formatMessage(fXMLSchemaLoader.getLocale(),
                     "ProperyNameNull", null));
         }
         if (name.equals(SECURITY_MANAGER)) {
@@ -284,7 +283,7 @@ public final class XMLSchemaFactory extends SchemaFactory {
         }
         else if (name.equals(XMLGRAMMAR_POOL)) {
             throw new SAXNotSupportedException(
-                    SAXMessageFormatter.formatMessage(Locale.getDefault(), 
+                    SAXMessageFormatter.formatMessage(fXMLSchemaLoader.getLocale(),
                     "property-not-supported", new Object [] {name}));
         }
         try {
@@ -294,12 +293,12 @@ public final class XMLSchemaFactory extends SchemaFactory {
             String identifier = e.getIdentifier();
             if (e.getType() == XMLConfigurationException.NOT_RECOGNIZED) {
                 throw new SAXNotRecognizedException(
-                        SAXMessageFormatter.formatMessage(Locale.getDefault(), 
+                        SAXMessageFormatter.formatMessage(fXMLSchemaLoader.getLocale(),
                         "property-not-recognized", new Object [] {identifier}));
             }
             else {
                 throw new SAXNotSupportedException(
-                        SAXMessageFormatter.formatMessage(Locale.getDefault(), 
+                        SAXMessageFormatter.formatMessage(fXMLSchemaLoader.getLocale(),
                         "property-not-supported", new Object [] {identifier}));
             }
         }
@@ -308,10 +307,15 @@ public final class XMLSchemaFactory extends SchemaFactory {
     public void setFeature(String name, boolean value)
         throws SAXNotRecognizedException, SAXNotSupportedException {
         if (name == null) {
-            throw new NullPointerException(JAXPValidationMessageFormatter.formatMessage(Locale.getDefault(), 
+            throw new NullPointerException(JAXPValidationMessageFormatter.formatMessage(fXMLSchemaLoader.getLocale(),
                     "FeatureNameNull", null));
         }
         if (name.equals(XMLConstants.FEATURE_SECURE_PROCESSING)) {
+            if (System.getSecurityManager() != null && (!value)) {
+                throw new SAXNotSupportedException(
+                        SAXMessageFormatter.formatMessage(null, 
+                        "jaxp-secureprocessing-feature", null));
+            }
             fSecurityManager = value ? new SecurityManager() : null;
             fXMLSchemaLoader.setProperty(SECURITY_MANAGER, fSecurityManager);
             return;
@@ -323,12 +327,12 @@ public final class XMLSchemaFactory extends SchemaFactory {
             String identifier = e.getIdentifier();
             if (e.getType() == XMLConfigurationException.NOT_RECOGNIZED) {
                 throw new SAXNotRecognizedException(
-                        SAXMessageFormatter.formatMessage(Locale.getDefault(), 
+                        SAXMessageFormatter.formatMessage(fXMLSchemaLoader.getLocale(),
                         "feature-not-recognized", new Object [] {identifier}));
             }
             else {
                 throw new SAXNotSupportedException(
-                        SAXMessageFormatter.formatMessage(Locale.getDefault(), 
+                        SAXMessageFormatter.formatMessage(fXMLSchemaLoader.getLocale(),
                         "feature-not-supported", new Object [] {identifier}));
             }
         }
@@ -337,7 +341,7 @@ public final class XMLSchemaFactory extends SchemaFactory {
     public void setProperty(String name, Object object)
         throws SAXNotRecognizedException, SAXNotSupportedException {
         if (name == null) {
-            throw new NullPointerException(JAXPValidationMessageFormatter.formatMessage(Locale.getDefault(), 
+            throw new NullPointerException(JAXPValidationMessageFormatter.formatMessage(fXMLSchemaLoader.getLocale(),
                     "ProperyNameNull", null));
         }
         if (name.equals(SECURITY_MANAGER)) {
@@ -347,7 +351,7 @@ public final class XMLSchemaFactory extends SchemaFactory {
         }
         else if (name.equals(XMLGRAMMAR_POOL)) {
             throw new SAXNotSupportedException(
-                    SAXMessageFormatter.formatMessage(Locale.getDefault(), 
+                    SAXMessageFormatter.formatMessage(fXMLSchemaLoader.getLocale(),
                     "property-not-supported", new Object [] {name}));
         }
         try {
@@ -357,12 +361,12 @@ public final class XMLSchemaFactory extends SchemaFactory {
             String identifier = e.getIdentifier();
             if (e.getType() == XMLConfigurationException.NOT_RECOGNIZED) {
                 throw new SAXNotRecognizedException(
-                        SAXMessageFormatter.formatMessage(Locale.getDefault(), 
+                        SAXMessageFormatter.formatMessage(fXMLSchemaLoader.getLocale(),
                         "property-not-recognized", new Object [] {identifier}));
             }
             else {
                 throw new SAXNotSupportedException(
-                        SAXMessageFormatter.formatMessage(Locale.getDefault(), 
+                        SAXMessageFormatter.formatMessage(fXMLSchemaLoader.getLocale(),
                         "property-not-supported", new Object [] {identifier}));
             }
         }

@@ -59,8 +59,8 @@ public class NamespaceContextWrapper implements NamespaceContext {
     }
     
     public String getPrefix(String namespaceURI) {
-        if (namespaceURI == null || namespaceURI.trim().length() == 0) {
-            throw new IllegalArgumentException("URI can't be null or empty String");
+        if (namespaceURI == null) {
+            throw new IllegalArgumentException("URI can't be null.");
         }
         return fNamespaceContext.getPrefix(namespaceURI.intern());
     }
@@ -70,8 +70,8 @@ public class NamespaceContextWrapper implements NamespaceContext {
      * the same namespaceURI.
      */
     public java.util.Iterator getPrefixes(String namespaceURI) {
-        if (namespaceURI == null || namespaceURI.trim().length() == 0) {
-            throw new IllegalArgumentException("URI can't be null or empty String");
+        if (namespaceURI == null) {
+            throw new IllegalArgumentException("URI can't be null.");
         } 
         else {
             Vector vector = 

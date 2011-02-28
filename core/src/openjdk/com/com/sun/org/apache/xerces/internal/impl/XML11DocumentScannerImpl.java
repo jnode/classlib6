@@ -102,14 +102,10 @@ public class XML11DocumentScannerImpl
     extends XMLDocumentScannerImpl {
 
 
-    /** Array of 3 strings. */
-    private String[] fStrings = new String[3];
-
-    
     /** String buffer. */
-    private XMLStringBuffer fStringBuffer = new XMLStringBuffer();
-    private XMLStringBuffer fStringBuffer2 = new XMLStringBuffer();
-    private XMLStringBuffer fStringBuffer3 = new XMLStringBuffer();
+    private final XMLStringBuffer fStringBuffer = new XMLStringBuffer();
+    private final XMLStringBuffer fStringBuffer2 = new XMLStringBuffer();
+    private final XMLStringBuffer fStringBuffer3 = new XMLStringBuffer();
 
     //
     // Constructors
@@ -384,7 +380,7 @@ public class XML11DocumentScannerImpl
                         }
                     }
                 }
-                else if (c != -1 && XML11Char.isXML11Invalid(c)) {
+                else if (c != -1 && isInvalidLiteral(c)) {
                     reportFatalError("InvalidCharInAttValue",
                                      new Object[] {eleName, atName, Integer.toString(c, 16)});
                     fEntityScanner.scanChar();

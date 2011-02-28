@@ -156,3 +156,4 @@ public abstract class SingleNodeCounter extends NodeCounter {
 	}
     }
 }
+

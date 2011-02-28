@@ -1,5 +1,5 @@
 /*
- * Portions Copyright 2003-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2003, 2006, Oracle and/or its affiliates. All rights reserved.
  */
 
 /*
@@ -1380,7 +1380,7 @@ protected static final String PARSER_SETTINGS =
         if(fCurrentEntity != null){
             //close the reader
             try{
-                fCurrentEntity.reader.close();
+                fCurrentEntity.close();
             }catch(IOException ex){
                 throw new XNIException(ex);
             }
@@ -2596,6 +2596,28 @@ protected static final String PARSER_SETTINGS =
             }
         }
 
+        // replace spaces in file names with %20.
+        // Original comment from JDK5: the following algorithm might not be
+        // very performant, but people who want to use invalid URI's have to
+        // pay the price.
+        int pos = str.indexOf(' ');
+        if (pos >= 0) {
+            StringBuilder sb = new StringBuilder(str.length());
+            // put characters before ' ' into the string builder
+            for (int i = 0; i < pos; i++)
+                sb.append(str.charAt(i));
+            // and %20 for the space
+            sb.append("%20");
+            // for the remamining part, also convert ' ' to "%20".
+            for (int i = pos+1; i < str.length(); i++) {
+                if (str.charAt(i) == ' ')
+                    sb.append("%20");
+                else
+                    sb.append(str.charAt(i));
+            }
+            str = sb.toString();
+        }
+        
         // done
         return str;
 

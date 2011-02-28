@@ -48,9 +48,13 @@ public class SAXParser
     protected static final String NOTIFY_BUILTIN_REFS =
         Constants.XERCES_FEATURE_PREFIX + Constants.NOTIFY_BUILTIN_REFS_FEATURE;
 
+    protected static final String REPORT_WHITESPACE =
+            Constants.SUN_SCHEMA_FEATURE_PREFIX + Constants.SUN_REPORT_IGNORED_ELEMENT_CONTENT_WHITESPACE;
+    
     /** Recognized features. */
     private static final String[] RECOGNIZED_FEATURES = {
         NOTIFY_BUILTIN_REFS,
+        REPORT_WHITESPACE
     };
 
     // properties

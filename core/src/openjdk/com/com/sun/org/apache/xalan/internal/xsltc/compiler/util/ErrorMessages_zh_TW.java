@@ -847,7 +847,10 @@ public class ErrorMessages_zh_TW extends ListResourceBundle {
          * stylesheet (see above).
          */
         {ErrorMsg.RUNTIME_ERROR_KEY,
-        "\u7de8\u8b6f\u5668\u932f\u8aa4\uff1a"}
+        "\u7de8\u8b6f\u5668\u932f\u8aa4\uff1a"},
+
+		{ErrorMsg.JAXP_SECUREPROCESSING_FEATURE,
+        "FEATURE_SECURE_PROCESSING: \u4f7f\u7528\u5b89\u5168\u6027\u7ba1\u7406\u54e1\u6642\uff0c\u4e0d\u53ef\u5c07\u6b64\u529f\u80fd\u8a2d\u70ba false\u3002"}
     };
     }
 }

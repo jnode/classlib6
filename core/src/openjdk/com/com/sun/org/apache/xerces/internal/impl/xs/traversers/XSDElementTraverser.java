@@ -20,6 +20,8 @@
 
 package com.sun.org.apache.xerces.internal.impl.xs.traversers;
 
+import java.util.Locale;
+
 import com.sun.org.apache.xerces.internal.impl.dv.ValidatedInfo;
 import com.sun.org.apache.xerces.internal.impl.dv.XSSimpleType;
 import com.sun.org.apache.xerces.internal.impl.xs.SchemaGrammar;
@@ -497,8 +499,8 @@ class XSDElementTraverser extends XSDAbstractTraverser {
         return element;
     }
     
-    void reset(SymbolTable symbolTable, boolean validateAnnotations) {
-        super.reset(symbolTable, validateAnnotations);
+    void reset(SymbolTable symbolTable, boolean validateAnnotations, Locale locale) {
+        super.reset(symbolTable, validateAnnotations, locale);
         fDeferTraversingLocalElements = true;
     } // reset()
     

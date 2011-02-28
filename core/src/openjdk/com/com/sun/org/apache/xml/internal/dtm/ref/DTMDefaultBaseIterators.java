@@ -2092,10 +2092,7 @@ public abstract class DTMDefaultBaseIterators extends DTMDefaultBaseTraversers
       }
       else if (_isRestartable)
       {
-        if (_currentNode == Integer.MIN_VALUE)
-        {
           _currentNode = _startNode = node;
-        }
 
         return resetPosition();
       }

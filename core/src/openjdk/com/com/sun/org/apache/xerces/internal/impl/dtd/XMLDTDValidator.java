@@ -111,9 +111,13 @@ public class XMLDTDValidator
     protected static final String DYNAMIC_VALIDATION = 
     Constants.XERCES_FEATURE_PREFIX + Constants.DYNAMIC_VALIDATION_FEATURE;
 
+    /** Feature identifier: balance syntax trees. */
+    protected static final String BALANCE_SYNTAX_TREES =
+        Constants.XERCES_FEATURE_PREFIX + Constants.BALANCE_SYNTAX_TREES;
+
     /** Feature identifier: warn on duplicate attdef */
     protected static final String WARN_ON_DUPLICATE_ATTDEF = 
-    Constants.XERCES_FEATURE_PREFIX +Constants.WARN_ON_DUPLICATE_ATTDEF_FEATURE; 
+        Constants.XERCES_FEATURE_PREFIX + Constants.WARN_ON_DUPLICATE_ATTDEF_FEATURE;
     
 	protected static final String PARSER_SETTINGS = 
 		Constants.XERCES_FEATURE_PREFIX + Constants.PARSER_SETTINGS;	
@@ -148,13 +152,15 @@ public class XMLDTDValidator
     private static final String[] RECOGNIZED_FEATURES = {
         NAMESPACES,
         VALIDATION,
-        DYNAMIC_VALIDATION
+        DYNAMIC_VALIDATION,
+        BALANCE_SYNTAX_TREES
     };
 
     /** Feature defaults. */
     private static final Boolean[] FEATURE_DEFAULTS = {
         null,
         null,
+        Boolean.FALSE,
         Boolean.FALSE,
     };
 
@@ -192,7 +198,7 @@ public class XMLDTDValidator
     protected ValidationManager fValidationManager = null;
     
     // validation state
-    protected ValidationState   fValidationState   = new ValidationState();
+    protected final ValidationState fValidationState = new ValidationState();
 
     // features
 
@@ -210,6 +216,9 @@ public class XMLDTDValidator
      * the validation feature is set to <code>true</code>.
      */
     protected boolean fDynamicValidation;
+
+    /** Controls whether the DTD grammar produces balanced syntax trees. */
+    protected boolean fBalanceSyntaxTrees;
 
     /** warn on duplicate attribute definition, this feature works only when validation is true */
     protected boolean fWarnDuplicateAttdef;
@@ -329,16 +338,16 @@ public class XMLDTDValidator
     private XMLElementDecl fTempElementDecl = new XMLElementDecl();
 
     /** Temporary atribute declaration. */
-    private XMLAttributeDecl fTempAttDecl = new XMLAttributeDecl();
+    private final XMLAttributeDecl fTempAttDecl = new XMLAttributeDecl();
 
     /** Temporary entity declaration. */
-    private XMLEntityDecl fEntityDecl = new XMLEntityDecl();
+    private final XMLEntityDecl fEntityDecl = new XMLEntityDecl();
 
     /** Temporary qualified name. */
-    private QName fTempQName = new QName();
+    private final QName fTempQName = new QName();
 
     /** Temporary string buffers. */
-    private StringBuffer fBuffer = new StringBuffer();
+    private final StringBuffer fBuffer = new StringBuffer();
 
     // symbols: general
 
@@ -472,6 +481,13 @@ public class XMLDTDValidator
             fDynamicValidation = false;
         }
         
+        try {
+            fBalanceSyntaxTrees = componentManager.getFeature(BALANCE_SYNTAX_TREES);
+        }
+        catch (XMLConfigurationException e) {
+            fBalanceSyntaxTrees = false;
+        }
+
         try {
             fWarnDuplicateAttdef = componentManager.getFeature(WARN_ON_DUPLICATE_ATTDEF);
         }
@@ -654,9 +670,10 @@ public class XMLDTDValidator
 
         // call handlers
         // get initial grammars
-        if(fGrammarPool != null) {
+        if (fGrammarPool != null) {
             Grammar [] grammars = fGrammarPool.retrieveInitialGrammarSet(XMLGrammarDescription.XML_DTD);
-            for(int i = 0; i<grammars.length; i++) {
+            final int length = (grammars != null) ? grammars.length : 0;
+            for (int i = 0; i < length; ++i) {
                 fGrammarBucket.putGrammar((DTDGrammar)grammars[i]);
             }
         }
@@ -737,7 +754,12 @@ public class XMLDTDValidator
         }
         if(fDTDGrammar == null) {
             // we'll have to create it...
+            if (!fBalanceSyntaxTrees) {
             fDTDGrammar = new DTDGrammar(fSymbolTable, grammarDesc);
+            }
+            else {
+                fDTDGrammar = new BalancedDTDGrammar(fSymbolTable, grammarDesc);
+            }
         } else {
             // we've found a cached one;so let's make sure not to read
             // any external subset!
@@ -1783,7 +1805,7 @@ public class XMLDTDValidator
                 buffer.append('(');
                 for (int i=0; i<attrDecl.simpleType.enumeration.length ; i++) {
                     if (i > 0) {
-                        buffer.append("|");
+                        buffer.append('|');
                     }
                     buffer.append(attrDecl.simpleType.enumeration[i]);
                 }
@@ -1835,9 +1857,8 @@ public class XMLDTDValidator
     } // init()
 
     /** ensure element stack capacity */
-    private void ensureStackCapacity ( int newElementDepth) {
+    private void ensureStackCapacity (int newElementDepth) {
         if (newElementDepth == fElementQNamePartsStack.length) {
-            int[] newStack = new int[newElementDepth * 2];
 
             QName[] newStackOfQueue = new QName[newElementDepth * 2];
             System.arraycopy(this.fElementQNamePartsStack, 0, newStackOfQueue, 0, newElementDepth );
@@ -1850,7 +1871,7 @@ public class XMLDTDValidator
                 }
             }
 
-            newStack = new int[newElementDepth * 2];
+            int[] newStack = new int[newElementDepth * 2];
             System.arraycopy(fElementIndexStack, 0, newStack, 0, newElementDepth);
             fElementIndexStack = newStack;
 

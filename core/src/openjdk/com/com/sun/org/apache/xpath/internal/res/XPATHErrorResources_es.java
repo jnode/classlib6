@@ -330,6 +330,11 @@ public static final String ER_IGNORABLE_WHITESPACE_NOT_HANDLED =
   public static final String ER_WRONG_NODETYPE = "ER_WRONG_NODETYPE";
   public static final String ER_XPATH_ERROR = "ER_XPATH_ERROR";
 
+  public static final String ER_NULL_XPATH_VARIABLE_RESOLVER = "ER_NULL_XPATH_VARIABLE_RESOLVER";
+
+  public static final String ER_SECUREPROCESSING_FEATURE = "ER_SECUREPROCESSING_FEATURE";
+
+
   public static final String WG_LOCALE_NAME_NOT_HANDLED =
          "WG_LOCALE_NAME_NOT_HANDLED";
   public static final String WG_PROPERTY_NOT_SUPPORTED =
@@ -1127,6 +1132,9 @@ public static final String ER_IGNORABLE_WHITESPACE_NOT_HANDLED =
   { ER_XPATH_ERROR,
        "Error desconocido en XPath."},
 
+
+{ER_SECUREPROCESSING_FEATURE,
+      "FEATURE_SECURE_PROCESSING: No se puede cambiar la funci\u00f3n a falso cuando el administrador de seguridad est\u00e1 presente: {1}#setFeature({0},{2})"}, 
 
   // Warnings...
 

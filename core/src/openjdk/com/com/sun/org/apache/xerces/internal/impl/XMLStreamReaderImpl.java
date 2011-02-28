@@ -58,6 +58,7 @@ import com.sun.org.apache.xerces.internal.impl.msg.XMLMessageFormatter;
 import com.sun.org.apache.xerces.internal.util.XMLChar;
 import com.sun.org.apache.xerces.internal.util.XMLStringBuffer;
 import com.sun.org.apache.xerces.internal.util.NamespaceSupport;
+import com.sun.org.apache.xerces.internal.util.XMLAttributesImpl;
 import com.sun.org.apache.xerces.internal.impl.Constants;
 import com.sun.org.apache.xerces.internal.xni.XMLDocumentHandler;
 import com.sun.xml.internal.stream.dtd.DTDGrammarUtil;
@@ -214,6 +215,8 @@ public class XMLStreamReaderImpl implements javax.xml.stream.XMLStreamReader {
             }
         }catch(java.io.IOException ex){
             throw new XMLStreamException(ex);
+        } catch(XNIException ex){ //Issue 56 XNIException not caught
+            throw new XMLStreamException(ex.getMessage(), getLocation(), ex.getException());
         }
     }//setInputSource
     
@@ -456,8 +459,7 @@ public class XMLStreamReaderImpl implements javax.xml.stream.XMLStreamReader {
     
     /** this Funtion returns true if the current event has name */
     public boolean hasName() {
-        if(fEventType == XMLEvent.START_ELEMENT || fEventType == XMLEvent.END_ELEMENT
-        || fEventType == XMLEvent.ENTITY_REFERENCE) {
+        if(fEventType == XMLEvent.START_ELEMENT || fEventType == XMLEvent.END_ELEMENT) {
             return true;
         }  else {
             return false;
@@ -469,6 +471,8 @@ public class XMLStreamReaderImpl implements javax.xml.stream.XMLStreamReader {
      * @return
      */
     public boolean hasNext() throws XMLStreamException {
+        //the scanner returns -1 when it detects a broken stream
+        if (fEventType == -1) return false;
         //we can check in scanners if the scanner state is not set to 
         //terminating, we still have more events.
         return fEventType != XMLEvent.END_DOCUMENT;
@@ -538,7 +542,11 @@ public class XMLStreamReaderImpl implements javax.xml.stream.XMLStreamReader {
      */
     public int next() throws XMLStreamException {
         if( !hasNext() ) {
+            if (fEventType != -1) {
             throw new java.util.NoSuchElementException( "END_DOCUMENT reached: no more elements on the stream." );
+            } else { 
+                throw new XMLStreamException( "Error processing input source. The input stream is not complete." ); 
+            }
         }
         try {
             fEventType = fScanner.next();
@@ -796,7 +804,14 @@ public class XMLStreamReaderImpl implements javax.xml.stream.XMLStreamReader {
     public String getAttributeValue(String namespaceURI, String localName) {
         //State should be either START_ELEMENT or ATTRIBUTE
         if( fEventType == XMLEvent.START_ELEMENT || fEventType == XMLEvent.ATTRIBUTE) {
-            return fScanner.getAttributeIterator().getValue(namespaceURI, localName) ;
+            XMLAttributesImpl attributes = fScanner.getAttributeIterator();
+            if (namespaceURI == null) { //sjsxp issue 70
+                return attributes.getValue(attributes.getIndexByLocalName(localName)) ;
+            } else {
+                return fScanner.getAttributeIterator().getValue(
+                        namespaceURI.length() == 0 ? null : namespaceURI, localName) ;
+            }
+            
         } else{
             throw new java.lang.IllegalStateException("Current state is not among the states " 
                      + getEventTypeString(XMLEvent.START_ELEMENT) + " , " 
@@ -852,29 +867,33 @@ public class XMLStreamReaderImpl implements javax.xml.stream.XMLStreamReader {
      */
     public Location getLocation() {
         return new Location() {
-            
+            String _systemId = fEntityScanner.getExpandedSystemId();
+            String _publicId = fEntityScanner.getPublicId();
+            int _offset = fEntityScanner.getCharacterOffset();
+            int _columnNumber = fEntityScanner.getColumnNumber();
+            int _lineNumber = fEntityScanner.getLineNumber(); 
             public String getLocationURI(){
-                return fEntityScanner.getExpandedSystemId();
+                return _systemId;
             }
             
             public int getCharacterOffset(){
-                return fEntityScanner.getCharacterOffset();
+                return _offset;
             }
             
             public int getColumnNumber() {
-                return fEntityScanner.getColumnNumber();
+                return _columnNumber;
             }
             
             public int getLineNumber(){
-                return fEntityScanner.getLineNumber();
+                return _lineNumber;
             }
             
             public String getPublicId(){
-                return fEntityScanner.getPublicId();
+                return _publicId;
             }
             
             public String getSystemId(){
-                return fEntityScanner.getExpandedSystemId();
+                return _systemId;
             }
             
             public String toString(){
@@ -904,7 +923,7 @@ public class XMLStreamReaderImpl implements javax.xml.stream.XMLStreamReader {
         if(fEventType == XMLEvent.START_ELEMENT || fEventType == XMLEvent.END_ELEMENT)
             return convertXNIQNametoJavaxQName(fScanner.getElementQName());
         else
-            throw new java.lang.IllegalArgumentException("Illegal to call getName() "+
+            throw new java.lang.IllegalStateException("Illegal to call getName() "+
             "when event type is "+ getEventTypeString(fEventType) + "."
                      + " Valid states are " + getEventTypeString(XMLEvent.START_ELEMENT) + ", "
                      + getEventTypeString(XMLEvent.END_ELEMENT));
@@ -1240,7 +1259,7 @@ public class XMLStreamReaderImpl implements javax.xml.stream.XMLStreamReader {
     public boolean standaloneSet() {
         //xxx: it requires if the standalone was set in the document ? This is different that if the document
         // is standalone
-        return fScanner.isStandAlone() ;
+        return fScanner.standaloneSet() ;
     }
     
     /**

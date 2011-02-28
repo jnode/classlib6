@@ -330,6 +330,8 @@ public static final String ER_IGNORABLE_WHITESPACE_NOT_HANDLED =
   public static final String ER_WRONG_NODETYPE = "ER_WRONG_NODETYPE";
   public static final String ER_XPATH_ERROR = "ER_XPATH_ERROR";
 
+  public static final String ER_SECUREPROCESSING_FEATURE = "ER_SECUREPROCESSING_FEATURE";
+
   public static final String WG_LOCALE_NAME_NOT_HANDLED =
          "WG_LOCALE_NAME_NOT_HANDLED";
   public static final String WG_PROPERTY_NOT_SUPPORTED =
@@ -1126,6 +1128,9 @@ public static final String ER_IGNORABLE_WHITESPACE_NOT_HANDLED =
 
   { ER_XPATH_ERROR,
        "XPath \u672a\u77e5\u9519\u8bef"},
+
+{ER_SECUREPROCESSING_FEATURE,
+      "FEATURE_SECURE_PROCESSING\uff1a\u5982\u679c\u6709\u5b89\u5168\u7ba1\u7406\u5668\uff0c\u5219\u65e0\u6cd5\u5c06\u8be5\u529f\u80fd\u8bbe\u7f6e\u4e3a false: {1}#setFeature({0},{2})"}, 
 
 
   // Warnings...

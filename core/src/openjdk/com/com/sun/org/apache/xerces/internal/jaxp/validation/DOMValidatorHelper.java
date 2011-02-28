@@ -22,7 +22,6 @@ package com.sun.org.apache.xerces.internal.jaxp.validation;
 
 import java.io.IOException;
 import java.util.Enumeration;
-import java.util.Locale;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -199,7 +198,7 @@ final class DOMValidatorHelper implements ValidatorHelper, EntityState {
                 finally {
                     // Release references to application objects
                     fRoot = null;
-                    fCurrentElement = null;
+                    //fCurrentElement = null; -- keep the reference to support current-element-node property
                     fEntities = null;
                     if (fDOMValidatorHandler != null) {
                         fDOMValidatorHandler.setDOMResult(null);
@@ -208,7 +207,7 @@ final class DOMValidatorHelper implements ValidatorHelper, EntityState {
             }
             return;
         }
-        throw new IllegalArgumentException(JAXPValidationMessageFormatter.formatMessage(Locale.getDefault(), 
+        throw new IllegalArgumentException(JAXPValidationMessageFormatter.formatMessage(fComponentManager.getLocale(),
                 "SourceResultMismatch", 
                 new Object [] {source.getClass().getName(), result.getClass().getName()}));
     }

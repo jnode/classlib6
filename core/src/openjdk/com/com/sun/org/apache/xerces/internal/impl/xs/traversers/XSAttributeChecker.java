@@ -1315,12 +1315,11 @@ public class XSAttributeChecker {
                 throw new InvalidDatatypeValueException("cvc-datatype-valid.1.2.1", new Object[]{value, "positiveInteger"});
             break;
         case DT_BLOCK:
-            // block = (#all | List of (substitution | extension | restriction | list | union))
+            // block = (#all | List of (substitution | extension | restriction))
             choice = 0;
             if (value.equals (SchemaSymbols.ATTVAL_POUNDALL)) {
                 choice = XSConstants.DERIVATION_SUBSTITUTION|XSConstants.DERIVATION_EXTENSION|
-                         XSConstants.DERIVATION_RESTRICTION|XSConstants.DERIVATION_LIST|
-                         XSConstants.DERIVATION_UNION;
+                         XSConstants.DERIVATION_RESTRICTION;
             }
             else {
                 // use the default \t\r\n\f delimiters

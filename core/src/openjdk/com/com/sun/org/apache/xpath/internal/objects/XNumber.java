@@ -62,7 +62,7 @@ public class XNumber extends XObject
     super();
 
     m_val = num.doubleValue();
-    m_obj = num;
+    setObject(num);
   }
 
   /**
@@ -379,7 +379,7 @@ public class XNumber extends XObject
   public Object object()
   {
     if(null == m_obj)
-      m_obj = new Double(m_val);
+      setObject(new Double(m_val));
     return m_obj;
   }
 

@@ -44,7 +44,7 @@ public class XNodeSetForDOM extends XNodeSet
     m_dtmMgr = dtmMgr;
     m_origObj = node;
     int dtmHandle = dtmMgr.getDTMHandleFromNode(node);
-    m_obj = new NodeSetDTM(dtmMgr);
+    setObject(new NodeSetDTM(dtmMgr));
     ((NodeSetDTM) m_obj).addNode(dtmHandle);
   }
   
@@ -71,7 +71,7 @@ public class XNodeSetForDOM extends XNodeSet
     // m_obj=new com.sun.org.apache.xpath.internal.NodeSetDTM(nodeList, xctxt);
     com.sun.org.apache.xpath.internal.NodeSetDTM nsdtm=new com.sun.org.apache.xpath.internal.NodeSetDTM(nodeList, xctxt);
     m_last=nsdtm.getLength();
-    m_obj = nsdtm;   
+    setObject(nsdtm);
   }
 
   public XNodeSetForDOM(NodeIterator nodeIter, XPathContext xctxt)
@@ -85,7 +85,7 @@ public class XNodeSetForDOM extends XNodeSet
     // m_obj = new com.sun.org.apache.xpath.internal.NodeSetDTM(nodeIter, xctxt);
     com.sun.org.apache.xpath.internal.NodeSetDTM nsdtm=new com.sun.org.apache.xpath.internal.NodeSetDTM(nodeIter, xctxt);
     m_last=nsdtm.getLength();
-    m_obj = nsdtm;   
+    setObject(nsdtm);
   }
   
   /**

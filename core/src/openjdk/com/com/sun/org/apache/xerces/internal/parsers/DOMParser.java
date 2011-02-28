@@ -70,6 +70,14 @@ public class DOMParser
     protected static final String USE_ENTITY_RESOLVER2 =
         Constants.SAX_FEATURE_PREFIX + Constants.USE_ENTITY_RESOLVER2_FEATURE;
 
+    protected static final String REPORT_WHITESPACE =
+            Constants.SUN_SCHEMA_FEATURE_PREFIX + Constants.SUN_REPORT_IGNORED_ELEMENT_CONTENT_WHITESPACE;
+
+    // recognized features:
+    private static final String[] RECOGNIZED_FEATURES = {
+        REPORT_WHITESPACE
+    };
+    
     // properties
 
     /** Property identifier: symbol table. */
@@ -139,6 +147,8 @@ public class DOMParser
         if (grammarPool != null) {
             fConfiguration.setProperty(XMLGRAMMAR_POOL, grammarPool);
         }
+
+        fConfiguration.addRecognizedFeatures(RECOGNIZED_FEATURES);
 
     } // <init>(SymbolTable,XMLGrammarPool)
 

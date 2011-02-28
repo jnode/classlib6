@@ -141,7 +141,7 @@ public class AttrImpl
     // REVISIT: we are losing the type information in DOM during serialization
     transient Object type;
 
-    protected static TextImpl textNode = null;
+    protected TextImpl textNode = null;
 
     //
     // Constructors

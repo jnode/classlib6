@@ -41,6 +41,7 @@ import java.io.File;
  * @author Norman Walsh
  * <a href="mailto:Norman.Walsh@Sun.COM">Norman.Walsh@Sun.COM</a>
  *
+ * @version 1.0
  */
 public abstract class FileURL {
   protected FileURL() { }
@@ -87,6 +88,6 @@ public abstract class FileURL {
     }
      */
       File file = new File(pathname);
-      return file.toURL();
+      return file.toURI().toURL();
   }
 }

@@ -1077,6 +1077,8 @@ public static final int MAX_CODE = 108;  // this is needed to keep track of the 
        "Ok\u00e4nt fel i XPath."},
 
 
+  {ER_SECUREPROCESSING_FEATURE,
+      "FEATURE_SECURE_PROCESSING: Det g\u00e5r inte att st\u00e4lla in funktionen n\u00e4r s\u00e4kerhetshanteraren anv\u00e4nds: {1}#setFeature({0},{2})"}, 
 
   // Warnings...
 
@@ -1249,3 +1251,5 @@ public static final int MAX_CODE = 108;  // this is needed to keep track of the 
   public static final String QUERY_HEADER = "M\u00d6NSTER ";
 
 }
+
+

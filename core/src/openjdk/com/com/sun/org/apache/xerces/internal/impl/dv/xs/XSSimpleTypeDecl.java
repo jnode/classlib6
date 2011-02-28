@@ -20,6 +20,7 @@
 
 package com.sun.org.apache.xerces.internal.impl.dv.xs;
 
+import java.util.Locale;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -224,6 +225,9 @@ public class XSSimpleTypeDecl implements XSSimpleType, TypeInfo {
 		public String getURI(String prefix) {
 			return null;
 		}
+                public Locale getLocale() {
+                        return Locale.getDefault();
+                }
 	};
 	
 	// this will be true if this is a static XSSimpleTypeDecl
@@ -802,7 +806,7 @@ public class XSSimpleTypeDecl implements XSSimpleType, TypeInfo {
                 patternAnnotations = facets.patternAnnotations;
                 RegularExpression regex = null;
                 try {
-                    regex = new RegularExpression(facets.pattern, "X");
+                    regex = new RegularExpression(facets.pattern, "X", context.getLocale());
                 } catch (ParseException e) {
                     reportError("InvalidRegex", new Object[]{facets.pattern, e.getLocalizedMessage(), new Integer(e.getLocation())});
                 }
@@ -2790,6 +2794,10 @@ public class XSSimpleTypeDecl implements XSSimpleType, TypeInfo {
 		public String getURI(String prefix) {
 			return null;
 		}
+
+                public Locale getLocale() {
+                    return Locale.getDefault();
+                }
 	};
     
     private boolean fAnonymous = false;
@@ -2854,6 +2862,10 @@ public class XSSimpleTypeDecl implements XSSimpleType, TypeInfo {
 			else
 				return fNSContext.getURI(prefix);
 		}
+
+                public Locale getLocale() {
+                    return fExternal.getLocale();
+                }
 	}
 	
 	public void reset(){
@@ -3259,3 +3271,4 @@ public class XSSimpleTypeDecl implements XSSimpleType, TypeInfo {
     }
 	
 } // class XSSimpleTypeDecl
+

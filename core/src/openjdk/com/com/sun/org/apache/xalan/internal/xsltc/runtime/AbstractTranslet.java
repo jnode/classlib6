@@ -25,6 +25,7 @@ package com.sun.org.apache.xalan.internal.xsltc.runtime;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.BufferedOutputStream;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
@@ -555,7 +556,7 @@ public abstract class AbstractTranslet implements Translet {
 
 	    factory.setEncoding(_encoding);
 	    factory.setOutputMethod(_method);
-            factory.setOutputStream(new FileOutputStream(filename, append));
+	    factory.setOutputStream(new BufferedOutputStream(new FileOutputStream(filename, append)));
 	    factory.setOutputType(TransletOutputHandlerFactory.STREAM);
 
 	    final SerializationHandler handler 

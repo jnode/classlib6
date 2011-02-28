@@ -1,5 +1,5 @@
 /*
- * Portions Copyright 2003-2005 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2003, 2005, Oracle and/or its affiliates. All rights reserved.
  */
 
 /*
@@ -41,6 +41,10 @@ public final class Constants {
     public static final String NS_XMLSCHEMA = "http://www.w3.org/2001/XMLSchema".intern();
     public static final String NS_DTD = "http://www.w3.org/TR/REC-xml".intern();
 
+    // Schema features
+    public static final String SUN_SCHEMA_FEATURE_PREFIX = "http://java.sun.com/xml/schema/features/";
+    public static final String SUN_REPORT_IGNORED_ELEMENT_CONTENT_WHITESPACE = "report-ignored-element-content-whitespace";
+
     //stax properties
     
     public static final String ZEPHYR_PROPERTY_PREFIX = "http://java.sun.com/xml/stream/properties/" ;    
@@ -51,6 +55,17 @@ public final class Constants {
     public static final String ADD_NAMESPACE_DECL_AS_ATTRIBUTE = "add-namespacedecl-as-attrbiute";
     public static final String ESCAPE_CHARACTERS = "escapeCharacters";
     public static final String REUSE_INSTANCE = "reuse-instance" ;
+    
+    //DOM properties
+    public static final String SUN_DOM_PROPERTY_PREFIX = "http://java.sun.com/xml/dom/properties/" ;
+    public static final String SUN_DOM_ANCESTOR_CHECCK = "ancestor-check";
+
+    /**
+     * If true, ignore DOCTYPE declaration as if it wasn't present at all.
+     * Note that this is a violation of the XML recommendation.
+     * The full property name is prefixed by {@link #ZEPHYR_PROPERTY_PREFIX}.
+     */
+    public static final String IGNORE_EXTERNAL_DTD = "ignore-external-dtd";
     
     // sax features
     
@@ -205,7 +220,7 @@ public final class Constants {
     public static final String DOM_ERROR_HANDLER = "error-handler";
     public static final String DOM_SCHEMA_TYPE = "schema-type";
     public static final String DOM_SCHEMA_LOCATION = "schema-location";
-
+    public static final String DOM_ANCESTOR_CHECCK = "ancestor-check";
     // XSModel
     public static final String DOM_PSVI = "psvi";
     
@@ -275,6 +290,9 @@ public final class Constants {
     /** Validate datatypes feature ("validation/validate-datatypes"). */
     public static final String VALIDATE_DATATYPES_FEATURE = "validation/validate-datatypes";
     
+    /** Balance syntax trees feature ("validation/balance-syntax-trees"). */
+    public static final String BALANCE_SYNTAX_TREES = "validation/balance-syntax-trees";
+
     /** Notify character references feature (scanner/notify-char-refs"). */
     public static final String NOTIFY_CHAR_REFS_FEATURE = "scanner/notify-char-refs";
     
@@ -365,6 +383,8 @@ public final class Constants {
     /** Security manager property ("security-manager"). */
     public static final String SECURITY_MANAGER_PROPERTY = "security-manager";
 
+    /** Locale property ("locale"). */
+    public static final String LOCALE_PROPERTY = "locale";
 
     /** property identifier: security manager. */
     protected static final String SECURITY_MANAGER =
@@ -422,7 +442,7 @@ public final class Constants {
     /** Element PSVI is stored in augmentations using string "ELEMENT_PSVI" */
     public final static String ELEMENT_PSVI = "ELEMENT_PSVI";
     
-    /* Attribute PSVI is stored in augmentations using string "ATTRIBUTE_PSVI" */
+    /** Attribute PSVI is stored in augmentations using string "ATTRIBUTE_PSVI" */
     public final static String ATTRIBUTE_PSVI = "ATTRIBUTE_PSVI";
         
     /** 
@@ -485,6 +505,7 @@ public final class Constants {
     public final static String LAST_ENTITY = "LAST_ENTITY";
     
     // XML version constants 
+    public final static short XML_VERSION_ERROR = -1;
     public final static short XML_VERSION_1_0 = 1;
     public final static short XML_VERSION_1_1 = 2;
 
@@ -540,6 +561,7 @@ public final class Constants {
         DEFAULT_ATTRIBUTE_VALUES_FEATURE,
         VALIDATE_CONTENT_MODELS_FEATURE,
         VALIDATE_DATATYPES_FEATURE,
+        BALANCE_SYNTAX_TREES,
         NOTIFY_CHAR_REFS_FEATURE,
         NOTIFY_BUILTIN_REFS_FEATURE,
         DISALLOW_DOCTYPE_DECL_FEATURE,
@@ -571,7 +593,8 @@ public final class Constants {
             SCHEMA_NONS_LOCATION,
             VALIDATION_MANAGER_PROPERTY,
             BUFFER_SIZE_PROPERTY,
-            SECURITY_MANAGER_PROPERTY
+            SECURITY_MANAGER_PROPERTY,
+            LOCALE_PROPERTY
     };
     
     /** Empty enumeration. */

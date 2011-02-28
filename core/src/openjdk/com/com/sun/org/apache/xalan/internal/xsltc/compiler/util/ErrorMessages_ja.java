@@ -847,7 +847,10 @@ public class ErrorMessages_ja extends ListResourceBundle {
          * stylesheet (see above).
          */
         {ErrorMsg.RUNTIME_ERROR_KEY,
-        "Translet \u30a8\u30e9\u30fc:"}
+        "Translet \u30a8\u30e9\u30fc:"},
+		
+		{ErrorMsg.JAXP_SECUREPROCESSING_FEATURE,
+        "FEATURE_SECURE_PROCESSING: \u30bb\u30ad\u30e5\u30ea\u30c6\u30a3\u30fc\u30de\u30cd\u30fc\u30b8\u30e3\u30fc\u304c\u5b58\u5728\u3059\u308b\u5834\u5408\u306b\u306f\u3001\u3053\u306e\u6a5f\u80fd\u3092 false \u306b\u8a2d\u5b9a\u3067\u304d\u307e\u305b\u3093\u3002"}
     };
     }
 }

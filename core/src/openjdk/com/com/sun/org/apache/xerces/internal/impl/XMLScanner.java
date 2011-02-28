@@ -1,5 +1,5 @@
 /*
- * Portions Copyright 2003-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2003, 2006, Oracle and/or its affiliates. All rights reserved.
  */
 
 /*
@@ -486,7 +486,7 @@ public abstract class XMLScanner
                         standalone = fString.toString();
                         state = STATE_DONE;
                         if (!standalone.equals("yes") && !standalone.equals("no")) {
-                            reportFatalError("SDDeclInvalid", null);
+                            reportFatalError("SDDeclInvalid", new Object[] {standalone});
                         }
                     } else {
                         reportFatalError("EncodingDeclRequired", null);
@@ -502,7 +502,7 @@ public abstract class XMLScanner
                         standalone = fString.toString();
                         state = STATE_DONE;
                         if (!standalone.equals("yes") && !standalone.equals("no")) {
-                            reportFatalError("SDDeclInvalid", null);
+                            reportFatalError("SDDeclInvalid",  new Object[] {standalone});
                         }
                     } else {
                         reportFatalError("EncodingDeclRequired", null);
@@ -1028,6 +1028,9 @@ public abstract class XMLScanner
                     int c = fEntityScanner.peekChar();
                     if (XMLChar.isMarkup(c) || c == ']') {
                         fStringBuffer.append((char)fEntityScanner.scanChar());
+                    } else if (c != -1 && isInvalidLiteral(c)) {
+                        reportFatalError("InvalidCharInSystemID",
+                            new Object[] {Integer.toString(c, 16)});
                     }
                 } while (fEntityScanner.scanLiteral(quote, ident) != quote);
                 fStringBuffer.append(ident);

@@ -26,7 +26,6 @@
 package com.sun.org.apache.xerces.internal.jaxp.validation;
 
 import java.io.IOException;
-import java.util.Locale;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -77,8 +76,8 @@ public final class StAXValidatorHelper implements ValidatorHelper {
                 }
             }
 
-            if( result!=null ) {
                 handler = new ValidatorHandlerImpl(fComponentManager);
+            if( result!=null ) {
                 handler.setContentHandler(identityTransformer2);
                 identityTransformer2.setResult(result);
             }
@@ -94,7 +93,7 @@ public final class StAXValidatorHelper implements ValidatorHelper {
             }
             return;
         }
-        throw new IllegalArgumentException(JAXPValidationMessageFormatter.formatMessage(Locale.getDefault(), 
+        throw new IllegalArgumentException(JAXPValidationMessageFormatter.formatMessage(fComponentManager.getLocale(),
                 "SourceResultMismatch", 
                 new Object [] {source.getClass().getName(), result.getClass().getName()}));
     }

@@ -178,14 +178,15 @@ public class DocumentBuilderImpl extends DocumentBuilder
             }
             config.addRecognizedFeatures(validatorComponent.getRecognizedFeatures());
             config.addRecognizedProperties(validatorComponent.getRecognizedProperties());
+            setFeatures(features);      // Must set before calling setDocumentHandler()
             config.setDocumentHandler((XMLDocumentHandler) validatorComponent);
             ((XMLDocumentSource)validatorComponent).setDocumentHandler(domParser);
             domParser.setDocumentSource((XMLDocumentSource) validatorComponent);
             fSchemaValidator = validatorComponent;
         }
-
-        // Set features
+        else {
         setFeatures(features);
+        }
         
         // Set attributes
         setDocumentBuilderFactoryAttributes(dbfAttrs);

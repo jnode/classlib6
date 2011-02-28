@@ -1,12 +1,12 @@
 /*
- * Copyright 2004-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2004, 2006, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Sun designates this
+ * published by the Free Software Foundation.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the LICENSE file that accompanied this code.
+ * by Oracle in the LICENSE file that accompanied this code.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -18,9 +18,9 @@
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
- * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
- * CA 95054 USA or visit www.sun.com if you need additional information or
- * have any questions.
+ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ * or visit www.oracle.com if you need additional information or have any
+ * questions.
  */
 
 package com.sun.org.apache.xerces.internal.jaxp.datatype;
@@ -182,6 +182,7 @@ import com.sun.org.apache.xerces.internal.util.DatatypeMessageFormatter;
  * @author <a href="mailto:Kohsuke.Kawaguchi@Sun.com">Kohsuke Kawaguchi</a>
  * @author <a href="mailto:Joseph.Fialli@Sun.com">Joseph Fialli</a>
  * @author <a href="mailto:Sunitha.Reddy@Sun.com">Sunitha Reddy</a>
+ * @version $Revision: 1.12 $, $Date: 2010/07/07 04:24:52 $
  * @see javax.xml.datatype.Duration
  * @since 1.5
  */
@@ -1300,6 +1301,10 @@ public class XMLGregorianCalendarImpl
                     || getSecond() != 0) {
                 invalidFieldValue(HOUR, getHour());
             }
+            // while 0-24 is acceptable in the lexical space, 24 is not valid in value space
+            // W3C XML Schema Part 2, Section 3.2.7.1
+            setHour(0, false);
+            add(new DurationImpl(true, 0, 0, 1, 0, 0, 0));
         }
     }
 
@@ -2783,6 +2788,7 @@ public class XMLGregorianCalendarImpl
                 // some tokens are left in the input
                 throw new IllegalArgumentException(value); //,vidx);
             }
+            testHour();
         }
 
         private char peek() throws IllegalArgumentException {
@@ -3048,3 +3054,4 @@ public class XMLGregorianCalendarImpl
         //PENDING : Implementation of reset method
     }
 }
+

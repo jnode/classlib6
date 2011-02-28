@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2000, 2003, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000, 2009, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -22,6 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
 package com.sun.security.sasl.util; 
 
 import javax.security.sasl.*;
@@ -47,10 +48,6 @@ import sun.misc.HexDumpEncoder;
  * @author Rosanna Lee
  */
 public abstract class AbstractSaslImpl {
-    /** 
-     * Logger for debug messages 
-     */
-    protected static Logger logger;  // set in initLogger(); lazily loads logger
 
     protected boolean completed = false;
     protected boolean privacy = false;
@@ -67,7 +64,6 @@ public abstract class AbstractSaslImpl {
     protected String myClassName;
 
     protected AbstractSaslImpl(Map props, String className) throws SaslException {
-	initLogger();
 	myClassName = className;
 	
 	// Parse properties  to set desired context options
@@ -324,18 +320,14 @@ public abstract class AbstractSaslImpl {
 	}
     }
 
-    /**
-     * Sets logger field.
-     */
-    private static synchronized void initLogger() {
-        if (logger == null) {
-            logger = Logger.getLogger(SASL_LOGGER_NAME);
-	}
-    }
-
     // ---------------- Constants  -----------------
     private static final String SASL_LOGGER_NAME = "javax.security.sasl";
     protected static final String MAX_SEND_BUF = "javax.security.sasl.sendmaxbuffer";
+
+    /** 
+     * Logger for debug messages 
+     */
+    protected static final Logger logger = Logger.getLogger(SASL_LOGGER_NAME);
 
     // default 0 (no protection); 1 (integrity only)
     protected static final byte NO_PROTECTION = (byte)1;

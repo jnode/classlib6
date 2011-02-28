@@ -634,6 +634,25 @@ implements XMLAttributes, XMLBufferListener {
     } // getIndex(String,String):int
 
     /**
+     * Look up the index of an attribute by local name only,
+     * ignoring its namespace.
+     *
+     * @param localName The attribute's local name.
+     * @return The index of the attribute, or -1 if it does not
+     *         appear in the list.
+     */
+    public int getIndexByLocalName(String localPart) {
+        for (int i = 0; i < fLength; i++) {
+            Attribute attribute = fAttributes[i];
+            if (attribute.name.localpart != null &&
+                attribute.name.localpart.equals(localPart)) {
+                return i;
+            }
+        }
+        return -1;
+    } // getIndex(String):int
+
+    /**
      * Look up an attribute's local name by index.
      *
      * @param index The attribute index (zero-based).
@@ -999,12 +1018,15 @@ implements XMLAttributes, XMLBufferListener {
     } // getURI(int):String
 
     /**
-     * Look up an attribute's value by Namespace name.
+     * Look up an attribute's value by Namespace name and
+     * Local name. If Namespace is null, ignore namespace
+     * comparison. If Namespace is "", treat the name as
+     * having no Namespace URI.
      *
      * <p>See {@link #getValue(int) getValue(int)} for a description
      * of the possible values.</p>
      *
-     * @param uri The Namespace URI, or null if the
+     * @param uri The Namespace URI, or null namespaces are ignored.
      * @param localName The local name of the attribute.
      * @return The attribute value as a string, or null if the
      *         attribute is not in the list.
@@ -1013,7 +1035,6 @@ implements XMLAttributes, XMLBufferListener {
         int index = getIndex(uri, localName);
         return index != -1 ? getValue(index) : null;
     } // getValue(String,String):String
-
 
     /**
      * Look up an augmentations by Namespace name.

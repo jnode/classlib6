@@ -125,6 +125,7 @@ public final class ErrorMsg {
     public static final String JAXP_SET_FEATURE_NULL_NAME = "JAXP_SET_FEATURE_NULL_NAME";
     public static final String JAXP_GET_FEATURE_NULL_NAME = "JAXP_GET_FEATURE_NULL_NAME";
     public static final String JAXP_UNSUPPORTED_FEATURE = "JAXP_UNSUPPORTED_FEATURE";
+    public static final String JAXP_SECUREPROCESSING_FEATURE = "JAXP_SECUREPROCESSING_FEATURE";
 
     // Command-line error messages
     public static final String COMPILE_STDIN_ERR = "COMPILE_STDIN_ERR";
@@ -303,3 +304,4 @@ public final class ErrorMsg {
         return _isWarningError;
     }
 }
+

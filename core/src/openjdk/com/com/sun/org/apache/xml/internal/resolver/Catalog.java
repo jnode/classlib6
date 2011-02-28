@@ -188,6 +188,7 @@ import com.sun.org.apache.xml.internal.resolver.helpers.FileURL;
  * @author Norman Walsh
  * <a href="mailto:Norman.Walsh@Sun.COM">Norman.Walsh@Sun.COM</a>
  *
+ * @version 1.0
  *
  * <p>Derived from public domain code originally published by Arbortext,
  * Inc.</p>
@@ -2116,13 +2117,11 @@ public class Catalog {
    * @return The normalized URI reference.
    */
   protected String normalizeURI(String uriref) {
-    String newRef = "";
-    byte[] bytes;
-
     if (uriref == null) {
       return null;
     }
 
+    byte[] bytes;
     try {
       bytes = uriref.getBytes("UTF-8");
     } catch (UnsupportedEncodingException uee) {
@@ -2131,6 +2130,7 @@ public class Catalog {
       return uriref;
     }
 
+    StringBuilder newRef = new StringBuilder(bytes.length);
     for (int count = 0; count < bytes.length; count++) {
       int ch = bytes[count] & 0xFF;
 
@@ -2146,13 +2146,13 @@ public class Catalog {
 	  || (ch == 0x7C) // |
 	  || (ch == 0x7D) // }
 	  || (ch == 0x7F)) {
-	newRef += encodedByte(ch);
+	newRef.append(encodedByte(ch));
       } else {
-	newRef += (char) bytes[count];
+        newRef.append((char) bytes[count]);
       }
     }
 
-    return newRef;
+    return newRef.toString();
   }
 
   /**
@@ -2210,3 +2210,4 @@ public class Catalog {
     }
   }
 }
+

@@ -21,6 +21,7 @@
 package com.sun.org.apache.xerces.internal.jaxp.validation;
 
 import java.util.HashMap;
+import java.util.Locale;
 
 import javax.xml.XMLConstants;
 
@@ -62,6 +63,10 @@ final class XMLSchemaValidatorComponentManager extends ParserConfigurationSettin
     /** Feature identifier: validation. */
     private static final String VALIDATION =
         Constants.SAX_FEATURE_PREFIX + Constants.VALIDATION_FEATURE;
+    
+    /** Feature identifier: send element default value via characters() */
+    private static final String SCHEMA_ELEMENT_DEFAULT =
+        Constants.XERCES_FEATURE_PREFIX + Constants.SCHEMA_ELEMENT_DEFAULT;
     
     /** Feature identifier: use grammar pool only. */
     private static final String USE_GRAMMAR_POOL_ONLY =
@@ -109,9 +114,17 @@ final class XMLSchemaValidatorComponentManager extends ParserConfigurationSettin
     private static final String XMLGRAMMAR_POOL =
         Constants.XERCES_PROPERTY_PREFIX + Constants.XMLGRAMMAR_POOL_PROPERTY;
     
+    /** Property identifier: locale. */
+    private static final String LOCALE =
+        Constants.XERCES_PROPERTY_PREFIX + Constants.LOCALE_PROPERTY;
+
     //
     // Data
     //
+    /**
+     * <p>State of secure mode.</p>
+     */
+    private boolean _isSecureMode = false;
     
     /** 
      * fConfigUpdated is set to true if there has been any change to the configuration settings, 
@@ -157,6 +170,9 @@ final class XMLSchemaValidatorComponentManager extends ParserConfigurationSettin
     /** Application's LSResourceResolver. */
     private LSResourceResolver fResourceResolver = null;
     
+    /** Locale chosen by the application. */
+    private Locale fLocale = null;
+
     /** Constructs a component manager suitable for Xerces' schema validator. */
     public XMLSchemaValidatorComponentManager(XSGrammarPoolContainer grammarContainer) {
         // setup components 
@@ -178,7 +194,13 @@ final class XMLSchemaValidatorComponentManager extends ParserConfigurationSettin
         // setup other properties
         fComponents.put(ENTITY_RESOLVER, null);
         fComponents.put(ERROR_HANDLER, null);
+
+        if (System.getSecurityManager() != null) {
+            _isSecureMode = true;
+            setProperty(SECURITY_MANAGER, new SecurityManager());
+        } else {        
         fComponents.put(SECURITY_MANAGER, null);
+        }
         fComponents.put(SYMBOL_TABLE, new SymbolTable());
         
         // setup grammar pool
@@ -220,6 +242,9 @@ final class XMLSchemaValidatorComponentManager extends ParserConfigurationSettin
         else if (XMLConstants.FEATURE_SECURE_PROCESSING.equals(featureId)) {
             return getProperty(SECURITY_MANAGER) != null;
         }
+        else if (SCHEMA_ELEMENT_DEFAULT.equals(featureId)) {
+            return true; //pre-condition: VALIDATION and SCHEMA_VALIDATION are always true
+        }
         return super.getFeature(featureId);
     }
     
@@ -243,6 +268,9 @@ final class XMLSchemaValidatorComponentManager extends ParserConfigurationSettin
         }
         fConfigUpdated = true;
         if (XMLConstants.FEATURE_SECURE_PROCESSING.equals(featureId)) {
+            if (_isSecureMode && !value) {
+                throw new XMLConfigurationException(XMLConfigurationException.NOT_ALLOWED, XMLConstants.FEATURE_SECURE_PROCESSING);
+            }
             setProperty(SECURITY_MANAGER, value ? new SecurityManager() : null);
             return;
         }
@@ -266,6 +294,9 @@ final class XMLSchemaValidatorComponentManager extends ParserConfigurationSettin
      */
     public Object getProperty(String propertyId)
             throws XMLConfigurationException {
+        if (LOCALE.equals(propertyId)) {
+            return getLocale();
+        }
         final Object component = fComponents.get(propertyId);
         if (component != null) {
             return component;
@@ -297,6 +328,11 @@ final class XMLSchemaValidatorComponentManager extends ParserConfigurationSettin
         fSchemaValidator.setProperty(propertyId, value);
         if (ENTITY_RESOLVER.equals(propertyId) || ERROR_HANDLER.equals(propertyId) || 
                 SECURITY_MANAGER.equals(propertyId)) {
+            fComponents.put(propertyId, value);
+            return;
+        }
+        else if (LOCALE.equals(propertyId)) {
+            setLocale((Locale) value);
             fComponents.put(propertyId, value);
             return;
         }
@@ -353,10 +389,19 @@ final class XMLSchemaValidatorComponentManager extends ParserConfigurationSettin
         setProperty(ENTITY_RESOLVER, new DOMEntityResolverWrapper(resourceResolver));
     }
     
-    public LSResourceResolver getResourceResolver() {
+    LSResourceResolver getResourceResolver() {
         return fResourceResolver;
     }
     
+    void setLocale(Locale locale) {
+        fLocale = locale;
+        fErrorReporter.setLocale(locale);
+    }
+
+    Locale getLocale() {
+        return fLocale;
+    }
+
     /** Cleans out configuration, restoring it to its initial state. */
     void restoreInitialState() {
         fConfigUpdated = true;
@@ -369,6 +414,10 @@ final class XMLSchemaValidatorComponentManager extends ParserConfigurationSettin
         fComponents.put(ENTITY_RESOLVER, null);
         fComponents.put(ERROR_HANDLER, null);
         
+        // Set the Locale back to null.
+        setLocale(null);
+        fComponents.put(LOCALE, null);
+       
         // Restore component defaults.
         setFeatureDefaults(fEntityManager, fEntityManager.getRecognizedFeatures());
         setPropertyDefaults(fEntityManager, fEntityManager.getRecognizedProperties());
@@ -421,3 +470,4 @@ final class XMLSchemaValidatorComponentManager extends ParserConfigurationSettin
     }
     
 } // XMLSchemaValidatorComponentManager
+ 

@@ -326,9 +326,11 @@ public final class EncodingInfo extends Object
             m_last = last;  
                       
             // Set the range of unicode values that this object 
-            // explicitly manages
-            m_explFirst = codePoint;
-            m_explLast = codePoint + (RANGE-1);  
+            // explicitly manages. Align the explicitly managed values
+            // to RANGE so multiple EncodingImpl objects dont manage the same 
+            // values.
+            m_explFirst = codePoint / RANGE * RANGE;
+            m_explLast = m_explFirst + (RANGE-1);
             
             m_encoding = encoding;
             

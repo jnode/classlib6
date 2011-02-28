@@ -944,8 +944,10 @@ public class ErrorMessages extends ListResourceBundle {
         "The feature name cannot be null in TransformerFactory.setFeature(String name, boolean value)."},
 
         {ErrorMsg.JAXP_UNSUPPORTED_FEATURE,
-        "Cannot set the feature ''{0}'' on this TransformerFactory."}
+        "Cannot set the feature ''{0}'' on this TransformerFactory."},
 
+        {ErrorMsg.JAXP_SECUREPROCESSING_FEATURE,
+        "FEATURE_SECURE_PROCESSING: Cannot set the feature to false when security manager is present."}
     };
     }
 }

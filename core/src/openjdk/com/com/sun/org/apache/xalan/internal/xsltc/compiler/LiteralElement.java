@@ -252,7 +252,7 @@ final class LiteralElement extends Instruction {
 	    // Handle xsl:use-attribute-sets. Attribute sets are placed first
 	    // in the vector or attributes to make sure that later local
 	    // attributes can override an attributes in the set.
-	    if (qname == parser.getUseAttributeSets()) {
+	    if (qname.equals(parser.getUseAttributeSets())) {
             	if (!Util.isValidQNames(val)) {
                     ErrorMsg err = new ErrorMsg(ErrorMsg.INVALID_QNAME_ERR, val, this);
                     parser.reportError(Constants.ERROR, err);	
@@ -260,11 +260,11 @@ final class LiteralElement extends Instruction {
 		setFirstAttribute(new UseAttributeSets(val, parser));
 	    }
 	    // Handle xsl:extension-element-prefixes
-	    else if (qname == parser.getExtensionElementPrefixes()) {
+	    else if (qname.equals(parser.getExtensionElementPrefixes())) {
 		stable.excludeNamespaces(val);
 	    }
 	    // Handle xsl:exclude-result-prefixes
-	    else if (qname == parser.getExcludeResultPrefixes()) {
+	    else if (qname.equals(parser.getExcludeResultPrefixes())) {
 		stable.excludeNamespaces(val);
 	    }
 	    else {
@@ -307,11 +307,11 @@ final class LiteralElement extends Instruction {
 	    final String val = _attributes.getValue(i);
 
 	    // Handle xsl:extension-element-prefixes
-	    if (qname == parser.getExtensionElementPrefixes()) {
+	    if (qname.equals(parser.getExtensionElementPrefixes())) {
 		stable.unExcludeNamespaces(val);
 	    }
 	    // Handle xsl:exclude-result-prefixes
-	    else if (qname == parser.getExcludeResultPrefixes()) {
+	    else if (qname.equals(parser.getExcludeResultPrefixes())) {
 		stable.unExcludeNamespaces(val);
 	    }
 	}
@@ -345,20 +345,11 @@ final class LiteralElement extends Instruction {
 
 	// The value of an attribute may depend on a (sibling) variable
     int j=0;
-    while (j < elementCount())
-    {
+        while (j < elementCount())  {
         final SyntaxTreeNode item = (SyntaxTreeNode) elementAt(j);
         if (item instanceof Variable) {
             item.translate(classGen, methodGen);
-            removeElement(item);	// avoid translating it twice
-            /* When removing an element we do not increment j
-             * but the removal will reduce the value of elementCount()
-             * so this loop WILL end. The next iteration will process
-             * elementAt(j), but with the old element removed
-             * we are actually processing the next element.
-             */
 	    }
-        else
             j++;
 	}
 
