@@ -23,7 +23,6 @@
  * questions.
  */
 
-
 package com.sun.xml.internal.ws.developer;
 
 import com.sun.xml.internal.ws.api.FeatureConstructor;

@@ -31,4 +31,3 @@ public class Properties {
     public static final String LEXICAL_HANDLER_PROPERTY =
             "http://xml.org/sax/properties/lexical-handler";
 }
-

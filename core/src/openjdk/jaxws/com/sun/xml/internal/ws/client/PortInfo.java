@@ -168,4 +168,3 @@ public class PortInfo implements WSPortInfo {
         return bindingId.toString();
     }
 }
-

@@ -199,7 +199,9 @@ abstract class AbstractInstanceResolver<T> extends InstanceResolver<T> {
     InjectionPlan<T,R> buildInjectionPlan(Class<? extends T> clazz, Class<R> resourceType, boolean isStatic) {
         List<InjectionPlan<T,R>> plan = new ArrayList<InjectionPlan<T,R>>();
 
-        for(Field field: clazz.getDeclaredFields()) {
+        Class<?> cl = clazz;
+        while(cl != Object.class) {
+            for(Field field: cl.getDeclaredFields()) {
             Resource resource = field.getAnnotation(Resource.class);
             if (resource != null) {
                 if(isInjectionPoint(resource, field.getType(),
@@ -212,8 +214,12 @@ abstract class AbstractInstanceResolver<T> extends InstanceResolver<T> {
                 }
             }
         }
+            cl = cl.getSuperclass();
+        }
 
-        for(Method method : clazz.getDeclaredMethods()) {
+        cl = clazz;
+        while(cl != Object.class) {
+            for(Method method : cl.getDeclaredMethods()) {
             Resource resource = method.getAnnotation(Resource.class);
             if (resource != null) {
                 Class[] paramTypes = method.getParameterTypes();
@@ -228,6 +234,8 @@ abstract class AbstractInstanceResolver<T> extends InstanceResolver<T> {
                     plan.add(new MethodInjectionPlan<T,R>(method));
                 }
             }
+        }
+            cl = cl.getSuperclass();
         }
 
         return new Compositor<T,R>(plan);

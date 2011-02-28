@@ -22,9 +22,6 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-/*
- * $Id: EndpointMethodDispatcher.java,v 1.1.2.5 2006/11/10 00:55:03 kohsuke Exp $
- */
 
 package com.sun.xml.internal.ws.server.sei;
 

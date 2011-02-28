@@ -27,12 +27,15 @@ package com.sun.xml.internal.ws.spi;
 
 import com.sun.xml.internal.ws.api.BindingID;
 import com.sun.xml.internal.ws.api.WSService;
-import com.sun.xml.internal.ws.api.server.*;
-import com.sun.xml.internal.ws.api.server.Container;
 import com.sun.xml.internal.ws.api.addressing.AddressingVersion;
 import com.sun.xml.internal.ws.api.addressing.WSEndpointReference;
 import com.sun.xml.internal.ws.api.model.wsdl.WSDLPort;
 import com.sun.xml.internal.ws.api.model.wsdl.WSDLService;
+import com.sun.xml.internal.ws.api.server.BoundEndpoint;
+import com.sun.xml.internal.ws.api.server.Container;
+import com.sun.xml.internal.ws.api.server.ContainerResolver;
+import com.sun.xml.internal.ws.api.server.Module;
+import com.sun.xml.internal.ws.api.server.WSEndpoint;
 import com.sun.xml.internal.ws.api.wsdl.parser.WSDLParserExtension;
 import com.sun.xml.internal.ws.client.WSServiceDelegate;
 import com.sun.xml.internal.ws.developer.MemberSubmissionEndpointReference;
@@ -51,11 +54,17 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.*;
+import javax.xml.ws.Endpoint;
+import javax.xml.ws.EndpointReference;
+import javax.xml.ws.Service;
+import javax.xml.ws.WebServiceException;
+import javax.xml.ws.WebServiceFeature;
 import javax.xml.ws.spi.Provider;
 import javax.xml.ws.spi.ServiceDelegate;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.List;
 
 /**
@@ -94,14 +103,20 @@ public class ProviderImpl extends Provider {
         return endpoint;
     }
 
-    public EndpointReference readEndpointReference(Source eprInfoset) {
-        Unmarshaller unmarshaller;
+    public EndpointReference readEndpointReference(final Source eprInfoset) {
+        // EPR constructors are private, so we need privilege escalation.
+        // this unmarshalling can only access instances of a fixed, known set of classes,
+        // so doing that shouldn't introduce security vulnerability.
+        return AccessController.doPrivileged(new PrivilegedAction<EndpointReference>() {
+            public EndpointReference run() {
         try {
-            unmarshaller = eprjc.createUnmarshaller();
+                    Unmarshaller unmarshaller = eprjc.createUnmarshaller();
             return (EndpointReference) unmarshaller.unmarshal(eprInfoset);
         } catch (JAXBException e) {
             throw new WebServiceException("Error creating Marshaller or marshalling.", e);
         }
+    }
+        });
     }
 
     public <T> T getPort(EndpointReference endpointReference, Class<T> clazz, WebServiceFeature... webServiceFeatures) {
@@ -123,12 +138,12 @@ public class ProviderImpl extends Provider {
     }
 
     public W3CEndpointReference createW3CEndpointReference(String address, QName serviceName, QName portName, List<Element> metadata, String wsdlDocumentLocation, List<Element> referenceParameters) {
+        Container container = ContainerResolver.getInstance().getContainer();
         if (address == null) {
             if (serviceName == null || portName == null) {
                 throw new IllegalStateException(ProviderApiMessages.NULL_ADDRESS_SERVICE_ENDPOINT());
             } else {
                 //check if it is run in a Java EE Container and if so, get address using serviceName and portName
-                Container container = ContainerResolver.getInstance().getContainer();
                 Module module = container.getSPI(Module.class);
                 if (module != null) {
                     List<BoundEndpoint> beList = module.getBoundEndpoints();
@@ -160,7 +175,7 @@ public class ProviderImpl extends Provider {
 
                 URL wsdlLoc = new URL(wsdlDocumentLocation);
                 WSDLModelImpl wsdlDoc = RuntimeWSDLParser.parse(wsdlLoc, new StreamSource(wsdlLoc.toExternalForm()), er,
-                        false, ServiceFinder.find(WSDLParserExtension.class).toArray());
+                        false, container, ServiceFinder.find(WSDLParserExtension.class).toArray());
                 if (serviceName != null) {
                     WSDLService wsdlService = wsdlDoc.getService(serviceName);
                     if (wsdlService == null)
@@ -185,10 +200,17 @@ public class ProviderImpl extends Provider {
     }
 
     private static JAXBContext getEPRJaxbContext() {
+        // EPRs have package and private fields, so we need privilege escalation.
+        // this access only fixed, known set of classes, so doing that
+        // shouldn't introduce security vulnerability.
+        return AccessController.doPrivileged(new PrivilegedAction<JAXBContext>() {
+            public JAXBContext run() {
         try {
             return JAXBContext.newInstance(MemberSubmissionEndpointReference.class, W3CEndpointReference.class);
         } catch (JAXBException e) {
             throw new WebServiceException("Error creating JAXBContext for W3CEndpointReference. ", e);
         }
+    }
+        });
     }
 }

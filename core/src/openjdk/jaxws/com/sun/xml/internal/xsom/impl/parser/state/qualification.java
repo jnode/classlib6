@@ -174,4 +174,3 @@ class qualification extends NGCCHandler {
 
 
 }
-

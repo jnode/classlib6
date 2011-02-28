@@ -27,7 +27,6 @@ package com.sun.xml.internal.ws.client;
 
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
-import com.sun.xml.internal.ws.Closeable;
 import com.sun.xml.internal.ws.model.wsdl.WSDLProperties;
 import com.sun.xml.internal.ws.api.EndpointAddress;
 import com.sun.xml.internal.ws.api.WSBinding;
@@ -70,7 +69,7 @@ import java.util.concurrent.Executor;
  *
  * @author Kohsuke Kawaguchi
  */
-public abstract class Stub implements WSBindingProvider, ResponseContextReceiver, Closeable {
+public abstract class Stub implements WSBindingProvider, ResponseContextReceiver  {
 
     /**
      * Reuse pipelines as it's expensive to create.
@@ -199,7 +198,33 @@ public abstract class Stub implements WSBindingProvider, ResponseContextReceiver
      *                       So we take a setter that abstracts that away.
      */
     protected final Packet process(Packet packet, RequestContext requestContext, ResponseContextReceiver receiver) {
-        {// fill in Packet
+        configureRequestPacket(packet, requestContext);
+        Pool<Tube> pool = tubes;
+        if (pool == null)
+            throw new WebServiceException("close method has already been invoked"); // TODO: i18n
+
+        Fiber fiber = engine.createFiber();
+        // then send it away!
+        Tube tube = pool.take();
+
+        try {
+            return fiber.runSync(tube, packet);
+        } finally {
+            // this allows us to capture the packet even when the call failed with an exception.
+            // when the call fails with an exception it's no longer a 'reply' but it may provide some information
+            // about what went wrong.
+
+            // note that Packet can still be updated after
+            // ResponseContext is created.
+            Packet reply = (fiber.getPacket() == null) ? packet : fiber.getPacket();
+            receiver.setResponseContext(new ResponseContext(reply));
+
+            pool.recycle(tube);
+        }
+    }
+
+    private void configureRequestPacket(Packet packet, RequestContext requestContext) {
+        // fill in Packet
             packet.proxy = this;
             packet.handlerConfig = binding.getHandlerConfig();
             requestContext.fill(packet);
@@ -225,31 +250,6 @@ public abstract class Stub implements WSBindingProvider, ResponseContextReceiver
                 packet.getMessage().getHeaders().addAll(hl);
         }
 
-
-        Pool<Tube> pool = tubes;
-        if (pool == null)
-            throw new WebServiceException("close method has already been invoked"); // TODO: i18n
-
-        Fiber fiber = engine.createFiber();
-        // then send it away!
-        Tube tube = pool.take();
-
-        try {
-            return fiber.runSync(tube, packet);
-        } finally {
-            // this allows us to capture the packet even when the call failed with an exception.
-            // when the call fails with an exception it's no longer a 'reply' but it may provide some information
-            // about what went wrong.
-
-            // note that Packet can still be updated after
-            // ResponseContext is created.
-            Packet reply = (fiber.getPacket() == null) ? packet : fiber.getPacket();
-            receiver.setResponseContext(new ResponseContext(reply));
-
-            pool.recycle(tube);
-        }
-    }
-
     /**
      * Passes a message through a {@link Tube}line for processing. The processing happens
      * asynchronously and when the response is available, Fiber.CompletionCallback is
@@ -269,16 +269,7 @@ public abstract class Stub implements WSBindingProvider, ResponseContextReceiver
      */
     protected final void processAsync(Packet request, RequestContext requestContext, final Fiber.CompletionCallback completionCallback) {
         // fill in Packet
-        request.proxy = this;
-        request.handlerConfig = binding.getHandlerConfig();
-        requestContext.fill(request);
-        if (wsdlProperties != null) {
-            request.addSatellite(wsdlProperties);
-        }
-        if (AddressingVersion.isEnabled(binding)) {
-            if(endpointReference!=null)
-                endpointReference.addReferenceParameters(request.getMessage().getHeaders());
-        }
+        configureRequestPacket(request, requestContext);
 
         final Pool<Tube> pool = tubes;
         if (pool == null)
@@ -402,5 +393,9 @@ public abstract class Stub implements WSBindingProvider, ResponseContextReceiver
     public final List<Header> getInboundHeaders() {
         return Collections.unmodifiableList((HeaderList)
             responseContext.get(JAXWSProperties.INBOUND_HEADER_LIST_PROPERTY));
+    }
+
+    public final void setAddress(String address) {
+        requestContext.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, address);
     }
 }
