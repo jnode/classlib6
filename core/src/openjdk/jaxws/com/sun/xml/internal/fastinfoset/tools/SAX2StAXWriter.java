@@ -27,7 +27,6 @@
 
 
 
-
 package com.sun.xml.internal.fastinfoset.tools;
 
 import com.sun.xml.internal.fastinfoset.QualifiedName;
@@ -199,4 +198,3 @@ public class SAX2StAXWriter extends DefaultHandler implements LexicalHandler {
     }
     
 }
-

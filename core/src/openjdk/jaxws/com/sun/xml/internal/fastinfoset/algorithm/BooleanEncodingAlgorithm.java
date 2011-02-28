@@ -26,7 +26,6 @@
  */
 
 
-
 package com.sun.xml.internal.fastinfoset.algorithm;
 
 
@@ -271,4 +270,3 @@ public class BooleanEncodingAlgorithm extends BuiltInEncodingAlgorithm {
     }
            
 }
-

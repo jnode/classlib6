@@ -27,7 +27,6 @@
 
 
 
-
 package com.sun.xml.internal.fastinfoset.sax;
 
 public class Features {

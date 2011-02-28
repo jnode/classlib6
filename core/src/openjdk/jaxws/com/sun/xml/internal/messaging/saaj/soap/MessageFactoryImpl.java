@@ -22,11 +22,6 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-/*
- * $Id: MessageFactoryImpl.java,v 1.23 2006/01/27 12:49:27 vj135062 Exp $
- * $Revision: 1.23 $
- * $Date: 2006/01/27 12:49:27 $
- */
 
 
 package com.sun.xml.internal.messaging.saaj.soap;
@@ -54,15 +49,15 @@ import com.sun.xml.internal.messaging.saaj.util.TeeInputStream;
  */
 public class MessageFactoryImpl extends MessageFactory {
 
-    protected static Logger log =
+    protected static final Logger log =
         Logger.getLogger(LogDomainConstants.SOAP_DOMAIN,
                          "com.sun.xml.internal.messaging.saaj.soap.LocalStrings");
 
-    protected static OutputStream listener;
+    protected  OutputStream listener;
 
     protected boolean lazyAttachments = false;
     
-    public static OutputStream listen(OutputStream newListener) {
+    public  OutputStream listen(OutputStream newListener) {
         OutputStream oldListener = listener;
         listener = newListener;
         return oldListener;

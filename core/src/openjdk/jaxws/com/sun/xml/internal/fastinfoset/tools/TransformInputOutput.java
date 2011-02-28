@@ -26,7 +26,6 @@
  */
 
 
-
 package com.sun.xml.internal.fastinfoset.tools;
 
 import java.io.BufferedInputStream;

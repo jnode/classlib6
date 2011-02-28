@@ -22,9 +22,6 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-/*
- * $Id: DetailEntry1_2Impl.java,v 1.13 2006/01/27 12:49:45 vj135062 Exp $
- */
 
 
 

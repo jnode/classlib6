@@ -22,9 +22,6 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-/*
- * $Id: Body1_2Impl.java,v 1.32 2006/01/27 12:49:44 vj135062 Exp $
- */
 
 
 
@@ -50,7 +47,7 @@ import com.sun.xml.internal.messaging.saaj.soap.name.NameImpl;
 
 public class Body1_2Impl extends BodyImpl {
     
-    protected static Logger log =
+    protected static final Logger log =
         Logger.getLogger(Body1_2Impl.class.getName(),
                          "com.sun.xml.internal.messaging.saaj.soap.ver1_2.LocalStrings");
     

@@ -22,6 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
 /**
  * The in-memory model of the JAXB-bound beans.
  *
@@ -65,6 +66,3 @@ import java.lang.reflect.Field;
 import javax.xml.bind.annotation.XmlSchema;
 
 import static javax.xml.bind.annotation.XmlNsForm.QUALIFIED;
-
-
-

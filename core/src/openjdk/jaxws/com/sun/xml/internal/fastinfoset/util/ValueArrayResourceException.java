@@ -26,7 +26,6 @@
  */
 
 
-
 package com.sun.xml.internal.fastinfoset.util;
 
 public class ValueArrayResourceException extends RuntimeException {

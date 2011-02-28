@@ -23,9 +23,6 @@
  * questions.
  */
 
-/*
- * @(#)$Id: WildcardLoader.java,v 1.2 2005/08/09 18:36:29 kohsuke Exp $
- */
 package com.sun.xml.internal.bind.v2.runtime.unmarshaller;
 
 import javax.xml.bind.annotation.DomHandler;

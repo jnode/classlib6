@@ -22,9 +22,6 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-/*
- * $Id: SOAPFactory1_1Impl.java,v 1.1.1.1 2006/01/27 13:10:57 kumarjayanti Exp $
- */
 
 
 
@@ -61,10 +58,8 @@ public class SOAPFactory1_1Impl extends SOAPFactoryImpl {
             throw new IllegalArgumentException("reasonText argument for createFault was passed NULL");
         }
         Fault1_1Impl fault = new Fault1_1Impl(createDocument(), null);
-        fault.setFaultString(reasonText);
-        
         fault.setFaultCode(faultCode);
-       
+        fault.setFaultString(reasonText);
         return fault;
     }
 

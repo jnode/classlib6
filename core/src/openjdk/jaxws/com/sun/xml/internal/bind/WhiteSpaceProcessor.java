@@ -195,4 +195,3 @@ public abstract class WhiteSpaceProcessor {
         return ch == 0x9 || ch == 0xA || ch == 0xD;
     }
 }
-

@@ -26,7 +26,6 @@
  */
 
 
-
 package com.sun.xml.internal.fastinfoset.algorithm;
 
 import java.io.EOFException;

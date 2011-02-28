@@ -26,7 +26,6 @@
  */
 
 
-
 package com.sun.xml.internal.org.jvnet.fastinfoset.sax.helpers;
 
 import com.sun.xml.internal.org.jvnet.fastinfoset.sax.*;

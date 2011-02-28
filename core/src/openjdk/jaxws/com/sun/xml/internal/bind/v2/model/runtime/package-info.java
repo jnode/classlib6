@@ -22,6 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
 /**
  * The specialization of {@link com.sun.xml.internal.bind.v2.model.core} for the runtime.
  *
@@ -35,6 +36,3 @@ package com.sun.xml.internal.bind.v2.model.runtime;
 
 import javax.xml.bind.annotation.XmlNsForm;
 import javax.xml.bind.annotation.XmlSchema;
-
-
-

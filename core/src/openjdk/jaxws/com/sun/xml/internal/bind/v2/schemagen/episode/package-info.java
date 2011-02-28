@@ -22,6 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
 /**
  * TXW interfaces for writing episode file, which is what XJC needs to
  * handle separate compilation.

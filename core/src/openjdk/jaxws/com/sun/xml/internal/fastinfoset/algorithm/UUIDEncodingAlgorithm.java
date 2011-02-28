@@ -25,7 +25,6 @@
  * THIS FILE WAS MODIFIED BY SUN MICROSYSTEMS, INC.
  */
 
-
 package com.sun.xml.internal.fastinfoset.algorithm;
 
 import java.util.ArrayList;
@@ -70,7 +69,7 @@ public class UUIDEncodingAlgorithm extends LongEncodingAlgorithm {
         
         final long[] ldata = (long[])data;
 
-        final int end = ldata.length - 1;
+        final int end = ldata.length - 2;
         for (int i = 0; i <= end; i += 2) {
             s.append(toUUIDString(ldata[i], ldata[i + 1]));
             if (i != end) {

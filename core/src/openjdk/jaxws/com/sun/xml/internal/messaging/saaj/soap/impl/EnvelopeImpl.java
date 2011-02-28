@@ -22,11 +22,6 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-/*
- * $Id: EnvelopeImpl.java,v 1.1.1.1 2006/01/27 13:10:56 kumarjayanti Exp $
- * $Revision: 1.1.1.1 $
- * $Date: 2006/01/27 13:10:56 $
- */
 
 
 package com.sun.xml.internal.messaging.saaj.soap.impl;
@@ -367,4 +362,3 @@ public abstract class EnvelopeImpl extends ElementImpl implements Envelope {
                                 + newName.getLocalPart());
      }
 }
-

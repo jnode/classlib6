@@ -22,11 +22,6 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-/*
- * $Id: HttpSOAPConnection.java,v 1.41 2006/01/27 12:49:17 vj135062 Exp $
- * $Revision: 1.41 $
- * $Date: 2006/01/27 12:49:17 $
- */
 
 
 package com.sun.xml.internal.messaging.saaj.client.p2p;
@@ -55,12 +50,19 @@ import com.sun.xml.internal.messaging.saaj.util.*;
  */
 public class HttpSOAPConnection extends SOAPConnection {
 
-    protected static Logger log =
+    public static final String vmVendor = System.getProperty("java.vendor.url");
+    private static final String sunVmVendor = "http://java.sun.com/";
+    private static final String ibmVmVendor = "http://www.ibm.com/";
+    private static final boolean isSunVM = sunVmVendor.equals(vmVendor) ? true: false;
+    private static final boolean isIBMVM = ibmVmVendor.equals(vmVendor) ? true : false;
+    private static final String JAXM_URLENDPOINT="javax.xml.messaging.URLEndpoint";
+
+    protected static final Logger log =
         Logger.getLogger(LogDomainConstants.HTTP_CONN_DOMAIN,
                          "com.sun.xml.internal.messaging.saaj.client.p2p.LocalStrings");
 
-    public static String defaultProxyHost = null;
-    public static int defaultProxyPort = -1;
+    private static final String defaultProxyHost = null;
+    private static final int defaultProxyPort = -1;
 
     MessageFactory messageFactory = null;
 
@@ -72,6 +74,9 @@ public class HttpSOAPConnection extends SOAPConnection {
 
         try {
             messageFactory = MessageFactory.newInstance(SOAPConstants.DYNAMIC_SOAP_PROTOCOL);
+        } catch (NoSuchMethodError ex) {
+            //fallback to default SOAP 1.1 in this case for backward compatibility
+            messageFactory = MessageFactory.newInstance();
         } catch (Exception ex) {
             log.log(Level.SEVERE, "SAAJ0001.p2p.cannot.create.msg.factory", ex);
             throw new SOAPExceptionImpl("Unable to create message factory", ex);
@@ -96,10 +101,14 @@ public class HttpSOAPConnection extends SOAPConnection {
         }
 
         Class urlEndpointClass = null;
-
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
         try {
-            urlEndpointClass = Class.forName("javax.xml.messaging.URLEndpoint");
-        } catch (Exception ex) {
+            if (loader != null) {
+                urlEndpointClass = loader.loadClass(JAXM_URLENDPOINT);
+            } else {
+                urlEndpointClass = Class.forName(JAXM_URLENDPOINT);
+            }
+        } catch (ClassNotFoundException ex) {
             //Do nothing. URLEndpoint is available only when JAXM is there.
             log.finest("SAAJ0090.p2p.endpoint.available.only.for.JAXM");
         }
@@ -640,9 +649,23 @@ public class HttpSOAPConnection extends SOAPConnection {
         return ret;
     }
 
-    private static String SSL_PKG = "com.sun.net.ssl.internal.www.protocol";
-    private static String SSL_PROVIDER =
-        "com.sun.net.ssl.internal.ssl.Provider";
+    //private static String SSL_PKG = "com.sun.net.ssl.internal.www.protocol";
+    //private static String SSL_PROVIDER =
+      //  "com.sun.net.ssl.internal.ssl.Provider";
+    private static final String SSL_PKG;
+    private static final String SSL_PROVIDER;
+
+    static {
+        if (isIBMVM) {
+            SSL_PKG ="com.ibm.net.ssl.internal.www.protocol";
+            SSL_PROVIDER ="com.ibm.net.ssl.internal.ssl.Provider";
+        } else {
+            //if not IBM VM default to Sun.
+            SSL_PKG = "com.sun.net.ssl.internal.www.protocol";
+            SSL_PROVIDER ="com.sun.net.ssl.internal.ssl.Provider";
+        }
+    }
+
     private void initHttps() {
         //if(!setHttps) {
         String pkgs = System.getProperty("java.protocol.handler.pkgs");

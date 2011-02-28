@@ -22,11 +22,6 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-/*
- * $Id: AttachmentPartImpl.java,v 1.1.1.1.2.1 2007/11/27 07:19:29 kumarjayanti Exp $
- * $Revision: 1.1.1.1.2.1 $
- * $Date: 2007/11/27 07:19:29 $
- */
 
 
 package com.sun.xml.internal.messaging.saaj.soap;
@@ -70,7 +65,7 @@ import javax.xml.soap.*;
  */
 public class AttachmentPartImpl extends AttachmentPart {
 
-    protected static Logger log =
+    protected static final Logger log =
         Logger.getLogger(LogDomainConstants.SOAP_DOMAIN,
                          "com.sun.xml.internal.messaging.saaj.soap.LocalStrings");
 
@@ -100,7 +95,7 @@ public class AttachmentPartImpl extends AttachmentPart {
                 mailMap.addMailcap(
                     "image/gif"
                         + hndlrStr
-                        + "com.sun.xml.internal.messaging.saaj.soap.GifDataContentHandler");*/
+                        + "com.sun.xml.internal.messaging.saaj.soap.GifDataContentHandler"); */
                 /*mailMap.addMailcap(
                     "multipart/*"
                         + hndlrStr
@@ -521,4 +516,3 @@ public class AttachmentPartImpl extends AttachmentPart {
     }
 
 }
-

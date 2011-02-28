@@ -22,11 +22,6 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-/*
- * $Id: ImageDataContentHandler.java,v 1.1.1.1.2.1 2007/11/27 07:19:28 kumarjayanti Exp $
- * $Revision: 1.1.1.1.2.1 $
- * $Date: 2007/11/27 07:19:28 $
- */
 
 
 package com.sun.xml.internal.messaging.saaj.soap;
@@ -49,7 +44,7 @@ import com.sun.xml.internal.messaging.saaj.util.LogDomainConstants;
 public class ImageDataContentHandler extends Component
     implements DataContentHandler {
 
-    protected static Logger log =
+    protected static final Logger log =
         Logger.getLogger(LogDomainConstants.SOAP_DOMAIN,
                          "com.sun.xml.internal.messaging.saaj.soap.LocalStrings");
     

@@ -24,7 +24,6 @@
  *
  * THIS FILE WAS MODIFIED BY SUN MICROSYSTEMS, INC.
  */
-
 package com.sun.xml.internal.fastinfoset;
 
 import java.util.Locale;

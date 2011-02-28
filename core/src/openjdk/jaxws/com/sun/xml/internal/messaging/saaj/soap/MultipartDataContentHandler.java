@@ -22,11 +22,6 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-/*
- * $Id: MultipartDataContentHandler.java,v 1.3 2006/01/27 12:49:28 vj135062 Exp $
- * $Revision: 1.3 $
- * $Date: 2006/01/27 12:49:28 $
- */
 
 
 package com.sun.xml.internal.messaging.saaj.soap;
@@ -104,4 +99,3 @@ public class MultipartDataContentHandler implements DataContentHandler {
 	}
     }
 }
-

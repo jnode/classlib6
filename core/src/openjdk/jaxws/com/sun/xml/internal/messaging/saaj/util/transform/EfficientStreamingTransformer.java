@@ -23,7 +23,6 @@
  * questions.
  */
 
-
 /*
  * EfficientStreamingTransformer.java
  *
@@ -62,11 +61,13 @@ import com.sun.xml.internal.messaging.saaj.util.FastInfosetReflection;
 public class EfficientStreamingTransformer
     extends javax.xml.transform.Transformer {
 
-  static final String version;
-  static final String vendor;
+  //static final String version;
+  //static final String vendor;
+  //removing the static :security issue : see CR 6813167
+  private final TransformerFactory transformerFactory = TransformerFactory.newInstance();
 
-  protected static TransformerFactory transformerFactory = TransformerFactory.newInstance();
-
+  /**
+  removing support for Java 1.4 and 1.3 : CR6658158
   static {
         version = System.getProperty("java.vm.version");
         vendor = System.getProperty("java.vm.vendor");
@@ -75,7 +76,7 @@ public class EfficientStreamingTransformer
             transformerFactory = 
                 new com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl();
         }
-  }
+  }*/
                                                                                                                                                   
     /**
      * TransformerFactory instance.
@@ -394,8 +395,9 @@ public class EfficientStreamingTransformer
 
     /**
      * Threadlocal to hold a Transformer instance for this thread.
+     * removing this optimiztion :  see CR 6813167
      */
-    private static ThreadLocal effTransformer = new ThreadLocal(); 
+    //private static ThreadLocal effTransformer = new ThreadLocal();
     
     /**
      * Return Transformer instance for this thread, allocating a new one if 
@@ -403,11 +405,14 @@ public class EfficientStreamingTransformer
      * properties or any other data set on a previously used transformer.
      */
     public static Transformer newTransformer() {
-        Transformer tt = (Transformer) effTransformer.get();
+       //removing this optimiztion: see CR 6813167
+        /* Transformer tt = (Transformer) ef U15 :fTransformer.get();
         if (tt == null) {
             effTransformer.set(tt = new EfficientStreamingTransformer());
         }       
         return tt;
+        */
+        return new EfficientStreamingTransformer();
     }
 
 }

@@ -26,7 +26,6 @@
  */
 
 
-
 package com.sun.xml.internal.fastinfoset.stax;
 
 import javax.xml.stream.Location;
@@ -123,4 +122,3 @@ public class EventLocation implements Location{
     }
     
 }
-

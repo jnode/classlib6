@@ -25,7 +25,6 @@
  * THIS FILE WAS MODIFIED BY SUN MICROSYSTEMS, INC.
  */
 
-
 package com.sun.xml.internal.fastinfoset.util;
 
 import com.sun.xml.internal.fastinfoset.EncodingConstants;

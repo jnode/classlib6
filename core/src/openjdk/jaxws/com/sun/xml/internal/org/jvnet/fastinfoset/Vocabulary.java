@@ -26,7 +26,6 @@
  */
 
 
-
 package com.sun.xml.internal.org.jvnet.fastinfoset;
 
 import java.util.LinkedHashSet;

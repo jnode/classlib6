@@ -27,7 +27,6 @@
 
 
 
-
 package com.sun.xml.internal.fastinfoset.tools;
 
 import javax.xml.namespace.QName;
@@ -172,4 +171,3 @@ public class StAX2SAXReader {
     }
 
 }
-

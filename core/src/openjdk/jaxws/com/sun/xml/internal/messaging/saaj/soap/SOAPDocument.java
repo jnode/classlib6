@@ -22,9 +22,6 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-/*
- * $Id: SOAPDocument.java,v 1.5 2006/01/27 12:49:28 vj135062 Exp $
- */
 
 
 

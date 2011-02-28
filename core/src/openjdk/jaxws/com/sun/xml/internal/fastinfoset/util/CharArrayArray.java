@@ -27,7 +27,6 @@
 
 
 
-
 package com.sun.xml.internal.fastinfoset.util;
 
 import com.sun.xml.internal.fastinfoset.CommonResourceBundle;

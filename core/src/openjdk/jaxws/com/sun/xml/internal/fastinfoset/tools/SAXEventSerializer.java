@@ -27,7 +27,6 @@
 
 
 
-
 package com.sun.xml.internal.fastinfoset.tools;
 
 import java.io.IOException;
@@ -408,4 +407,3 @@ public class SAXEventSerializer extends DefaultHandler
     }
 
 }
-

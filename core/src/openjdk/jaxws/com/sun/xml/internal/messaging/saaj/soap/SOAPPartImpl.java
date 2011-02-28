@@ -22,11 +22,6 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-/*
- * $Id: SOAPPartImpl.java,v 1.1.1.1 2006/01/27 13:10:55 kumarjayanti Exp $
- * $Revision: 1.1.1.1 $
- * $Date: 2006/01/27 13:10:55 $
- */
 
 
 package com.sun.xml.internal.messaging.saaj.soap;
@@ -59,7 +54,7 @@ import javax.xml.transform.sax.SAXSource;
  * @author Anil Vijendran (anil@sun.com)
  */
 public abstract class SOAPPartImpl extends SOAPPart implements SOAPDocument {
-    protected static Logger log =
+    protected static final Logger log =
         Logger.getLogger(LogDomainConstants.SOAP_DOMAIN,
                          "com.sun.xml.internal.messaging.saaj.soap.LocalStrings");
 
@@ -612,20 +607,20 @@ public abstract class SOAPPartImpl extends SOAPPart implements SOAPDocument {
 
             InputStream inputStream = ((StreamSource) source).getInputStream();
             if (inputStream != null) {
-                if (sourceCharsetEncoding == null) {
+                if (getSourceCharsetEncoding() == null) {
                     reader = new InputStreamReader(inputStream);
                 } else {
                     try {
                         reader =
                             new InputStreamReader(
-                                inputStream, sourceCharsetEncoding);
+                                inputStream, getSourceCharsetEncoding());
                     } catch (UnsupportedEncodingException uee) {
                         log.log(
                             Level.SEVERE,
                             "SAAJ0551.soap.unsupported.encoding",
-                            new Object[] {sourceCharsetEncoding});
+                            new Object[] {getSourceCharsetEncoding()});
                         throw new SOAPExceptionImpl(
-                            "Unsupported encoding " + sourceCharsetEncoding,
+                            "Unsupported encoding " + getSourceCharsetEncoding(),
                             uee);
                     }
                 }
@@ -796,5 +791,9 @@ public abstract class SOAPPartImpl extends SOAPPart implements SOAPDocument {
 
     public void detachNode() {
         // Nothing seems to be required to be done here
+    }
+
+    public String getSourceCharsetEncoding() {
+        return sourceCharsetEncoding;
     }
 }

@@ -22,6 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
 package com.sun.xml.internal.messaging.saaj.soap;
 
 import javax.xml.soap.SAAJMetaFactory;
@@ -37,7 +38,7 @@ import com.sun.xml.internal.messaging.saaj.util.LogDomainConstants;
 
 public class SAAJMetaFactoryImpl extends SAAJMetaFactory {
 
-    protected static Logger log =
+    protected static final Logger log =
         Logger.getLogger(LogDomainConstants.SOAP_DOMAIN,
                          "com.sun.xml.internal.messaging.saaj.soap.LocalStrings");
 

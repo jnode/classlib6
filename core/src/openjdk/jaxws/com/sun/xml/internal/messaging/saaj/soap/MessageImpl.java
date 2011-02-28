@@ -22,11 +22,6 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-/*
- * $Id: MessageImpl.java,v 1.5 2006/12/12 10:16:33 kumarjayanti Exp $
- * $Revision: 1.5 $
- * $Date: 2006/12/12 10:16:33 $
- */
 
 
 package com.sun.xml.internal.messaging.saaj.soap;
@@ -69,7 +64,7 @@ public abstract class MessageImpl
     public static final String CONTENT_ID             = "Content-ID";
     public static final String CONTENT_LOCATION       = "Content-Location";
 
-    protected static Logger log =
+    protected static final Logger log =
         Logger.getLogger(LogDomainConstants.SOAP_DOMAIN,
                          "com.sun.xml.internal.messaging.saaj.soap.LocalStrings");
 
@@ -151,7 +146,7 @@ public abstract class MessageImpl
      *      must be all lower case
      */
     private static boolean isSoap1_1Type(String primary, String sub) {
-        return primary.equals("text") && sub.equals("xml")
+        return primary.equalsIgnoreCase("text") && sub.equalsIgnoreCase("xml")
             || primary.equals("application")
                && sub.equals("fastinfoset");
     }
@@ -848,6 +843,7 @@ public abstract class MessageImpl
             }
         }
         attachments = f;
+       // needsSave();
     }
 
     public AttachmentPart createAttachmentPart() {

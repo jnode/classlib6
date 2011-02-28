@@ -23,9 +23,6 @@
  * questions.
  */
 
-/*
- * @(#)$Id:
- */
 package com.sun.xml.internal.bind.v2.runtime.property;
 
 import com.sun.xml.internal.bind.v2.runtime.JAXBContextImpl;
@@ -70,4 +67,3 @@ public final class UnmarshallerChain {
         return offset;
     }
 }
-

@@ -27,7 +27,6 @@
 
 
 
-
 package com.sun.xml.internal.fastinfoset.util;
 
 public class CharArrayString extends CharArray {

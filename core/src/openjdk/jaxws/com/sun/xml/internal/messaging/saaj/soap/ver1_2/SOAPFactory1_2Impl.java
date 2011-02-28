@@ -22,9 +22,6 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-/*
- * $Id: SOAPFactory1_2Impl.java,v 1.1.1.1 2006/01/27 13:10:57 kumarjayanti Exp $
- */
 
 
 

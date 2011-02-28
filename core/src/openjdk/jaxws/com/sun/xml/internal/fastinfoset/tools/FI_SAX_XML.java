@@ -27,7 +27,6 @@
 
 
 
-
 package com.sun.xml.internal.fastinfoset.tools;
 
 import com.sun.xml.internal.org.jvnet.fastinfoset.FastInfosetSource;

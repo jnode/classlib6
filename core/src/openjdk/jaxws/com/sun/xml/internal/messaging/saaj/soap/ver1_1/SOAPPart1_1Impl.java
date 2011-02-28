@@ -22,9 +22,6 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-/*
- * $Id: SOAPPart1_1Impl.java,v 1.1.1.1 2006/01/27 13:10:57 kumarjayanti Exp $
- */
 
 
 
@@ -48,7 +45,7 @@ import com.sun.xml.internal.messaging.saaj.util.XMLDeclarationParser;
 
 public class SOAPPart1_1Impl extends SOAPPartImpl implements SOAPConstants {
 
-    protected static Logger log =
+    protected static final Logger log =
         Logger.getLogger(LogDomainConstants.SOAP_VER1_1_DOMAIN,
                          "com.sun.xml.internal.messaging.saaj.soap.ver1_1.LocalStrings");
 

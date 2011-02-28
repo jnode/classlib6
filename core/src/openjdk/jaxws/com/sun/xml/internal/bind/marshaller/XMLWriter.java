@@ -22,6 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
 // @@3RD PARTY CODE@@
 
 // XMLWriter.java - serialize an XML document.

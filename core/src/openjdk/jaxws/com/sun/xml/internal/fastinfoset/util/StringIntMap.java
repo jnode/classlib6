@@ -27,7 +27,6 @@
 
 
 
-
 package com.sun.xml.internal.fastinfoset.util;
 
 import com.sun.xml.internal.fastinfoset.CommonResourceBundle;
@@ -167,7 +166,7 @@ public class StringIntMap extends KeyIntMap {
             }
         }
                 
-        return -1;
+        return NOT_PRESENT;
     }
 
 

@@ -27,7 +27,6 @@
 
 
 
-
 package com.sun.xml.internal.fastinfoset;
 
 import java.io.UnsupportedEncodingException;

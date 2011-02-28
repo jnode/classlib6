@@ -25,7 +25,6 @@
  * THIS FILE WAS MODIFIED BY SUN MICROSYSTEMS, INC.
  */
 
-
 package com.sun.xml.internal.fastinfoset.dom;
 
 import com.sun.xml.internal.fastinfoset.Encoder;
@@ -203,7 +202,7 @@ public class DOMDocumentSerializer extends Encoder {
                 
                 final String value = a.getNodeValue();
                 final boolean addToTable = isAttributeValueLengthMatchesLimit(value.length());
-                encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable);
+                encodeNonIdentifyingStringOnFirstBit(value, _v.attributeValue, addToTable, false);
             }
             
             _b = EncodingConstants.TERMINATOR;

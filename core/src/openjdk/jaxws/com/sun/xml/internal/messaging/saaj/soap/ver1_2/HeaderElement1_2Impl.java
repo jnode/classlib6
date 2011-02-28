@@ -22,9 +22,6 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-/*
- * $Id: HeaderElement1_2Impl.java,v 1.29 2006/01/27 12:49:48 vj135062 Exp $
- */
 
 
 
@@ -47,7 +44,7 @@ import com.sun.xml.internal.messaging.saaj.soap.name.NameImpl;
 
 public class HeaderElement1_2Impl extends HeaderElementImpl {
 
-    private static Logger log =
+    private static final Logger log =
         Logger.getLogger(HeaderElement1_2Impl.class.getName(),
                          "com.sun.xml.internal.messaging.saaj.soap.ver1_2.LocalStrings");
        
