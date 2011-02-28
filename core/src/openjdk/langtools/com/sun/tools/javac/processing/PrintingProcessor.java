@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005, 2006, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2005, 2010, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -43,7 +43,7 @@ import java.util.*;
  * -Xprint option; the included visitor class is used to implement
  * Elements.printElements.
  *
- * <p><b>This is NOT part of any API supported by Sun Microsystems.
+ * <p><b>This is NOT part of any supported API.
  * If you write code that depends on this, you do so at your own risk.
  * This code and its internal interfaces are subject to change or
  * deletion without notice.</b>
@@ -229,23 +229,24 @@ public class PrintingProcessor extends AbstractProcessor {
 	    if (kind == ENUM) {
 		List<Element> enclosedElements = 
 		    new ArrayList<Element>(e.getEnclosedElements());
+                // Handle any enum constants specially before other entities.
 		List<Element> enumConstants = new ArrayList<Element>();
 		for(Element element : enclosedElements) {
 		    if (element.getKind() == ENUM_CONSTANT)
 			enumConstants.add(element);
 		}
-		
+                if (!enumConstants.isEmpty()) {
 		int i;
 		for(i = 0; i < enumConstants.size()-1; i++) {
 		    this.visit(enumConstants.get(i), true);
 		    writer.print(",");
 		}
-		if (i >= 0 ) {
 		    this.visit(enumConstants.get(i), true);
-		    writer.print(";");
-		}
+                    writer.println(";\n");
 		
 		enclosedElements.removeAll(enumConstants);
+                }
+
 		for(Element element : enclosedElements)
 		    this.visit(element);
 	    } else {
