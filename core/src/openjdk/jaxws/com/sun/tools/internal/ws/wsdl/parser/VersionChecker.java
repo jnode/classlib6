@@ -24,7 +24,6 @@
  */
 
 
-
 package com.sun.tools.internal.ws.wsdl.parser;
 
 import com.sun.tools.internal.ws.resources.WsdlMessages;
@@ -136,4 +135,3 @@ public class VersionChecker extends XMLFilterImpl {
     private static final Set<String> VERSIONS = new HashSet<String>(Arrays.asList("2.0","2.1"));
 
 }
-

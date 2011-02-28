@@ -170,4 +170,3 @@ public abstract class ErrorReceiver  implements ErrorHandler, ErrorListener {
       return url;
   }
 }
-

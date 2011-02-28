@@ -22,6 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
 package com.sun.tools.internal.xjc.generator.bean.field;
 
 import com.sun.tools.internal.xjc.Options;
@@ -66,6 +67,12 @@ public class FieldRendererFactory {
     }
     public FieldRenderer getList(JClass coreList) {
         return new UntypedListFieldRenderer(coreList);
+    }
+    public FieldRenderer getContentList(JClass coreList) {
+        return new UntypedListFieldRenderer(coreList, false, true);
+    }
+    public FieldRenderer getDummyList(JClass coreList) {
+        return new UntypedListFieldRenderer(coreList, true, false);
     }
     public FieldRenderer getConst(FieldRenderer fallback) {
         return new ConstFieldRenderer(fallback);

@@ -22,6 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
 /**
  * <h1>Schema to Java compiler</h1>.
  *

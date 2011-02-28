@@ -24,7 +24,6 @@
  */
 
 
-
 package com.sun.tools.internal.ws.wscompile;
 
 import com.sun.tools.internal.xjc.api.ErrorListener;
@@ -66,6 +65,10 @@ public class ErrorReceiverFilter extends ErrorReceiver {
         if(core!=null)  core.info(exception);
     }
 
+    public void debug(SAXParseException exception) {
+
+    }
+
     public void warning(SAXParseException exception) {
         if(core!=null)  core.warning(exception);
     }
@@ -81,4 +84,3 @@ public class ErrorReceiverFilter extends ErrorReceiver {
     }
 
 }
-

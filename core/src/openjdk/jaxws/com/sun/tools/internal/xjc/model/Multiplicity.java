@@ -192,4 +192,3 @@ public final class Multiplicity {
         return create(min,null);
     }
 }
-    

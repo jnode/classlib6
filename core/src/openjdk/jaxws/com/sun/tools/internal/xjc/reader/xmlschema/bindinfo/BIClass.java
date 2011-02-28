@@ -121,4 +121,3 @@ public final class BIClass extends AbstractDeclarationImpl {
     /** Name of this declaration. */
     public static final QName NAME = new QName( Const.JAXB_NSURI, "class" );
 }
-

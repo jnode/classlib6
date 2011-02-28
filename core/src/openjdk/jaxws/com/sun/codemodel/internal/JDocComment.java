@@ -193,4 +193,3 @@ public class JDocComment extends JCommentPart implements JGenerable {
 
     private static final String INDENT = " *     ";
 }
-

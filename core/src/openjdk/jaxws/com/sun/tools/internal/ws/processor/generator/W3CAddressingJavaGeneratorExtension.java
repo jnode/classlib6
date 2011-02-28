@@ -22,9 +22,6 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-/*
- * $Id: W3CAddressingJavaGeneratorExtension.java,v 1.1.2.4 2006/10/31 19:57:28 vivekp Exp $
- */
 
 package com.sun.tools.internal.ws.processor.generator;
 

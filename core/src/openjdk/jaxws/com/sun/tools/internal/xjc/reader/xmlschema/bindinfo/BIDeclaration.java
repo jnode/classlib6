@@ -102,4 +102,3 @@ public interface BIDeclaration {
      */
     Collection<BIDeclaration> getChildren();
 }
-

@@ -22,11 +22,6 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-/*
- * @(#)$Id: CollisionInfo.java,v 1.1 2005/04/15 20:09:53 kohsuke Exp $
- */
-
-
 package com.sun.tools.internal.xjc.reader.xmlschema;
 
 import org.xml.sax.Locator;

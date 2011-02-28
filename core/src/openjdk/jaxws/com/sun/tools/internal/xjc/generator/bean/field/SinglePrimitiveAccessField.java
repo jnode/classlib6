@@ -22,6 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
 package com.sun.tools.internal.xjc.generator.bean.field;
 
 import com.sun.tools.internal.xjc.generator.bean.ClassOutlineImpl;

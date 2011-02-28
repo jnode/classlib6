@@ -254,9 +254,11 @@ public abstract class BIConversion extends AbstractDeclarationImpl {
         private String printMethodFor(XSSimpleType owner) {
             if(printMethod!=null)   return printMethod;
 
+            if(inMemoryType.unboxify().isPrimitive()) {
             String method = getConversionMethod("print",owner);
             if(method!=null)
                 return method;
+            }
 
             return "toString";
         }
@@ -264,10 +266,12 @@ public abstract class BIConversion extends AbstractDeclarationImpl {
         private String parseMethodFor(XSSimpleType owner) {
             if(parseMethod!=null)   return parseMethod;
 
+            if(inMemoryType.unboxify().isPrimitive()) {
             String method = getConversionMethod("parse", owner);
             if(method!=null) {
                 // this cast is necessary for conversion between primitive Java types
                 return '('+inMemoryType.unboxify().fullName()+')'+method;
+            }
             }
 
             return "new";
@@ -342,4 +346,3 @@ public abstract class BIConversion extends AbstractDeclarationImpl {
         }
     }
 }
-
