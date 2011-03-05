@@ -1,12 +1,12 @@
 /*
- * Copyright 2003-2004 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2003, 2008, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Sun designates this
+ * published by the Free Software Foundation.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the LICENSE file that accompanied this code.
+ * by Oracle in the LICENSE file that accompanied this code.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -18,9 +18,9 @@
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
- * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
- * CA 95054 USA or visit www.sun.com if you need additional information or
- * have any questions.
+ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ * or visit www.oracle.com if you need additional information or have any
+ * questions.
  */
 
 package sun.security.rsa;
@@ -47,7 +47,7 @@ public final class RSAKeyPairGenerator extends KeyPairGeneratorSpi {
     // public exponent to use
     private BigInteger publicExponent;
 
-    // size of the key to generate, >= 512
+    // size of the key to generate, >= RSAKeyFactory.MIN_MODLEN
     private int keySize;
 
     // PRNG to use
@@ -60,15 +60,16 @@ public final class RSAKeyPairGenerator extends KeyPairGeneratorSpi {
 
     // initialize the generator. See JCA doc
     public void initialize(int keySize, SecureRandom random) {
-        if (keySize < 512) {
-            throw new InvalidParameterException
-                ("Key size must be at least 512 bits");
+
+        // do not allow unreasonably small or large key sizes,
+        // probably user error
+        try {
+            RSAKeyFactory.checkKeyLengths(keySize, RSAKeyGenParameterSpec.F4,
+                512, 64 * 1024);
+        } catch (InvalidKeyException e) {
+            throw new InvalidParameterException(e.getMessage());
         }
-        if (keySize > 64 * 1024) {
-            // do not allow unreasonably large key sizes, probably user error
-            throw new InvalidParameterException
-                ("Key size must be 65536 bits or less");
-        }
+
         this.keySize = keySize;
         this.random = random;
         this.publicExponent = RSAKeyGenParameterSpec.F4;
@@ -77,35 +78,41 @@ public final class RSAKeyPairGenerator extends KeyPairGeneratorSpi {
     // second initialize method. See JCA doc.
     public void initialize(AlgorithmParameterSpec params, SecureRandom random)
             throws InvalidAlgorithmParameterException {
+
         if (params instanceof RSAKeyGenParameterSpec == false) {
             throw new InvalidAlgorithmParameterException
                 ("Params must be instance of RSAKeyGenParameterSpec");
         }
+
         RSAKeyGenParameterSpec rsaSpec = (RSAKeyGenParameterSpec)params;
-        keySize = rsaSpec.getKeysize();
-        publicExponent = rsaSpec.getPublicExponent();
-        this.random = random;
-        if (keySize < 512) {
-            throw new InvalidAlgorithmParameterException
-                ("Key size must be at least 512 bits");
-        }
-        if (keySize > 64 * 1024) {
-            // do not allow unreasonably large key sizes, probably user error
-            throw new InvalidAlgorithmParameterException
-                ("Key size must be 65536 bits or less");
-        }
-        if (publicExponent == null) {
-            publicExponent = RSAKeyGenParameterSpec.F4;
+        int tmpKeySize = rsaSpec.getKeysize();
+        BigInteger tmpPublicExponent = rsaSpec.getPublicExponent();
+
+        if (tmpPublicExponent == null) {
+            tmpPublicExponent = RSAKeyGenParameterSpec.F4;
         } else {
-            if (publicExponent.compareTo(RSAKeyGenParameterSpec.F0) < 0) {
+            if (tmpPublicExponent.compareTo(RSAKeyGenParameterSpec.F0) < 0) {
                 throw new InvalidAlgorithmParameterException
                         ("Public exponent must be 3 or larger");
             }
-            if (publicExponent.bitLength() > keySize) {
+            if (tmpPublicExponent.bitLength() > tmpKeySize) {
                 throw new InvalidAlgorithmParameterException
                         ("Public exponent must be smaller than key size");
             }
         }
+
+        // do not allow unreasonably large key sizes, probably user error
+        try {
+            RSAKeyFactory.checkKeyLengths(tmpKeySize, tmpPublicExponent,
+                512, 64 * 1024);
+        } catch (InvalidKeyException e) {
+            throw new InvalidAlgorithmParameterException(
+                "Invalid key sizes", e);
+        }
+
+        this.keySize = tmpKeySize;
+        this.publicExponent = tmpPublicExponent;
+        this.random = random;
     }
 
     // generate the keypair. See JCA doc
