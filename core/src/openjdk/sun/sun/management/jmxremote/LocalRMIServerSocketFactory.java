@@ -1,12 +1,12 @@
 /*
- * Copyright 2007 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2007, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Sun designates this
+ * published by the Free Software Foundation.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the LICENSE file that accompanied this code.
+ * by Oracle in the LICENSE file that accompanied this code.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -18,9 +18,9 @@
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
- * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
- * CA 95054 USA or visit www.sun.com if you need additional information or
- * have any questions.
+ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ * or visit www.oracle.com if you need additional information or have any
+ * questions.
  */
 
 package sun.management.jmxremote;
@@ -49,13 +49,34 @@ public final class LocalRMIServerSocketFactory implements RMIServerSocketFactory
         return new ServerSocket(port) {
             @Override
             public Socket accept() throws IOException {
-                Socket socket = super.accept();
-                InetAddress remoteAddr = socket.getInetAddress();
+                final Socket socket = super.accept();
+                final InetAddress remoteAddr = socket.getInetAddress();
                 final String msg = "The server sockets created using the " +
                         "LocalRMIServerSocketFactory only accept connections " +
                         "from clients running on the host where the RMI " +
                         "remote objects have been exported.";
-                if (remoteAddr.isAnyLocalAddress()) {
+
+                if (remoteAddr == null) {
+                    // Though unlikeky, the socket could be already
+                    // closed... Send a more detailed message in
+                    // this case. Also avoid throwing NullPointerExceptiion
+                    //
+                    String details = "";
+                    if (socket.isClosed()) {
+                        details = " Socket is closed.";
+                    } else if (!socket.isConnected()) {
+                        details = " Socket is not connected";
+                    }
+                    try {
+                        socket.close();
+                    } catch (Exception ok) {
+                        // ok - this is just cleanup before throwing detailed
+                        // exception.
+                    }
+                    throw new IOException(msg +
+                            " Couldn't determine client address." +
+                            details);
+                } else if (remoteAddr.isLoopbackAddress()) {
                     // local address: accept the connection.
                     return socket;
                 }
