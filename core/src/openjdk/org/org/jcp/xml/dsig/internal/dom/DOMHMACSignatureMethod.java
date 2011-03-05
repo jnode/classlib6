@@ -1,12 +1,12 @@
 /*
- * Copyright 2005-2007 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2005, 2009, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Sun designates this
+ * published by the Free Software Foundation.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the LICENSE file that accompanied this code.
+ * by Oracle in the LICENSE file that accompanied this code.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -18,9 +18,9 @@
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
- * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
- * CA 95054 USA or visit www.sun.com if you need additional information or
- * have any questions.
+ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ * or visit www.oracle.com if you need additional information or have any
+ * questions.
  */
 /*
  * $Id: DOMHMACSignatureMethod.java,v 1.17 2005/09/15 14:29:04 mullan Exp $
@@ -59,6 +59,7 @@ public abstract class DOMHMACSignatureMethod extends DOMSignatureMethod {
 	Logger.getLogger("org.jcp.xml.dsig.internal.dom");
     private Mac hmac;
     private int outputLength;
+    private boolean outputLengthSet;
 
     /**
      * Creates a <code>DOMHMACSignatureMethod</code> with the specified params 
@@ -88,13 +89,12 @@ public abstract class DOMHMACSignatureMethod extends DOMSignatureMethod {
 	            ("params must be of type HMACParameterSpec");
 	    }
 	    outputLength = ((HMACParameterSpec) params).getOutputLength();
+            outputLengthSet = true;
 	    if (log.isLoggable(Level.FINE)) {
 	        log.log(Level.FINE, 
 		    "Setting outputLength from HMACParameterSpec to: "
 		    + outputLength);
 	    }
-        } else {
-	    outputLength = -1;
         }
     }
 
@@ -102,6 +102,7 @@ public abstract class DOMHMACSignatureMethod extends DOMSignatureMethod {
 	throws MarshalException {
         outputLength = new Integer
 	    (paramsElem.getFirstChild().getNodeValue()).intValue();
+        outputLengthSet = true;
         if (log.isLoggable(Level.FINE)) {
             log.log(Level.FINE, "unmarshalled outputLength: " + outputLength);
 	}
@@ -136,23 +137,13 @@ public abstract class DOMHMACSignatureMethod extends DOMSignatureMethod {
                 throw new XMLSignatureException(nsae);
             }
         }
-	if (log.isLoggable(Level.FINE)) {
-	    log.log(Level.FINE, "outputLength = " + outputLength);
+        if (outputLengthSet && outputLength < getDigestLength()) {
+            throw new XMLSignatureException
+                ("HMACOutputLength must not be less than " + getDigestLength());
 	}
         hmac.init((SecretKey) key);
 	si.canonicalize(context, new MacOutputStream(hmac));
         byte[] result = hmac.doFinal();
-	if (log.isLoggable(Level.FINE)) {
-            log.log(Level.FINE, "resultLength = " + result.length);
-	}
-	if (outputLength != -1) {
-	    int byteLength = outputLength/8;
-	    if (result.length > byteLength) {
-                byte[] truncated = new byte[byteLength];
-                System.arraycopy(result, 0, truncated, 0, byteLength);
-                result = truncated;
-	    }
-        }
 
         return MessageDigest.isEqual(sig, result);
     }
@@ -172,18 +163,13 @@ public abstract class DOMHMACSignatureMethod extends DOMSignatureMethod {
                 throw new XMLSignatureException(nsae);
             }
         }
+        if (outputLengthSet && outputLength < getDigestLength()) {
+            throw new XMLSignatureException
+                ("HMACOutputLength must not be less than " + getDigestLength());
+        }
         hmac.init((SecretKey) key);
 	si.canonicalize(context, new MacOutputStream(hmac));
-        byte[] result = hmac.doFinal();
-	if (outputLength != -1) {
-	    int byteLength = outputLength/8;
-	    if (result.length > byteLength) {
-                byte[] truncated = new byte[byteLength];
-                System.arraycopy(result, 0, truncated, 0, byteLength);
-                result = truncated;
-	    }
-        }
-	return result;
+        return hmac.doFinal();
     }
 
     boolean paramsEqual(AlgorithmParameterSpec spec) {
@@ -198,6 +184,11 @@ public abstract class DOMHMACSignatureMethod extends DOMSignatureMethod {
 	return (outputLength == ospec.getOutputLength());
     }
 
+    /**
+     * Returns the output length of the hash/digest.
+     */
+    abstract int getDigestLength();
+
     static final class SHA1 extends DOMHMACSignatureMethod {
         SHA1(AlgorithmParameterSpec params)
             throws InvalidAlgorithmParameterException {
@@ -211,6 +202,9 @@ public abstract class DOMHMACSignatureMethod extends DOMSignatureMethod {
         }
         String getSignatureAlgorithm() {
             return "HmacSHA1";
+        }
+        int getDigestLength() {
+            return 160;
         }
     }
 
@@ -228,6 +222,9 @@ public abstract class DOMHMACSignatureMethod extends DOMSignatureMethod {
         String getSignatureAlgorithm() {
             return "HmacSHA256";
         }
+        int getDigestLength() {
+            return 256;
+        }
     }
 
     static final class SHA384 extends DOMHMACSignatureMethod {
@@ -244,6 +241,9 @@ public abstract class DOMHMACSignatureMethod extends DOMSignatureMethod {
         String getSignatureAlgorithm() {
             return "HmacSHA384";
         }
+        int getDigestLength() {
+            return 384;
+        }
     }
 
     static final class SHA512 extends DOMHMACSignatureMethod {
@@ -259,6 +259,9 @@ public abstract class DOMHMACSignatureMethod extends DOMSignatureMethod {
         }
         String getSignatureAlgorithm() {
             return "HmacSHA512";
+        }
+        int getDigestLength() {
+            return 512;
         }
     }
 }

@@ -1,12 +1,12 @@
 /*
- * Copyright 2000-2005 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2000, 2005, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Sun designates this
+ * published by the Free Software Foundation.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the LICENSE file that accompanied this code.
+ * by Oracle in the LICENSE file that accompanied this code.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -18,9 +18,9 @@
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
- * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
- * CA 95054 USA or visit www.sun.com if you need additional information or
- * have any questions.
+ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ * or visit www.oracle.com if you need additional information or have any
+ * questions.
  */
 
 // SAX exception class.
@@ -54,6 +54,7 @@ package org.xml.sax;
  *
  * @since SAX 1.0
  * @author David Megginson
+ * @version 2.0.1 (sax2r2)
  * @see org.xml.sax.SAXException
  * @see org.xml.sax.Locator
  * @see org.xml.sax.ErrorHandler
@@ -255,6 +256,23 @@ public class SAXParseException extends SAXException {
 	return this.columnNumber;
     }
     
+    /**
+     * Override toString to provide more detailed error message.
+     *
+     * @return A string representation of this exception.
+     */
+    public String toString() {
+        StringBuilder buf = new StringBuilder(getClass().getName());
+        String message = getLocalizedMessage();
+        if (publicId!=null)    buf.append("publicId: ").append(publicId);
+        if (systemId!=null)    buf.append("; systemId: ").append(systemId);
+        if (lineNumber!=-1)    buf.append("; lineNumber: ").append(lineNumber);
+        if (columnNumber!=-1)  buf.append("; columnNumber: ").append(columnNumber);
+
+       //append the exception message at the end
+        if (message!=null)     buf.append("; ").append(message);
+        return buf.toString();    
+    }
     
     //////////////////////////////////////////////////////////////////////
     // Internal state.

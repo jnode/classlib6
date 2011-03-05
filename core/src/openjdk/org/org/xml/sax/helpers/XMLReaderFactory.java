@@ -34,6 +34,8 @@ package org.xml.sax.helpers;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import org.xml.sax.XMLReader;
 import org.xml.sax.SAXException;
 
@@ -69,6 +71,7 @@ import org.xml.sax.SAXException;
  *
  * @since SAX 2.0
  * @author David Megginson, David Brownell
+ * @version 2.0.1 (sax2r2)
  */
 final public class XMLReaderFactory
 {
@@ -83,6 +86,8 @@ final public class XMLReaderFactory
 
     private static final String property = "org.xml.sax.driver";
 
+    private static String _clsFromJar = null;
+    private static boolean _jarread = false;
     /**
      * Attempt to create an XMLReader from system defaults.
      * In environments which can support it, the name of the XMLReader
@@ -137,24 +142,35 @@ final public class XMLReaderFactory
 
 	// 2. if that fails, try META-INF/services/
 	if (className == null) {
+            if (!_jarread) {
+                final ClassLoader	loader1 = loader;
+                _jarread = true;
+                _clsFromJar =  (String)
+                AccessController.doPrivileged(new PrivilegedAction() {
+                    public Object run() {
+                        String clsName = null;
 	    try {
 		String		service = "META-INF/services/" + property;
 		InputStream	in;
 		BufferedReader	reader;
-
-		if (loader == null)
+                            if (loader1 == null)
 		    in = ClassLoader.getSystemResourceAsStream (service);
 		else
-		    in = loader.getResourceAsStream (service);
+                                in = loader1.getResourceAsStream (service);
 
 		if (in != null) {
 		    reader = new BufferedReader (
 			    new InputStreamReader (in, "UTF8"));
-		    className = reader.readLine ();
+                                clsName = reader.readLine ();
 		    in.close ();
 		}
 	    } catch (Exception e) {
 	    }
+                        return clsName;
+                    }
+                });
+            }
+            className = _clsFromJar;
 	}
 
 	// 3. Distro-specific fallback
