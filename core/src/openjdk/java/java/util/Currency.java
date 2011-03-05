@@ -33,6 +33,7 @@ import java.util.spi.LocaleServiceProvider;
 import sun.util.LocaleServiceProviderPool;
 import sun.util.resources.LocaleData;
 
+//jnode - complete integration needed
 
 /**
  * Represents a currency. Currencies are identified by their ISO 4217 currency
