@@ -119,14 +119,13 @@ public class XMLEventReaderImpl implements javax.xml.stream.XMLEventReader{
         //<foo>....some long text say in KB and underlying parser reports multiple character
         // but getElementText() events....</foo>
         
+        String data = null;
         //having a peeked event makes things really worse -- we have to test the first event
         if(fPeekedEvent != null){
             XMLEvent event = fPeekedEvent ;
             fPeekedEvent = null;
             int type = event.getEventType();
             
-            
-            String data = null;
             if(  type == XMLEvent.CHARACTERS || type == XMLEvent.SPACE ||
             type == XMLEvent.CDATA){
                 data = event.asCharacters().getData();
@@ -177,12 +176,16 @@ public class XMLEventReaderImpl implements javax.xml.stream.XMLEventReader{
                 if(data != null && data.length() > 0 ) {
                     buffer.append(data);
                 }
+                event = nextEvent();
             }
             return buffer.toString();
         }//if (fPeekedEvent != null)
         
-        //if there was no peeked event simply delegate everything to fXMLReader
-        return fXMLReader.getElementText();
+        //if there was no peeked, delegate everything to fXMLReader
+        //update the last event before returning the text
+        data = fXMLReader.getElementText();
+        fLastEvent = fXMLEventAllocator.allocate(fXMLReader);
+        return data;
     }
     
     /** Get the value of a feature/property from the underlying implementation
@@ -213,7 +216,8 @@ public class XMLEventReaderImpl implements javax.xml.stream.XMLEventReader{
             //if peeked event is PI or COMMENT move to the next event
             if( (event.isCharacters() && event.asCharacters().isWhiteSpace())
             || eventType == XMLStreamConstants.PROCESSING_INSTRUCTION
-            || eventType == XMLStreamConstants.COMMENT){
+            || eventType == XMLStreamConstants.COMMENT
+            || eventType == XMLStreamConstants.START_DOCUMENT){
                 event = nextEvent();
                 eventType = event.getEventType();
             }
@@ -235,7 +239,7 @@ public class XMLEventReaderImpl implements javax.xml.stream.XMLEventReader{
         
         //if there is no peeked event -- delegate the work of getting next event to fXMLReader
         fXMLReader.nextTag();
-        return fXMLEventAllocator.allocate(fXMLReader);
+        return (fLastEvent = fXMLEventAllocator.allocate(fXMLReader));
     }
     
     public Object next() {

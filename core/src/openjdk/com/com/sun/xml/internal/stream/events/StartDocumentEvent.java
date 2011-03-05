@@ -43,38 +43,43 @@ implements StartDocument {
     protected String fEncodingScheam;
     protected boolean fStandalone;
     protected String fVersion;
-    private boolean fEncodingSchemeSet;
-    private boolean fStandaloneSet;
+    private boolean fEncodingSchemeSet = false;
+    private boolean fStandaloneSet = false;
+    private boolean nestedCall = false;
     
     public StartDocumentEvent() {
-        this("UTF-8","1.0",true,null);
+        init("UTF-8","1.0",true,null);
     }
     
     public StartDocumentEvent(String encoding){
-        this(encoding,"1.0",true,null);
+        init(encoding,"1.0",true,null);
     }
     
     public StartDocumentEvent(String encoding, String version){
-        this(encoding,version,true,null);
+        init(encoding,version,true,null);
     }
     
     public StartDocumentEvent(String encoding, String version, boolean standalone){
-        this(encoding,version,standalone,null);
+        this.fStandaloneSet = true;
+        init(encoding,version,standalone,null);
     }
     
     public StartDocumentEvent(String encoding, String version, boolean standalone,Location loc){
-        init();
+        this.fStandaloneSet = true;
+        init(encoding, version, standalone, loc);
+    }
+    protected void init(String encoding, String version, boolean standalone,Location loc) {
+        setEventType(XMLStreamConstants.START_DOCUMENT);
         this.fEncodingScheam = encoding;
         this.fVersion = version;
         this.fStandalone = standalone;
+        if (encoding != null && !encoding.equals(""))
+            this.fEncodingSchemeSet = true;
+        else {
         this.fEncodingSchemeSet = false;
-        this.fStandaloneSet = false;
-        if (loc != null) {
+            this.fEncodingScheam = "UTF-8";
+    }
         this.fLocation = loc;
-    }
-    }
-    protected void init() {
-        setEventType(XMLStreamConstants.START_DOCUMENT);
     }
     
     public String getSystemId() {
@@ -158,5 +163,11 @@ implements StartDocument {
     
     public boolean isStartDocument() {
         return true;
+    }
+    
+    protected void writeAsEncodedUnicodeEx(java.io.Writer writer) 
+    throws java.io.IOException
+    {
+        writer.write(toString());
     }
 }

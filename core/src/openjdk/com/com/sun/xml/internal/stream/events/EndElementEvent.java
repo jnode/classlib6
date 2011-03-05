@@ -75,23 +75,17 @@ implements EndElement {
         this.fQName = qname;
     }
     
-    
-    /** This method will write the XMLEvent as per the XML 1.0 specification as Unicode characters.
-     * No indentation or whitespace should be outputted.
-     *
-     * Any user defined event type SHALL have this method
-     * called when being written to on an output stream.
-     * Built in Event types MUST implement this method,
-     * but implementations MAY choose not call these methods
-     * for optimizations reasons when writing out built in
-     * Events to an output stream.
-     * The output generated MUST be equivalent in terms of the
-     * infoset expressed.
-     *
-     * @param writer The writer that will output the data
-     * @throws XMLStreamException if there is a fatal error writing the event
-     */
-    public void writeAsEncodedUnicode(Writer writer) throws javax.xml.stream.XMLStreamException {
+    protected void writeAsEncodedUnicodeEx(java.io.Writer writer) 
+    throws java.io.IOException
+    {
+        writer.write("</");
+        String prefix = fQName.getPrefix();
+        if (prefix != null && prefix.length() > 0) {
+            writer.write(prefix);
+            writer.write(':');
+     }
+        writer.write(fQName.getLocalPart());
+        writer.write('>');
     }
     
     /** Returns an Iterator of namespaces that have gone out

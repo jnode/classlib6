@@ -25,14 +25,15 @@
 
 package com.sun.xml.internal.stream.events ;
 
-
+import java.io.IOException;
+import java.io.Writer;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.stream.events.Characters;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.namespace.QName;
-import java.io.Writer;
 import javax.xml.stream.Location;
+import javax.xml.stream.XMLStreamException;
 
 /** DummyEvent is an abstract class. It provides functionality for most of the
  * function of XMLEvent.
@@ -174,7 +175,60 @@ public abstract class DummyEvent implements XMLEvent {
      * @param writer The writer that will output the data
      * @throws XMLStreamException if there is a fatal error writing the event
      */
-    public void writeAsEncodedUnicode(Writer writer) throws javax.xml.stream.XMLStreamException {
+    public void writeAsEncodedUnicode(Writer writer) throws XMLStreamException {
+        try {
+            writeAsEncodedUnicodeEx(writer);
+        } catch (IOException e) {
+            throw new XMLStreamException(e);
+        }
+    }
+    /** Helper method in order to expose IOException.
+     * @param writer The writer that will output the data
+     * @throws XMLStreamException if there is a fatal error writing the event
+     * @throws IOException if there is an IO error
+     */
+    protected abstract void writeAsEncodedUnicodeEx(Writer writer) 
+        throws IOException, XMLStreamException;
+
+    /** Helper method to escape < > & for characters event and
+     *  quotes, lt and amps for Entity
+     */
+    protected void charEncode(Writer writer, String data) 
+        throws IOException
+    {
+        if (data == null || data == "") return;
+        int i = 0, start = 0;
+        int len = data.length();
+
+        loop:
+        for (; i < len; ++i) {
+            switch (data.charAt(i)) {
+            case '<':
+                writer.write(data, start, i - start);
+                writer.write("&lt;");
+                start = i + 1;
+                break;
+
+            case '&':
+                writer.write(data, start, i - start);
+                writer.write("&amp;");
+                start = i + 1;
+                break;
+
+            case '>':
+                writer.write(data, start, i - start);
+                writer.write("&gt;");
+                start = i + 1;
+                break;
+            case '"':
+                writer.write(data, start, i - start);
+                writer.write("&quot;");
+                start = i + 1;
+                break;
+            }
+        }
+        // Write any pending data
+        writer.write(data, start, len - start);                  
     }
     
     static class DummyLocation implements Location {

@@ -33,17 +33,10 @@ import com.sun.org.apache.xerces.internal.xni.grammars.XMLGrammarPool;
  */
 final class EmptyXMLSchema extends AbstractXMLSchema implements XMLGrammarPool {
     
-    private static EmptyXMLSchema EMPTY_XML_SCHEMA_INSTANCE = new EmptyXMLSchema();
-    
     /** Zero length grammar array. */
     private static final Grammar [] ZERO_LENGTH_GRAMMAR_ARRAY = new Grammar [0];
 
-    /** Returns the one and only instance of this class. */
-    public static EmptyXMLSchema getInstance() {
-        return EMPTY_XML_SCHEMA_INSTANCE;
-    }
-    
-    private EmptyXMLSchema() {}
+    public EmptyXMLSchema() {}
     
     /*
      * XMLGrammarPool methods

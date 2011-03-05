@@ -118,4 +118,33 @@ public class EntityDeclarationImpl extends DummyEvent implements EntityDeclarati
     protected void init(){
         setEventType(XMLEvent.ENTITY_DECLARATION);
     }
+    
+    protected void writeAsEncodedUnicodeEx(java.io.Writer writer) 
+    throws java.io.IOException
+    {
+        writer.write("<!ENTITY ");
+        writer.write(fEntityName);
+        if (fReplacementText != null) {
+            //internal entity
+            //escape quotes, lt and amps
+            writer.write(" \"");
+            charEncode(writer, fReplacementText);             
+        } else {
+            //external entity
+            String pubId = getPublicId();
+            if (pubId != null) {
+                writer.write(" PUBLIC \"");
+                writer.write(pubId);
+            } else {
+                writer.write(" SYSTEM \"");
+                writer.write(getSystemId());
+            }
+        }
+        writer.write("\"");
+        if (fNotationName != null) {
+            writer.write(" NDATA ");
+            writer.write(fNotationName);
+        }
+        writer.write(">");
+    }        
 }

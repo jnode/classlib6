@@ -624,7 +624,7 @@ public class XMLDOMWriterImpl implements XMLStreamWriter  {
         if(needContextPop[depth]){
             namespaceContext.pushContext();
         }
-        depth++;
+        incDepth();
     }
     
     /**
@@ -670,7 +670,7 @@ public class XMLDOMWriterImpl implements XMLStreamWriter  {
         if(needContextPop[depth]){
             namespaceContext.pushContext();
         }
-        depth++;
+        incDepth();
     }
     
     /**
@@ -711,7 +711,7 @@ public class XMLDOMWriterImpl implements XMLStreamWriter  {
             if(needContextPop[depth]){
                 namespaceContext.pushContext();
             }
-            depth++;
+            incDepth();
             
         }
     }
@@ -730,5 +730,13 @@ public class XMLDOMWriterImpl implements XMLStreamWriter  {
         } else{
             return currentNode;
         }
+    }
+    private void incDepth() {
+	depth++;
+        if (depth == needContextPop.length) {
+	    boolean[] array = new boolean[depth + resizeValue];
+	    System.arraycopy(needContextPop, 0, array, 0, depth);
+	    needContextPop = array;
+	}
     }
 }

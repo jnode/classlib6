@@ -99,9 +99,16 @@ public class XMLOutputFactoryImpl extends XMLOutputFactory {
             } else {
                 throw new java.lang.UnsupportedOperationException("Result of type " + result + " is not supported");
             }
+        } else {
+            if (result.getSystemId() !=null) {
+                //this is not correct impl of SAXResult. Keep it for now for compatibility
+                return createXMLStreamWriter(new StreamResult(result.getSystemId()));
+            } else {
+                throw new java.lang.UnsupportedOperationException("Result of type " + result + " is not supported. " +
+                        "Supported result types are: DOMResult, StAXResult and StreamResult.");
+            }
         }
         
-        return createXMLStreamWriter(new StreamResult(result.getSystemId()));
     }
     
     public javax.xml.stream.XMLStreamWriter createXMLStreamWriter(java.io.Writer writer) throws javax.xml.stream.XMLStreamException {

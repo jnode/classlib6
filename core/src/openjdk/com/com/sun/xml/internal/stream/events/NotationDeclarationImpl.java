@@ -82,4 +82,22 @@ public class NotationDeclarationImpl extends DummyEvent implements NotationDecla
     void setName(String name){
         this.fName = name;
     }
+    
+    protected void writeAsEncodedUnicodeEx(java.io.Writer writer) 
+    throws java.io.IOException
+    {
+        writer.write("<!NOTATION ");
+        writer.write(getName());
+        if (fPublicId != null) {
+            writer.write(" PUBLIC \"");
+            writer.write(fPublicId);
+            writer.write("\"");
+        } else if (fSystemId != null) {
+            writer.write(" SYSTEM");
+            writer.write(" \"");
+            writer.write(fSystemId);
+            writer.write("\"");
+        }
+        writer.write('>');
+    }
 }

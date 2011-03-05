@@ -67,4 +67,10 @@ public class CommentEvent extends DummyEvent implements Comment {
         return fText ;
     }
     
+    protected void writeAsEncodedUnicodeEx(java.io.Writer writer) 
+    throws java.io.IOException
+    {
+        writer.write("<!--" + getText() + "-->");
+    }    
+    
 }

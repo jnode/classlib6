@@ -48,4 +48,11 @@ public interface XSGrammarPoolContainer {
      */
     public boolean isFullyComposed();
     
+    /**
+     * Returns the initial value of a feature for validators created
+     * using this grammar pool container or null if the validators
+     * should use the default value.
+     */
+    public Boolean getFeature(String featureId);
+
 }

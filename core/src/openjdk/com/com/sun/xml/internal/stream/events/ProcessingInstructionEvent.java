@@ -83,7 +83,7 @@ implements ProcessingInstruction {
     
     public String toString() {
         if(fContent != null && fName != null)
-            return "<?" + fName + fContent + "?>";
+            return "<?" + fName + " " + fContent + "?>";
         if(fName != null)
             return "<?" + fName + "?>";
         if(fContent != null)
@@ -92,22 +92,10 @@ implements ProcessingInstruction {
             return "<??>";
     }
     
-    /** This method will write the XMLEvent as per the XML 1.0 specification as Unicode characters.
-     * No indentation or whitespace should be outputted.
-     *
-     * Any user defined event type SHALL have this method
-     * called when being written to on an output stream.
-     * Built in Event types MUST implement this method,
-     * but implementations MAY choose not call these methods
-     * for optimizations reasons when writing out built in
-     * Events to an output stream.
-     * The output generated MUST be equivalent in terms of the
-     * infoset expressed.
-     *
-     * @param writer The writer that will output the data
-     * @throws XMLStreamException if there is a fatal error writing the event
-     */
-    public void writeAsEncodedUnicode(Writer writer) throws XMLStreamException {
+    protected void writeAsEncodedUnicodeEx(java.io.Writer writer) 
+    throws java.io.IOException
+    {
+        writer.write(toString());
     }
     
 }

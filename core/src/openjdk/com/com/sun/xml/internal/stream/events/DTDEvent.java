@@ -95,4 +95,10 @@ public class DTDEvent extends DummyEvent implements DTD{
     public String toString(){
         return fDoctypeDeclaration ;
     }
+    
+    protected void writeAsEncodedUnicodeEx(java.io.Writer writer) 
+    throws java.io.IOException
+    {
+        writer.write(fDoctypeDeclaration);
+    }    
 }

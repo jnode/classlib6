@@ -74,4 +74,10 @@ public class NamedEvent extends DummyEvent {
         return name.getNamespaceURI();
     }
     
+    protected void writeAsEncodedUnicodeEx(java.io.Writer writer) 
+    throws java.io.IOException
+    {
+        writer.write(nameAsString());
+    }    
+    
 }

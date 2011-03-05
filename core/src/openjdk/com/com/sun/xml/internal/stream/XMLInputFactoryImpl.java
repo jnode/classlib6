@@ -55,8 +55,8 @@ public class XMLInputFactoryImpl extends javax.xml.stream.XMLInputFactory {
     private XMLStreamReaderImpl fTempReader = null ;
     
     boolean fPropertyChanged = false;
-    //default value is true
-    boolean fReuseInstance = true;
+    //no reader reuse by default
+    boolean fReuseInstance = false;
     
     /** Creates a new instance of ZephryParserFactory */
     public XMLInputFactoryImpl() {
@@ -280,7 +280,6 @@ public class XMLInputFactoryImpl extends javax.xml.stream.XMLInputFactory {
     }
     
     XMLInputSource jaxpSourcetoXMLInputSource(Source source){
-        
         if(source instanceof StreamSource){
             StreamSource stSource = (StreamSource)source;
             String systemId = stSource.getSystemId();
@@ -298,6 +297,9 @@ public class XMLInputFactoryImpl extends javax.xml.stream.XMLInputFactory {
             }
         }
         
-        return new XMLInputSource(null, source.getSystemId(), null);
+         throw new UnsupportedOperationException("Cannot create " +
+                "XMLStreamReader or XMLEventReader from a " +
+                source.getClass().getName());
     }
+    
 }//XMLInputFactoryImpl

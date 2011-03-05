@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2000, 2003, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000, 2008, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -22,6 +22,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
 package com.sun.tools.jdi;
 
 import com.sun.jdi.*;
@@ -246,7 +247,7 @@ public class ConcreteMethodImpl extends MethodImpl {
     
     public byte[] bytecodes() {
         byte[] bytecodes = (bytecodesRef == null) ? null : 
-                                     (byte[])bytecodesRef.get();
+                                     bytecodesRef.get();
         if (bytecodes == null) {
             try {
                 bytecodes = JDWP.Method.Bytecodes.
@@ -261,7 +262,7 @@ public class ConcreteMethodImpl extends MethodImpl {
          * to return the cached bytecodes directly; instead, we 
          * make a clone at the cost of using more memory.
          */
-        return (byte[])bytecodes.clone();
+        return bytecodes.clone();
     }
 
     int argSlotCount() throws AbsentInformationException {
@@ -278,7 +279,7 @@ public class ConcreteMethodImpl extends MethodImpl {
         String stratumID = stratum.id();
         SoftLocationXRefs info =
             (softOtherLocationXRefsRef == null) ? null :
-               (SoftLocationXRefs)softOtherLocationXRefsRef.get();
+               softOtherLocationXRefsRef.get();
         if (info != null && info.stratumID.equals(stratumID)) {
             return info;
         }
@@ -347,7 +348,7 @@ public class ConcreteMethodImpl extends MethodImpl {
 
     private SoftLocationXRefs getBaseLocations() {
         SoftLocationXRefs info = (softBaseLocationXRefsRef == null) ? null :
-                                     (SoftLocationXRefs)softBaseLocationXRefsRef.get();
+                                     softBaseLocationXRefsRef.get();
         if (info != null) {
             return info;
         }

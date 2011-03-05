@@ -27,6 +27,7 @@ package com.sun.xml.internal.stream.events ;
 
 import javax.xml.stream.events.Characters;
 import java.io.Writer;
+import java.io.IOException;
 import javax.xml.stream.events.XMLEvent;
 import com.sun.org.apache.xerces.internal.util.XMLChar;
 
@@ -144,7 +145,13 @@ implements Characters {
      * @param writer The writer that will output the data
      * @throws XMLStreamException if there is a fatal error writing the event
      */
-    public void writeAsEncodedUnicode(Writer writer) throws javax.xml.stream.XMLStreamException {
+    protected void writeAsEncodedUnicodeEx(Writer writer) throws IOException
+    {
+        if (fIsCData) {
+            writer.write("<![CDATA[" + getData() + "]]>");
+        } else {
+            charEncode(writer, fData);         
+        }
     }
     
     /**
