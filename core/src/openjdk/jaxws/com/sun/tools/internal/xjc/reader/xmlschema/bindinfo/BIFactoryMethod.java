@@ -22,23 +22,43 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+package com.sun.tools.internal.xjc.reader.xmlschema.bindinfo;
 
-package com.sun.xml.internal.ws.addressing.model;
-
-import javax.xml.ws.WebServiceException;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.namespace.QName;
 
+import com.sun.xml.internal.xsom.XSComponent;
+import com.sun.tools.internal.xjc.model.CPropertyInfo;
+import com.sun.tools.internal.xjc.reader.Ring;
+import com.sun.tools.internal.xjc.reader.Const;
+import com.sun.tools.internal.xjc.reader.xmlschema.BGMBuilder;
+
 /**
- * @author Arun Gupta
+ * Controls the <tt>ObjectFactory</tt> method name.
+ *
+ * @author Kohsuke Kawaguchi
  */
-public class MapRequiredException extends WebServiceException {
-    QName name;
+@XmlRootElement(name="factoryMethod")
+public class BIFactoryMethod extends AbstractDeclarationImpl {
+    @XmlAttribute
+    public String name;
 
-    public MapRequiredException(QName name) {
-        this.name = name;
+    /**
+     * If the given component has {@link BIInlineBinaryData} customization,
+     * reflect that to the specified property.
+     */
+    public static void handle(XSComponent source, CPropertyInfo prop) {
+        BIInlineBinaryData inline = Ring.get(BGMBuilder.class).getBindInfo(source).get(BIInlineBinaryData.class);
+        if(inline!=null) {
+            prop.inlineBinaryData = true;
+            inline.markAsAcknowledged();
+        }
     }
 
-    public QName getMapQName() {
-        return name;
-    }
+
+    public final QName getName() { return NAME; }
+
+    /** Name of the declaration. */
+    public static final QName NAME = new QName(Const.JAXB_NSURI,"factoryMethod");
 }
