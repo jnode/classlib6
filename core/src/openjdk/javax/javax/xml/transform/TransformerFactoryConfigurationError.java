@@ -119,4 +119,11 @@ public class TransformerFactoryConfigurationError extends Error {
     public Exception getException() {
         return exception;
     }
+    /**
+     * use the exception chaining mechanism of JDK1.4
+    */
+    @Override
+    public Throwable getCause() {
+        return exception;
+    }
 }

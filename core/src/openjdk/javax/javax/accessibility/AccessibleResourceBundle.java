@@ -44,14 +44,10 @@ public class AccessibleResourceBundle extends ListResourceBundle {
      * localized display strings.
      */
     public Object[][] getContents() {
-	return contents;
-    }
+        // The table holding the mapping between the programmatic keys
+        // and the display strings for the en_US locale.
+        return new Object[][] {
 
-    /**
-     * The table holding the mapping between the programmatic keys
-     * and the display strings for the en_US locale.
-     */
-    static final Object[][] contents = {
     // LOCALIZE THIS
         // Role names
 //        { "application","application" },
@@ -152,4 +148,5 @@ public class AccessibleResourceBundle extends ListResourceBundle {
         { "horizontal","horizontal" }
     // END OF MATERIAL TO LOCALIZE
     };
+    }
 }

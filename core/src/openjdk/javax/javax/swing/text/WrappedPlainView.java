@@ -1,12 +1,12 @@
 /*
- * Copyright 1998-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 1998, 2006, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Sun designates this
+ * published by the Free Software Foundation.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the LICENSE file that accompanied this code.
+ * by Oracle in the LICENSE file that accompanied this code.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -18,9 +18,9 @@
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
- * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
- * CA 95054 USA or visit www.sun.com if you need additional information or
- * have any questions.
+ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ * or visit www.oracle.com if you need additional information or have any
+ * questions.
  */
 package javax.swing.text;
 
@@ -327,13 +327,45 @@ public class WrappedPlainView extends BoxView implements TabExpander {
     /**
      * Return reasonable default values for the view dimensions.  The standard
      * text terminal size 80x24 is pretty suitable for the wrapped plain view.
+     *
+     * The size should not be larger than the component housing the view's 
+     * container.
      */
     private float getDefaultSpan(int axis) {
+         Container host = getContainer();
+         Component parent = null;
+
+         if (host != null) {
+            parent = host.getParent(); 
+         }	
+
          switch (axis) {
             case View.X_AXIS:
-                return 80 * metrics.getWidths()['M'];
+	       int defaultWidth = 80 * metrics.getWidths()['M'];
+               int parentWidth = 0;
+               
+               if (parent != null) {
+                  parentWidth = parent.getWidth();
+               }
+               
+               if (defaultWidth > parentWidth) {
+                 return parentWidth;
+               }
+               return defaultWidth;
+
             case View.Y_AXIS:
-                return 24 * metrics.getHeight();
+	       int defaultHeight = 24 * metrics.getHeight();
+               int parentHeight = 0;
+               
+               if (parent != null) {
+                  parentHeight = parent.getHeight();
+               }
+               
+               if (defaultHeight > parentHeight) {
+                 return parentHeight;
+               }
+               return defaultHeight;		
+
             default:
                 throw new IllegalArgumentException("Invalid axis: " + axis);
         }

@@ -21,7 +21,8 @@
  * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
  * or visit www.oracle.com if you need additional information or have any
  * questions.
- */package javax.swing.text;
+ */
+package javax.swing.text;
 
 import java.lang.reflect.*;
 import java.text.*;

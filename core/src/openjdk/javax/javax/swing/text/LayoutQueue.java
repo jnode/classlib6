@@ -1,12 +1,12 @@
 /*
- * Copyright 1999 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 1999, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Sun designates this
+ * published by the Free Software Foundation.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the LICENSE file that accompanied this code.
+ * by Oracle in the LICENSE file that accompanied this code.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -18,13 +18,14 @@
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
- * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
- * CA 95054 USA or visit www.sun.com if you need additional information or
- * have any questions.
+ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ * or visit www.oracle.com if you need additional information or have any
+ * questions.
  */
 package javax.swing.text;
 
 import java.util.Vector;
+import sun.awt.AppContext;
 
 /**
  * A queue of text layout tasks. 
@@ -35,10 +36,10 @@ import java.util.Vector;
  */
 public class LayoutQueue {
 
-    Vector tasks;
-    Thread worker;
+    private static final Object DEFAULT_QUEUE = new Object();
 
-    static LayoutQueue defaultQueue;
+    private Vector tasks;
+    private Thread worker;
 
     /**
      * Construct a layout queue.
@@ -51,10 +52,15 @@ public class LayoutQueue {
      * Fetch the default layout queue.
      */
     public static LayoutQueue getDefaultQueue() {
+        AppContext ac = AppContext.getAppContext();
+        synchronized (DEFAULT_QUEUE) {
+            LayoutQueue defaultQueue = (LayoutQueue) ac.get(DEFAULT_QUEUE);
 	if (defaultQueue == null) {
 	    defaultQueue = new LayoutQueue();
+                ac.put(DEFAULT_QUEUE, defaultQueue);
 	}
 	return defaultQueue;
+    }
     }
 
     /**
@@ -63,7 +69,9 @@ public class LayoutQueue {
      * @param q the new queue.
      */
     public static void setDefaultQueue(LayoutQueue q) {
-	defaultQueue = q;
+        synchronized (DEFAULT_QUEUE) {
+            AppContext.getAppContext().put(DEFAULT_QUEUE, q);
+        }
     }
 
     /**

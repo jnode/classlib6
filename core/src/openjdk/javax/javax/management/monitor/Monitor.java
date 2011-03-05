@@ -1,12 +1,12 @@
 /*
- * Copyright 1999-2007 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 1999, 2007, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Sun designates this
+ * published by the Free Software Foundation.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the LICENSE file that accompanied this code.
+ * by Oracle in the LICENSE file that accompanied this code.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -18,9 +18,9 @@
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
- * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
- * CA 95054 USA or visit www.sun.com if you need additional information or
- * have any questions.
+ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ * or visit www.oracle.com if you need additional information or have any
+ * questions.
  */
 
 package javax.management.monitor;
@@ -37,9 +37,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.security.AccessControlContext;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.security.ProtectionDomain;
 import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -170,7 +172,10 @@ public abstract class Monitor
     /**
      * AccessControlContext of the Monitor.start() caller.
      */
-    private AccessControlContext acc;
+    private static final AccessControlContext noPermissionsACC =
+            new AccessControlContext(
+            new ProtectionDomain[] {new ProtectionDomain(null, null)});
+    private volatile AccessControlContext acc = noPermissionsACC;
 
     /**
      * Scheduler Service.
@@ -180,14 +185,20 @@ public abstract class Monitor
             new DaemonThreadFactory("Scheduler"));
 
     /**
+     * Map containing the thread pool executor per thread group.
+     */
+    private static final Map<ThreadPoolExecutor, Void> executors =
+            new WeakHashMap<ThreadPoolExecutor, Void>();
+
+    /**
+     * Lock for executors map.
+     */
+    private static final Object executorsLock = new Object();
+
+    /**
      * Maximum Pool Size
      */
     private static final int maximumPoolSize;
-
-    /**
-     * Executor Service.
-     */
-    private static final ExecutorService executor;
     static {
         final String maximumPoolSizeSysProp = "jmx.x.monitor.maximum.pool.size";
         final String maximumPoolSizeStr = AccessController.doPrivileged(
@@ -217,20 +228,7 @@ public abstract class Monitor
                 maximumPoolSize = maximumPoolSizeTmp;
             }
         }
-        executor = new ThreadPoolExecutor(
-                maximumPoolSize,
-                maximumPoolSize,
-                60L,
-                TimeUnit.SECONDS,
-                new LinkedBlockingQueue<Runnable>(),
-                new DaemonThreadFactory("Executor"));
-        ((ThreadPoolExecutor)executor).allowCoreThreadTimeOut(true);
     }
-
-    /**
-     * Monitor task to be executed by the Executor Service.
-     */
-    private final MonitorTask monitorTask = new MonitorTask();
 
     /**
      * Future associated to the current monitor task.
@@ -240,7 +238,7 @@ public abstract class Monitor
     /**
      * Scheduler task to be executed by the Scheduler Service.
      */
-    private final SchedulerTask schedulerTask = new SchedulerTask(monitorTask);
+    private final SchedulerTask schedulerTask = new SchedulerTask();
 
     /**
      * ScheduledFuture associated to the current scheduler task.
@@ -373,7 +371,7 @@ public abstract class Monitor
     /**
      * Constant used to initialize all the numeric values.
      */
-    static final Integer INTEGER_ZERO = new Integer(0);
+    static final Integer INTEGER_ZERO = 0;
 
 
     /*
@@ -523,7 +521,7 @@ public abstract class Monitor
         //
         ObservedObject o = createObservedObject(object);
         o.setAlreadyNotified(RESET_FLAGS_ALREADY_NOTIFIED);
-        o.setDerivedGauge(null);
+        o.setDerivedGauge(INTEGER_ZERO);
         o.setDerivedGaugeTimeStamp(System.currentTimeMillis());
         observedObjects.add(o);
 
@@ -726,6 +724,7 @@ public abstract class Monitor
             // Start the scheduler.
             //
             cleanupFutures();
+            schedulerTask.setMonitorTask(new MonitorTask());
             schedulerFuture = scheduler.schedule(schedulerTask,
                                                  getGranularityPeriod(),
                                                  TimeUnit.MILLISECONDS);
@@ -755,7 +754,7 @@ public abstract class Monitor
 
             // Reset the AccessControlContext.
             //
-            acc = null;
+            acc = noPermissionsACC;
 
             // Reset the complex type attribute information
             // such that it is recalculated again.
@@ -1505,7 +1504,7 @@ public abstract class Monitor
      */
     private class SchedulerTask implements Runnable {
 
-        private Runnable task = null;
+        private MonitorTask task;
 
         /*
          * ------------------------------------------
@@ -1513,7 +1512,16 @@ public abstract class Monitor
          * ------------------------------------------
          */
 
-        public SchedulerTask(Runnable task) {
+        public SchedulerTask() {
+        }
+
+        /*
+         * ------------------------------------------
+         *  GETTERS/SETTERS
+         * ------------------------------------------
+         */
+
+        public void setMonitorTask(MonitorTask task) {
             this.task = task;
         }
 
@@ -1525,7 +1533,7 @@ public abstract class Monitor
 
         public void run() {
             synchronized (Monitor.this) {
-                Monitor.this.monitorFuture = executor.submit(task);
+                Monitor.this.monitorFuture = task.submit();
             }
         }
     }
@@ -1538,6 +1546,8 @@ public abstract class Monitor
      */
     private class MonitorTask implements Runnable {
 
+        private ThreadPoolExecutor executor;
+
         /*
          * ------------------------------------------
          *  CONSTRUCTORS
@@ -1545,6 +1555,38 @@ public abstract class Monitor
          */
 
         public MonitorTask() {
+            // Find out if there's already an existing executor for the calling
+            // thread and reuse it. Otherwise, create a new one and store it in
+            // the executors map. If there is a SecurityManager, the group of
+            // System.getSecurityManager() is used, else the group of the thread
+            // instantiating this MonitorTask, i.e. the group of the thread that
+            // calls "Monitor.start()".
+            SecurityManager s = System.getSecurityManager();
+            ThreadGroup group = (s != null) ? s.getThreadGroup() :
+                Thread.currentThread().getThreadGroup();
+            synchronized (executorsLock) {
+                for (ThreadPoolExecutor e : executors.keySet()) {
+                    DaemonThreadFactory tf =
+                            (DaemonThreadFactory) e.getThreadFactory();
+                    ThreadGroup tg = tf.getThreadGroup();
+                    if (tg == group) {
+                        executor = e;
+                        break;
+                    }
+                }
+                if (executor == null) {
+                    executor = new ThreadPoolExecutor(
+                            maximumPoolSize,
+                            maximumPoolSize,
+                            60L,
+                            TimeUnit.SECONDS,
+                            new LinkedBlockingQueue<Runnable>(),
+                            new DaemonThreadFactory("ThreadGroup<" +
+                            group.getName() + "> Executor", group));
+                    executor.allowCoreThreadTimeOut(true);
+                    executors.put(executor, null);
+                }
+            }
         }
 
         /*
@@ -1553,12 +1595,18 @@ public abstract class Monitor
          * ------------------------------------------
          */
 
+        public Future<?> submit() {
+            return executor.submit(this);
+        }
+
         public void run() {
             final ScheduledFuture<?> sf;
+            final AccessControlContext ac;
             synchronized (Monitor.this) {
                 sf = Monitor.this.schedulerFuture;
+                ac = Monitor.this.acc;
             }
-            AccessController.doPrivileged(new PrivilegedAction<Void>() {
+            PrivilegedAction<Void> action = new PrivilegedAction<Void>() {
                 public Void run() {
                     if (Monitor.this.isActive()) {
                         final int an[] = alreadyNotifieds;
@@ -1571,7 +1619,11 @@ public abstract class Monitor
                     }
                     return null;
                 }
-            }, Monitor.this.acc);
+            };
+            if (ac == null) {
+                throw new SecurityException("AccessControlContext cannot be null");
+            }
+            AccessController.doPrivileged(action, ac);
             synchronized (Monitor.this) {
                 if (Monitor.this.isActive() &&
                     Monitor.this.schedulerFuture == sf) {
@@ -1609,6 +1661,15 @@ public abstract class Monitor
             group = (s != null) ? s.getThreadGroup() :
                                   Thread.currentThread().getThreadGroup();
             namePrefix = "JMX Monitor " + poolName + " Pool [Thread-";
+        }
+
+        public DaemonThreadFactory(String poolName, ThreadGroup threadGroup) {
+            group = threadGroup;
+            namePrefix = "JMX Monitor " + poolName + " Pool [Thread-";
+        }
+
+        public ThreadGroup getThreadGroup() {
+            return group;
         }
 
         public Thread newThread(Runnable r) {

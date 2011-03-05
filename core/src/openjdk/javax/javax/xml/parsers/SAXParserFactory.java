@@ -38,6 +38,7 @@ import org.xml.sax.SAXNotSupportedException;
  * @author <a href="mailto:Jeff.Suttor@Sun.com">Jeff Suttor</a>
  * @author <a href="mailto:Neeraj.Bajaj@sun.com">Neeraj Bajaj</a>
  *
+ * @version $Revision: 1.9 $, $Date: 2010/05/25 16:19:44 $
  *
  */
 public abstract class SAXParserFactory {
@@ -442,13 +443,11 @@ public abstract class SAXParserFactory {
      * @since 1.5
      */
     public void setXIncludeAware(final boolean state) {
-        throw new UnsupportedOperationException(
-            "This parser does not support specification \""
-            + this.getClass().getPackage().getSpecificationTitle()
-            + "\" version \""
-            + this.getClass().getPackage().getSpecificationVersion()
-            + "\""
-            );
+        if (state) {
+            throw new UnsupportedOperationException(" setXIncludeAware " +
+                "is not supported on this JAXP"  +
+                " implementation or earlier: " + this.getClass());
+        }
     }
 
     /**
@@ -471,3 +470,4 @@ public abstract class SAXParserFactory {
             );
     }
 }
+

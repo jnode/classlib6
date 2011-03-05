@@ -1,12 +1,12 @@
 /*
- * Copyright 1997-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 1997, 2006, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Sun designates this
+ * published by the Free Software Foundation.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the LICENSE file that accompanied this code.
+ * by Oracle in the LICENSE file that accompanied this code.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -18,9 +18,9 @@
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
- * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
- * CA 95054 USA or visit www.sun.com if you need additional information or
- * have any questions.
+ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ * or visit www.oracle.com if you need additional information or have any
+ * questions.
  */
 
 
@@ -35,6 +35,10 @@ import java.util.concurrent.locks.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.Serializable;
+import java.io.*;
+import java.security.AccessControlContext;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import javax.swing.event.EventListenerList;
 
 
@@ -174,6 +178,23 @@ public class Timer implements Serializable
 
     private transient final Lock lock = new ReentrantLock();
 
+    /*
+     * The timer's AccessControlContext.
+     */
+     private transient volatile AccessControlContext acc =
+            AccessController.getContext();
+
+    /**
+      * Returns the acc this timer was constructed with.
+      */
+     final AccessControlContext getAccessControlContext() {
+       if (acc == null) {
+           throw new SecurityException(
+                   "Timer is missing AccessControlContext");
+       }
+       return acc;
+     }
+
     // This field is maintained by TimerQueue.
     // eventQueued can also be reset by the TimerQueue, but will only ever
     // happen in applet case when TimerQueues thread is destroyed.
@@ -191,7 +212,7 @@ public class Timer implements Serializable
      *
      * @param delay milliseconds for the initial and between-event delay
      * @param listener  an initial listener; can be <code>null</code>
-     *
+
      * @see #addActionListener
      * @see #setInitialDelay
      * @see #setRepeats
@@ -207,7 +228,6 @@ public class Timer implements Serializable
 	    addActionListener(listener);
 	}
     }
-
 
     /**
      * DoPostEvent is a runnable class that fires actionEvents to 
@@ -589,7 +609,12 @@ public class Timer implements Serializable
 
     void post() {
         if (notify.compareAndSet(false, true) || !coalesce) {
+            AccessController.doPrivileged(new PrivilegedAction<Void>() {
+                public Void run() {
             SwingUtilities.invokeLater(doPostEvent);
+                    return null;
+                 }
+            }, getAccessControlContext());
         }
     }
 
@@ -611,4 +636,11 @@ public class Timer implements Serializable
         timer.actionCommand = actionCommand;
         return timer;
     }
+
+     private void readObject(ObjectInputStream in) 
+        throws ClassNotFoundException, IOException
+     {
+        this.acc = AccessController.getContext();
+        in.defaultReadObject();
+     }
 }

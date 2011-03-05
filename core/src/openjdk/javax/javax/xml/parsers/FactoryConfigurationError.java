@@ -32,6 +32,7 @@ package javax.xml.parsers;
  * or instantiated.
  *
  * @author <a href="mailto:Jeff.Suttor@Sun.com">Jeff Suttor</a>
+ * @version $Revision: 1.5 $, $Date: 2010/02/03 07:34:04 $
  */
 
 public class FactoryConfigurationError extends Error {
@@ -120,6 +121,14 @@ public class FactoryConfigurationError extends Error {
      */
     
     public Exception getException () {
+        return exception;
+    }
+
+    /**
+     * use the exception chaining mechanism of JDK1.4
+    */
+    @Override
+    public Throwable getCause() {
         return exception;
     }
 }

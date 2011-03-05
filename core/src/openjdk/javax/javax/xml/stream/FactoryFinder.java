@@ -160,8 +160,8 @@ class FactoryFinder {
     }
     
     /**
-     * Finds the implementation Class object in the specified order.  Main
-     * entry point.
+     * Finds the implementation Class object in the specified order.
+     *
      * @return Class object of factory, never null
      *
      * @param factoryId             Name of the factory to find, same as
@@ -172,6 +172,28 @@ class FactoryFinder {
      * Package private so this code can be shared.
      */
     static Object find(String factoryId, String fallbackClassName)
+        throws ConfigurationError
+    {
+        return find(factoryId, null, fallbackClassName);
+    }
+
+    /**
+     * Finds the implementation Class object in the specified order.  Main
+     * entry point.
+     * @return Class object of factory, never null
+     *
+     * @param factoryId             Name of the factory to find, same as
+     *                              a property name
+     *
+     * @param cl                    ClassLoader to be used to load the class, null means to use
+     * the bootstrap ClassLoader
+     *
+     * @param fallbackClassName     Implementation class name, if nothing else
+     *                              is found.  Use null to mean no fallback.
+     *
+     * Package private so this code can be shared.
+     */
+    static Object find(String factoryId, ClassLoader cl, String fallbackClassName)
         throws ConfigurationError
     {        
         dPrint("find factoryId =" + factoryId);
@@ -238,7 +260,7 @@ class FactoryFinder {
         }
 
         dPrint("loaded from fallback value: " + fallbackClassName);
-        return newInstance(fallbackClassName, null, true);
+        return newInstance(fallbackClassName, cl, true);
     }
     
     /*
@@ -323,6 +345,13 @@ class FactoryFinder {
         }
         
         Exception getException() {
+            return exception;
+        }
+        /**
+        * use the exception chaining mechanism of JDK1.4
+        */
+        @Override
+        public Throwable getCause() {
             return exception;
         }
     }
