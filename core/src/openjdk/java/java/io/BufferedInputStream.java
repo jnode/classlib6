@@ -1,12 +1,12 @@
 /*
- * Copyright 1994-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 1994, 2006, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Sun designates this
+ * published by the Free Software Foundation.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the LICENSE file that accompanied this code.
+ * by Oracle in the LICENSE file that accompanied this code.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -18,13 +18,12 @@
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
- * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
- * CA 95054 USA or visit www.sun.com if you need additional information or
- * have any questions.
+ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ * or visit www.oracle.com if you need additional information or have any
+ * questions.
  */
 
 package java.io;
-import java.security.PrivilegedAction;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
 /**
@@ -66,23 +65,10 @@ class BufferedInputStream extends FilterInputStream {
      * of buf[] as primary indicator that this stream is closed. (The
      * "in" field is also nulled out on close.)
      */
-    private static final AtomicReferenceFieldUpdater<BufferedInputStream, byte[]> bufUpdater;
-
-    //jnode
-    //todo: should be cleaned up (possible reason: bug in jnode security subsystem)
-    static {
-        bufUpdater = java.security.AccessController.doPrivileged(
-                new PrivilegedAction<AtomicReferenceFieldUpdater<BufferedInputStream, byte[]>>() {
-                    @Override
-                    public AtomicReferenceFieldUpdater<BufferedInputStream, byte[]> run() {
-                        return createUpdater();
-                    }
-                });
-    }
-
-	private static final AtomicReferenceFieldUpdater<BufferedInputStream, byte[]> createUpdater() {
-        return AtomicReferenceFieldUpdater.newUpdater(BufferedInputStream.class,  byte[].class, "buf");
-	}
+    private static final
+        AtomicReferenceFieldUpdater<BufferedInputStream, byte[]> bufUpdater =
+        AtomicReferenceFieldUpdater.newUpdater
+        (BufferedInputStream.class,  byte[].class, "buf");
 
     /**
      * The index one greater than the index of the last valid byte in 

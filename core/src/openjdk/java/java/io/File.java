@@ -1,12 +1,12 @@
 /*
- * Copyright 1994-2007 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 1994, 2007, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Sun designates this
+ * published by the Free Software Foundation.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the LICENSE file that accompanied this code.
+ * by Oracle in the LICENSE file that accompanied this code.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -18,9 +18,9 @@
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
- * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
- * CA 95054 USA or visit www.sun.com if you need additional information or
- * have any questions.
+ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ * or visit www.oracle.com if you need additional information or have any
+ * questions.
  */
 
 package java.io;
@@ -32,9 +32,9 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Hashtable;
-import java.util.Random;
 import java.security.AccessController;
 import java.security.AccessControlException;
+import java.security.SecureRandom;
 import sun.security.action.GetPropertyAction;
 
 
@@ -1676,28 +1676,28 @@ public class File
     
     /* -- Temporary files -- */
 
-    private static final Object tmpFileLock = new Object();
+    // lazy initialization of SecureRandom and temporary file directory
+    private static class LazyInitialization {
+        static final SecureRandom random = new SecureRandom();
 
-    private static int counter = -1; /* Protected by tmpFileLock */
+        static final String temporaryDirectory = temporaryDirectory();
+        static String temporaryDirectory() {
+            return fs.normalize(
+                AccessController.doPrivileged(
+                    new GetPropertyAction("java.io.tmpdir")));
+        }
+    }
 
     private static File generateFile(String prefix, String suffix, File dir)
 	throws IOException
     {
-	if (counter == -1) {
-	    counter = new Random().nextInt() & 0xffff;
-	}
-	counter++;
-	return new File(dir, prefix + Integer.toString(counter) + suffix);
+        long n = LazyInitialization.random.nextLong();
+        if (n == Long.MIN_VALUE) {
+            n = 0;      // corner case
+        } else {
+            n = Math.abs(n);
     }
-
-    private static String tmpdir; /* Protected by tmpFileLock */
-
-    private static String getTempDir() {
-        if (tmpdir == null)
-            tmpdir = fs.normalize(
-                AccessController.doPrivileged(
-                    new GetPropertyAction("java.io.tmpdir")));
-	return tmpdir;
+        return new File(dir, prefix + Long.toString(n) + suffix);
     }
 
     private static boolean checkAndCreate(String filename, SecurityManager sm)
@@ -1793,9 +1793,8 @@ public class File
 	if (prefix.length() < 3)
 	    throw new IllegalArgumentException("Prefix string too short");
 	String s = (suffix == null) ? ".tmp" : suffix;
-	synchronized (tmpFileLock) {
 	    if (directory == null) {
-                String tmpDir = getTempDir();
+            String tmpDir = LazyInitialization.temporaryDirectory();
 		directory = new File(tmpDir, fs.prefixLength(tmpDir));
 	    }
 	    SecurityManager sm = System.getSecurityManager();
@@ -1805,7 +1804,6 @@ public class File
 	    } while (!checkAndCreate(f.getPath(), sm));
 	    return f;
 	}
-    }
 
     /**
      * Creates an empty file in the default temporary-file directory, using
@@ -1938,11 +1936,12 @@ public class File
     private synchronized void readObject(java.io.ObjectInputStream s)
          throws IOException, ClassNotFoundException
     {
-	s.defaultReadObject();
+        ObjectInputStream.GetField fields = s.readFields();
+        String pathField = (String)fields.get("path", null);
 	char sep = s.readChar(); // read the previous separator char
 	if (sep != separatorChar)
-	    this.path = this.path.replace(sep, separatorChar);
-	this.path = fs.normalize(this.path);
+            pathField = pathField.replace(sep, separatorChar);
+        this.path = fs.normalize(pathField);
 	this.prefixLength = fs.prefixLength(this.path);
     }
 
