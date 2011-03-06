@@ -1,12 +1,12 @@
 /*
- * Copyright 1997-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 1997, 2006, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Sun designates this
+ * published by the Free Software Foundation.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the LICENSE file that accompanied this code.
+ * by Oracle in the LICENSE file that accompanied this code.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -18,9 +18,9 @@
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
- * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
- * CA 95054 USA or visit www.sun.com if you need additional information or
- * have any questions.
+ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ * or visit www.oracle.com if you need additional information or have any
+ * questions.
  */
  
 package java.net;
@@ -34,6 +34,7 @@ import java.util.StringTokenizer;
 import java.net.InetAddress;
 import java.security.Permission;
 import java.security.PermissionCollection;
+import java.security.Policy;
 import java.io.Serializable;
 import java.io.ObjectStreamField;
 import java.io.ObjectOutputStream;
@@ -41,6 +42,7 @@ import java.io.ObjectInputStream;
 import java.io.IOException;
 import sun.net.util.IPAddressUtil;
 import sun.security.util.SecurityConstants;
+import sun.security.util.Debug;
 
 
 /**
@@ -128,7 +130,6 @@ import sun.security.util.SecurityConstants;
  * @see java.security.Permissions
  * @see SocketPermission
  *
- * @version 1.67 07/05/05
  *
  * @author Marianne Mueller
  * @author Roland Schemers 
@@ -212,13 +213,37 @@ implements java.io.Serializable
     // port range on host
     private transient int[] portrange; 
 
+    private transient boolean defaultDeny = false;
+
+    // true if this SocketPermission represents a hostname
+    // that failed our reverse mapping heuristic test
+    private transient boolean untrusted;
+
     // true if the trustProxy system property is set
     private static boolean trustProxy;
 
+    // true if the sun.net.trustNameService system property is set
+    private static boolean trustNameService;
+
+    private static Debug debug = null;
+    private static boolean debugInit = false;
+
     static {
-	Boolean tmp = (Boolean) java.security.AccessController.doPrivileged(
+        Boolean tmp = java.security.AccessController.doPrivileged(
                 new sun.security.action.GetBooleanAction("trustProxy"));
 	trustProxy = tmp.booleanValue();
+        tmp = java.security.AccessController.doPrivileged(
+            new sun.security.action.GetBooleanAction("sun.net.trustNameService"));
+        trustNameService = tmp.booleanValue();
+    }
+
+    private static synchronized Debug getDebug()
+    {
+        if (!debugInit) {
+            debug = Debug.getInstance("access");
+            debugInit = true;
+        }
+        return debug;
     }
 
     /**
@@ -262,6 +287,10 @@ implements java.io.Serializable
 	super(getHost(host));
 	// name initialized to getHost(host); NPE detected in getHost()
 	init(getName(), mask);
+    }
+
+    private void setDeny() {
+        defaultDeny = true;
     }
 
     private static String getHost(String host)
@@ -568,7 +597,7 @@ implements java.io.Serializable
     void getCanonName()
 	throws UnknownHostException
     {
-	if (cname != null || invalid) return;
+        if (cname != null || invalid || untrusted) return;
 
 	// attempt to get the canonical name
 
@@ -587,11 +616,142 @@ implements java.io.Serializable
 	    } else {
 	     cname = InetAddress.getByName(addresses[0].getHostAddress()).
                                               getHostName(false).toLowerCase();
+                if (!trustNameService && sun.net.www.URLConnection.isProxiedHost(hostname)) {
+                    if (!match(cname, hostname) && 
+                        (defaultDeny || !cname.equals(addresses[0].getHostAddress()))) {
+                        // Last chance
+                        if (!authorized(hostname, addresses[0].getAddress())) {
+                            untrusted = true;
+                            Debug debug = getDebug();
+                            if (debug != null && Debug.isOn("failure")) {
+                                debug.println("socket access restriction: proxied host " + "(" + addresses[0] + ")" + " does not match " + cname + " from reverse lookup");
+                            }
+                        }
+                    }
+                }
 	    }
 	} catch (UnknownHostException uhe) {
 	    invalid = true;
 	    throw uhe;
 	}
+    }
+
+    private boolean match(String cname, String hname) {
+        String a = cname.toLowerCase();
+        String b = hname.toLowerCase();
+        if (a.startsWith(b)  &&
+            ((a.length() == b.length()) || (a.charAt(b.length()) == '.')))
+            return true;
+        if (b.endsWith(".akamai.net") || b.endsWith(".akamai.com"))
+            return true;
+        String af = fragment(a);
+        String bf = fragment(b);
+        return af.length() != 0 && bf.length() != 0 && fragment(a).equals(fragment(b));
+    }
+
+    // www.sun.com. -> sun.com
+    // www.sun.co.uk -> sun.co.uk
+    // www.sun.com.au -> sun.com.au
+    private String fragment(String cname) {
+        int dot;
+        dot = cname.lastIndexOf('.');
+        if (dot == -1)
+            return cname;
+        if (dot == 0)
+            return "";
+        if (dot == cname.length() - 1) {
+            cname = cname.substring(0, cname.length() -1);
+            dot = cname.lastIndexOf('.');
+        }
+        if (dot < 1)
+            return "";
+        int second = cname.lastIndexOf('.', dot - 1);
+        if (second == -1)
+            return cname;
+        if (((cname.length() - dot) <= 3) && ((dot - second) <= 4) && second > 0) {
+            if (dot - second == 4) {
+                String s = cname.substring(second + 1, dot);
+                if (!(s.equals("com") || s.equals("org") || s.equals("edu"))) {
+                    return cname.substring(second + 1);
+                }
+            }
+            int third = cname.lastIndexOf('.', second - 1);
+            if (third == -1)
+                return cname.substring(second + 1);
+            else
+                return cname.substring(third + 1);
+        }
+        return cname.substring(second + 1);
+    }
+
+    private boolean authorized(String cname, byte[] addr) {
+        if (addr.length == 4)
+            return authorizedIPv4(cname, addr);
+        else if (addr.length == 16)
+            return authorizedIPv6(cname, addr);
+        else
+            return false;
+    }
+
+    private boolean authorizedIPv4(String cname, byte[] addr) {
+        String authHost = "";
+        InetAddress auth;
+
+        try {
+            authHost = "auth." + 
+                        (addr[3] & 0xff) + "." + (addr[2] & 0xff) + "." + 
+                        (addr[1] & 0xff) + "." + (addr[0] & 0xff) +
+                        ".in-addr.arpa";
+            //auth = InetAddress.getAllByName0(authHost, false)[0];
+            authHost = hostname + '.' + authHost;
+            auth = InetAddress.getAllByName0(authHost, false)[0];
+            if (auth.equals(InetAddress.getByAddress(addr)))
+                return true;
+            Debug debug = getDebug();
+            if (debug != null && Debug.isOn("failure")) {
+                debug.println("socket access restriction: IP address of " + auth + " != " + InetAddress.getByAddress(addr));
+            }
+        } catch (UnknownHostException uhe) {
+            Debug debug = getDebug();
+            if (debug != null && Debug.isOn("failure")) {
+                debug.println("socket access restriction: forward lookup failed for " + authHost);
+            }
+        } catch (IOException x) {
+        }
+        return false;
+    }
+
+    private boolean authorizedIPv6(String cname, byte[] addr) {
+        String authHost = "";
+        InetAddress auth;
+
+        try {
+            StringBuffer sb = new StringBuffer(39);
+
+            for (int i = 15; i >= 0; i--) {
+                sb.append(Integer.toHexString(((addr[i]) & 0x0f)));
+                sb.append('.');
+                sb.append(Integer.toHexString(((addr[i] >> 4) & 0x0f)));
+                sb.append('.');
+            }
+            authHost = "auth." + sb.toString() + "IP6.ARPA";
+            //auth = InetAddress.getAllByName0(authHost, false)[0];
+            authHost = hostname + '.' + authHost;
+            auth = InetAddress.getAllByName0(authHost, false)[0];
+            if (auth.equals(InetAddress.getByAddress(addr)))
+                return true;
+            Debug debug = getDebug();
+            if (debug != null && Debug.isOn("failure")) {
+                debug.println("socket access restriction: IP address of " + auth + " != " + InetAddress.getByAddress(addr));
+            }
+        } catch (UnknownHostException uhe) {
+            Debug debug = getDebug();
+            if (debug != null && Debug.isOn("failure")) {
+                debug.println("socket access restriction: forward lookup failed for " + authHost);
+            }
+        } catch (IOException x) {
+        }
+        return false;
     }
 
     /**
@@ -770,6 +930,10 @@ implements java.io.Serializable
 		return (that.cname.endsWith(this.cname));
 	    }
 
+            if (this.cname == null) {
+                this.getCanonName();
+            }
+
 	    // comapare IP addresses
 	    if (this.addresses == null) {
 		this.getIP();
@@ -779,6 +943,7 @@ implements java.io.Serializable
 		that.getIP();
 	    }
 
+            if (!(that.init_with_ip && this.untrusted)) {
 	    for (j = 0; j < this.addresses.length; j++) {
 		for (i=0; i < that.addresses.length; i++) {
 		    if (this.addresses[j].equals(that.addresses[i]))
@@ -788,15 +953,12 @@ implements java.io.Serializable
 
 	    // XXX: if all else fails, compare hostnames?
 	    // Do we really want this?
-	    if (this.cname == null) {
-		this.getCanonName();
-	    }
-
 	    if (that.cname == null) {
 		that.getCanonName();
 	    }
 
 	    return (this.cname.equalsIgnoreCase(that.cname));
+            }
 
 	} catch (UnknownHostException uhe) {
 	    if (trustProxy)
@@ -1075,7 +1237,6 @@ else its the cname?
  * @see java.security.Permissions
  * @see java.security.PermissionCollection
  *
- * @version 1.67 05/05/07
  *
  * @author Roland Schemers
  *

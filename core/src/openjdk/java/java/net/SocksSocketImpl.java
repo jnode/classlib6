@@ -1,12 +1,12 @@
 /*
- * Copyright 2000-2007 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2000, 2007, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Sun designates this
+ * published by the Free Software Foundation.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the LICENSE file that accompanied this code.
+ * by Oracle in the LICENSE file that accompanied this code.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -18,9 +18,9 @@
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
- * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
- * CA 95054 USA or visit www.sun.com if you need additional information or
- * have any questions.
+ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ * or visit www.oracle.com if you need additional information or have any
+ * questions.
  */
 package java.net;
 import java.io.IOException;
@@ -48,6 +48,10 @@ class SocksSocketImpl extends PlainSocketImpl implements SocksConsts {
     private InputStream cmdIn = null;
     private OutputStream cmdOut = null;
 
+    /* true if the Proxy has been set programatically */
+    private boolean applicationSetProxy;  /* false */
+
+
     SocksSocketImpl() {
         // Nothing needed
     }
@@ -64,6 +68,7 @@ class SocksSocketImpl extends PlainSocketImpl implements SocksConsts {
             // Use getHostString() to avoid reverse lookups
             server = ad.getHostString();
             port = ad.getPort();
+            applicationSetProxy = true;
         }
     }
 
@@ -165,8 +170,7 @@ class SocksSocketImpl extends PlainSocketImpl implements SocksConsts {
                         throw (IOException) pae.getException();
                     }
                 } else {
-                    userName = java.security.AccessController.doPrivileged(
-                        new sun.security.action.GetPropertyAction("user.name"));
+                    userName = getUserName();
                 }
             }
             if (userName == null)
@@ -267,8 +271,7 @@ class SocksSocketImpl extends PlainSocketImpl implements SocksConsts {
         out.write((endpoint.getPort() >> 8) & 0xff);
         out.write((endpoint.getPort() >> 0) & 0xff);
         out.write(endpoint.getAddress().getAddress());
-        String userName = java.security.AccessController.doPrivileged(
-               new sun.security.action.GetPropertyAction("user.name"));
+        String userName = getUserName();
         try {
             out.write(userName.getBytes("ISO-8859-1"));
         } catch (java.io.UnsupportedEncodingException uee) {
@@ -589,8 +592,7 @@ class SocksSocketImpl extends PlainSocketImpl implements SocksConsts {
         out.write((super.getLocalPort() >> 8) & 0xff);
         out.write((super.getLocalPort() >> 0) & 0xff);
         out.write(addr1);
-        String userName = java.security.AccessController.doPrivileged(
-               new sun.security.action.GetPropertyAction("user.name"));
+        String userName = getUserName();
         try {
             out.write(userName.getBytes("ISO-8859-1"));
         } catch (java.io.UnsupportedEncodingException uee) {
@@ -1052,4 +1054,16 @@ class SocksSocketImpl extends PlainSocketImpl implements SocksConsts {
         super.close();
     }
 
+    private String getUserName() {
+        String userName = "";
+        if (applicationSetProxy) {
+            try {
+                userName = System.getProperty("user.name");
+            } catch (SecurityException se) { /* swallow Exception */ }
+        } else {
+            userName = java.security.AccessController.doPrivileged(
+                new sun.security.action.GetPropertyAction("user.name"));
+        }
+        return userName;
+    }
 }

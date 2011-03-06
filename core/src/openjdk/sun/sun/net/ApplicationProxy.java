@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1995, 1997, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2009, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -23,34 +23,21 @@
  * questions.
  */
 
-package java.net;
+package sun.net;
 
-import java.io.IOException;
+import java.net.Proxy;
+import java.net.SocketAddress;
 
 /**
- * Thrown to indicate that an unknown service exception has 
- * occurred. Either the MIME type returned by a URL connection does 
- * not make sense, or the application is attempting to write to a 
- * read-only URL connection. 
- *
- * @author  unascribed
- * @since   JDK1.0
+ * Proxy wrapper class so that we can determine application set
+ * proxies by type.
  */
-public class UnknownServiceException extends IOException {
-    /**
-     * Constructs a new <code>UnknownServiceException</code> with no 
-     * detail message. 
-     */
-    public UnknownServiceException() {
+public final class ApplicationProxy extends Proxy {
+    private ApplicationProxy(Proxy proxy) {
+        super(proxy.type(), proxy.address());
     }
 
-    /**
-     * Constructs a new <code>UnknownServiceException</code> with the 
-     * specified detail message. 
-     *
-     * @param   msg   the detail message.
-     */
-    public UnknownServiceException(String msg) {
-	super(msg);
+    public static ApplicationProxy create(Proxy proxy) {
+        return new ApplicationProxy(proxy);
     }
 }
