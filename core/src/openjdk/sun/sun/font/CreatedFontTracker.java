@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1995, 1997, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2008, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -22,30 +22,33 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package java.awt;
 
+package sun.font;
 
-/**
- * Signals that an Absract Window Toolkit exception has occurred.
- *
- * @author 	Arthur van Hoff
- */
-public class AWTException extends Exception {
- 
-    /*
-     * JDK 1.1 serialVersionUID 
-     */
-     private static final long serialVersionUID = -1900414231151323879L;
+public class CreatedFontTracker {
 
-    /**
-     * Constructs an instance of <code>AWTException</code> with the 
-     * specified detail message. A detail message is an 
-     * instance of <code>String</code> that describes this particular
-     * exception. 
-     * @param   msg     the detail message
-     * @since   JDK1.0
-     */
-    public AWTException(String msg) {
-	super(msg);
+    public static final int MAX_FILE_SIZE = 32 * 1024 * 1024;
+    public static final int MAX_TOTAL_BYTES = 10 * MAX_FILE_SIZE;
+
+    static int numBytes;
+    static CreatedFontTracker tracker;
+
+    public static synchronized CreatedFontTracker getTracker() {
+        if (tracker == null) {
+            tracker = new CreatedFontTracker();
+        }
+        return tracker;
+    }
+
+    public synchronized int getNumBytes() {
+        return numBytes;
+    }
+
+    public synchronized void addBytes(int sz) {
+        numBytes += sz;
+    }
+
+    public synchronized void subBytes(int sz) {
+        numBytes -= sz;
     }
 }

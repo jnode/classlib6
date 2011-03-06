@@ -1,12 +1,12 @@
 /*
- * Copyright 2003-2005 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2003, 2005, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Sun designates this
+ * published by the Free Software Foundation.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the LICENSE file that accompanied this code.
+ * by Oracle in the LICENSE file that accompanied this code.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -18,9 +18,9 @@
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
- * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
- * CA 95054 USA or visit www.sun.com if you need additional information or
- * have any questions.
+ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ * or visit www.oracle.com if you need additional information or have any
+ * questions.
  */
 
 package sun.font;
@@ -39,6 +39,7 @@ import java.nio.BufferUnderflowException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
 import sun.java2d.Disposer;
+import sun.java2d.DisposerRecord;
 import java.util.HashSet;
 import java.util.HashMap;
 import java.awt.Font;
@@ -76,6 +77,27 @@ import java.awt.Font;
  */
 public class Type1Font extends FileFont {
     
+     private static class T1DisposerRecord  implements DisposerRecord {
+        String fileName = null;
+
+        T1DisposerRecord(String name) {
+            fileName = name;
+        }
+
+        public synchronized void dispose() {
+            java.security.AccessController.doPrivileged(
+	        new java.security.PrivilegedAction() {
+	            public Object run() {
+
+                        if (fileName != null) {
+                            (new java.io.File(fileName)).delete();
+                        }
+                        return null;
+		    }
+	     });
+        }
+    }
+
     WeakReference bufferRef = new WeakReference(null);
 
     private String psName = null;
@@ -125,18 +147,42 @@ public class Type1Font extends FileFont {
 
 
     /**
+     * Constructs a Type1 Font.
+     * @param platname - Platform identifier of the font. Typically file name.
+     * @param nativeNames - Native names - typically XLFDs on Unix.
+     */
+    public Type1Font(String platname, Object nativeNames)
+        throws FontFormatException {
+
+        this(platname, nativeNames, false);
+    }
+
+    /**
      * - does basic verification of the file
      * - reads the names (full, family).
      * - determines the style of the font.
      * @throws FontFormatException - if the font can't be opened
      * or fails verification,  or there's no usable cmap
      */
-    public Type1Font(String platname, Object nativeNames)
+    public Type1Font(String platname, Object nativeNames, boolean createdCopy)
 	throws FontFormatException {
 	super(platname, nativeNames);
 	fontRank = Font2D.TYPE1_RANK;
 	checkedNatives = true;
+        try {
 	verify();
+        } catch (Throwable t) {
+            if (createdCopy) {
+                T1DisposerRecord ref = new T1DisposerRecord(platname);
+                Disposer.addObjectRecord(bufferRef, ref);
+                bufferRef = null;
+            }
+            if (t instanceof FontFormatException) {
+                throw (FontFormatException)t;
+            } else {
+                throw new FontFormatException("Unexpected runtime exception.");
+            }
+        }
     }
 
     private synchronized ByteBuffer getBuffer() throws FontFormatException {
@@ -631,7 +677,7 @@ public class Type1Font extends FileFont {
 
     public String toString() {
 	return "** Type1 Font: Family="+familyName+ " Name="+fullName+
-	    " style="+style+" fileName="+platName;
+            " style="+style+" fileName="+getPublicFileName();
     }
     
 }

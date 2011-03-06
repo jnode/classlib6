@@ -1,12 +1,12 @@
 /*
- * Copyright 2003-2006 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2003, 2008, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Sun designates this
+ * published by the Free Software Foundation.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the LICENSE file that accompanied this code.
+ * by Oracle in the LICENSE file that accompanied this code.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -18,9 +18,9 @@
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
- * Please contact Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
- * CA 95054 USA or visit www.sun.com if you need additional information or
- * have any questions.
+ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ * or visit www.oracle.com if you need additional information or have any
+ * questions.
  */
 
 package sun.font;
@@ -48,6 +48,9 @@ import java.nio.channels.ClosedChannelException;
 import java.util.HashSet;
 import java.util.HashMap;
 import java.awt.Font;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 
 public abstract class FileFont extends PhysicalFont {
 
@@ -125,9 +128,9 @@ public abstract class FileFont extends PhysicalFont {
 	return true;
     }
 
-    void setFileToRemove(File file) {
+    void setFileToRemove(File file, CreatedFontTracker tracker) {
 	Disposer.addObjectRecord(this,
-				 new CreatedFontFileDisposerRecord(file));
+                         new CreatedFontFileDisposerRecord(file, tracker));
     }
 
     /* This is called when a font scaler is determined to
@@ -246,12 +249,16 @@ public abstract class FileFont extends PhysicalFont {
         return getScaler().getUnitsPerEm();
     }
 
-    private static class CreatedFontFileDisposerRecord implements DisposerRecord {
+    private static class CreatedFontFileDisposerRecord
+        implements DisposerRecord {
 	
 	File fontFile = null;
+        CreatedFontTracker tracker;
 
-	private CreatedFontFileDisposerRecord(File file) {
+        private CreatedFontFileDisposerRecord(File file,
+                                              CreatedFontTracker tracker) {
 	    fontFile = file;
+            this.tracker = tracker;
 	}
 
 	public void dispose() {
@@ -260,6 +267,9 @@ public abstract class FileFont extends PhysicalFont {
 	              public Object run() {
 			  if (fontFile != null) {
 			      try {
+                                  if (tracker != null) {
+                                      tracker.subBytes((int)fontFile.length());
+                                  }
 				  /* REMIND: is it possible that the file is
 				   * still open? It will be closed when the
 				   * font2D is disposed but could this code
@@ -277,4 +287,49 @@ public abstract class FileFont extends PhysicalFont {
 	    }); 
 	}
     }
+
+    protected String getPublicFileName() {
+        SecurityManager sm = System.getSecurityManager();
+        if (sm == null) {
+            return platName;
+        }
+        boolean canReadProperty = true;
+
+        try {
+            sm.checkPropertyAccess("java.io.tmpdir");
+        } catch (SecurityException e) {
+            canReadProperty = false;
+        }
+
+        if (canReadProperty) {
+            return platName;
+        }
+
+        final File f = new File(platName);
+
+         Boolean isTmpFile = Boolean.FALSE;
+         try {
+             isTmpFile = AccessController.doPrivileged(
+                 new PrivilegedExceptionAction<Boolean>() {
+                     public Boolean run() {
+                         File tmp = new File(System.getProperty("java.io.tmpdir"));
+                         try {
+                             String tpath = tmp.getCanonicalPath();
+                             String fpath = f.getCanonicalPath();
+
+                             return (fpath == null) || fpath.startsWith(tpath);
+                         } catch (IOException e) {
+                             return Boolean.TRUE;
+                         }
+                     }
+                 }
+             );
+         } catch (PrivilegedActionException e) {
+             // unable to verify whether value of java.io.tempdir will be
+             // exposed, so return only a name of the font file.
+             isTmpFile = Boolean.TRUE;
+         }
+
+         return  isTmpFile ? "temp file" : platName;
+     }
 }
