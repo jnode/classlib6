@@ -76,12 +76,15 @@
     </copy>
   </target>
 
-  <!-- Compile all subproject java files -->
-  <target name="compile" depends="prepare">
+  <target name="pre-compile" depends="prepare">
     <jnode.compile>
       <src refid="classpath-sources" />
       <classpath refid="my-cp"/>
     </jnode.compile>
+  </target>
+
+  <!-- Compile all subproject java files -->
+  <target name="compile" depends="pre-compile">
     <parallel >
       <jnode.compile>
         <src refid="classpath-sources-corba" />

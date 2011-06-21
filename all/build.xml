@@ -47,7 +47,6 @@
 	<property name="mauve.jar" value="${root.dir}/core/lib/mauve.jar"/>
     <property name="ejc.jar" value="${root.dir}/core/lib/ejc-3.1.1.jar"/>
 
-    <property name="iso9660.jar" value="${root.dir}/builder/lib/iso9660.jar" />
     <property name="sabre.jar" value="${root.dir}/builder/lib/sabre.jar" />
 
     <!-- libraries needed to run tests -->
@@ -89,18 +88,8 @@
         <pathelement location="${cglib.jar}"/>
         <pathelement location="${log4j.jar}"/>
         <pathelement location="${basedir}/conf"/>
-        <pathelement location="${beanshell.jar}"/>
-        <pathelement location="${js.jar}"/>
-        <pathelement location="${oncrpc.jar}"/>
-        <pathelement location="${edtftpj.jar}"/>
-        <pathelement location="${jcifs.jar}"/>
         <pathelement location="${commons-net.jar}"/>
-        <pathelement location="${dnsjava.jar}"/>
         <pathelement location="${mauve.jar}"/>
-        <pathelement location="${derby.jar}"/>
-        <pathelement location="${derbynet.jar}"/>
-        <pathelement location="${derbytools.jar}"/>
-        <pathelement location="${iso9660.jar}"/>
         <pathelement location="${sabre.jar}"/>
     </path>
 
@@ -337,105 +326,13 @@ classlib-src.md5=${classlib-src.md5}</echo>
     <!-- Call the assemble target of all subprojects -->
     <target name="assemble-projects" depends="prepare">
         <!-- pre compile tasks needed for compilation -->
+        <ant target="pre-compile" dir="${root.dir}/core" inheritall="on" inheritrefs="on" />
         <ant target="pre-compile" dir="${root.dir}/builder" inheritall="on" inheritrefs="on" />
         <jnode.antall target="assemble"/>
     </target>
 
-    <!-- Assemble all plugins -->
-    <target name="assemble-plugins" depends="assemble-projects,openjdk-annotate">
-        <!-- Now assemble all plugins -->
-        <!--
-        <taskdef name="plugin" classname="org.jnode.build.PluginTask" classpathref="cp-jnode"/>
-        <plugin todir="${plugins.dir}" tmpdir="${build.dir}/tmp/plugins" pluginDir="${descriptors.dir}">
-        	<packager userApplicationsDir="${user.applications.dir}" pathRefId="cp"/>
-        	
-            <libalias name="jnode-core.jar" alias="${jnode-core.jar}"/>
-            <libalias name="jnode-distr.jar" alias="${jnode-distr.jar}"/>
-
-        	<libalias name="jnode-mmtk-genrc.jar" alias="${jnode-mmtk-genrc.jar}"/>
-        	<libalias name="jnode-mmtk-ms.jar" alias="${jnode-mmtk-ms.jar}"/>
-           	<libalias name="jnode-mmtk-nogc.jar" alias="${jnode-mmtk-nogc.jar}"/>
-
-        	<libalias name="mmtk.jar" alias="${mmtk.jar}"/>
-
-            <libalias name="commons-net-1.1.0.jar" alias="${commons-net.jar}"/>
-            <libalias name="dnsjava-1.6.6.jar" alias="${dnsjava.jar}"/>
-            <libalias name="jsch-0.1.24.jar" alias="${jsch.jar}"/>
-            <libalias name="log4j.jar" alias="${log4j.jar}"/>
-            <libalias name="beanshell.jar" alias="${beanshell.jar}"/>
-            <libalias name="nanoxml-java.jar" alias="${nanoxml-java.jar}"/>
-            <libalias name="js.jar" alias="${js.jar}"/>
-            <libalias name="thinlet.jar" alias="${thinlet.jar}"/>
-
-            <libalias name="junit.jar" alias="${junit.jar}"/>
-            <libalias name="jmock-1.0.1.jar" alias="${jmock.jar}"/>
-            <libalias name="jmock-cglib-1.0.1.jar" alias="${jmock-cglib.jar}"/>
-            <libalias name="asm.jar" alias="${asm.jar}"/>
-        	<libalias name="asm-attrs.jar" alias="${asm-attrs.jar}"/>
-        	<libalias name="asm-util.jar" alias="${asm-util.jar}"/>
-            <libalias name="cglib.jar" alias="${cglib.jar}"/>
-        	<libalias name="mauve.jar" alias="${mauve.jar}"/>
-
-            <libalias name="ant.jar" alias="${ant.jar}"/>
-            <libalias name="ant-launcher.jar" alias="${ant-launcher.jar}"/>
-            <libalias name="edtftpj.jar" alias="${edtftpj.jar}"/>
-            <libalias name="jcifs.jar" alias="${jcifs.jar}"/>
-            <libalias name="ejc.jar" alias="${ejc.jar}"/>
-        	<libalias name="oncrpc.jar" alias="${oncrpc.jar}"/>
-        	<libalias name="telnetd.jar" alias="${telnetd.jar}"/>
-            <libalias name="commons-logging.jar" alias="${commons-logging.jar}"/>
-            <libalias name="jetty.jar" alias="${jetty.jar}"/>
-            <libalias name="jetty-util.jar" alias="${jetty-util.jar}"/>
-            <libalias name="jsp.jar" alias="${jsp.jar}"/>
-            <libalias name="jsp-api.jar" alias="${jsp-api.jar}"/>
-            <libalias name="servlet.jar" alias="${servlet.jar}"/>
-            <libalias name="derby.jar" alias="${derby.jar}"/>
-            <libalias name="derbynet.jar" alias="${derbynet.jar}"/>
-            <libalias name="derbytools.jar" alias="${derbytools.jar}"/>
-
-            <descriptors dir="${descriptors.dir}/">
-                <include name="*.xml"/>
-                <exclude name="*plugin-list.xml"/>
-            </descriptors>
-        </plugin>
-        -->
-    </target>
-
-    <!-- Assemble all default initjars -->
-    <target name="assemble-default-initjars" depends="assemble-plugins" unless="no.default.initjars">
-        <!-- Build all default initjar's -->
-        <!--
-        <taskdef name="initjars" classname="org.jnode.build.InitJarsBuilder" classpathref="cp-jnode"/>
-        <initjars destdir="${initjars.dir}"
-            pluginDir="${plugins.dir}"
-            systemPluginList="${basedir}/conf/system-plugin-list.xml">
-            <insert userApplicationsDir="${user.applications.dir}"/>
-                    	
-            <fileset dir="${basedir}/conf">
-                <exclude name="system-plugin-list.xml"/>
-                <include name="*plugin-list.xml"/>
-            </fileset>
-        </initjars>
-        -->
-    </target>
-
-    <!-- Assemble all custom initjars -->
-    <target name="assemble-custom-initjars" depends="assemble-plugins" if="custom.plugin-list.dir">
-        <!-- Build all custom initjar's -->
-        <!--
-        <taskdef name="initjars" classname="org.jnode.build.InitJarsBuilder" classpathref="cp-jnode"/>
-        <initjars destdir="${initjars.dir}"
-            pluginDir="${plugins.dir}"
-            systemPluginList="${basedir}/conf/system-plugin-list.xml">
-            <fileset dir="${custom.plugin-list.dir}">
-                <include name="*plugin-list.xml"/>
-            </fileset>
-        </initjars>
-        -->
-    </target>
-
     <!-- Assemble all subprojects, plugins and initjars -->
-    <target name="assemble" depends="assemble-default-initjars, assemble-custom-initjars">
+    <target name="assemble" depends="assemble-projects,openjdk-annotate">
     </target>
 
     <!-- Give help on possible targets -->
@@ -466,28 +363,6 @@ clean             Remove all intermediate build results.
         </echo>
     </target>
 
-    <!-- Upload a distribution -->
-    <!--target name="upload">
-        <property name="upload.dir" value="${build.dir}/upload"/>
-        <mkdir dir="${upload.dir}"/>
-        <gzip src="${jnode-x86.iso}" destfile="${upload.dir}/jnode-x86-${jnode-ver}.iso.gz"/>
-        <copy todir="${upload.dir}" file="${sources.dist.tar.gz}"/>
-        <checksum algorithm="MD5" forceoverwrite="true">
-            <fileset dir="${upload.dir}">
-                <include name="jnode-x86-${jnode-ver}.iso.gz" />
-                <include name="jnodesources-${jnode-ver}.tar.gz" />
-            </fileset>
-        </checksum>
-        <echo message="FTP upload disabled. Uploadables are in: ${upload.dir}"/>
-        TODO find a way to automatically upload the files
-        jsch based scp with sftp fails with an error to sourceforge
-        FTP uploads are abandone by sourceforge
-        <ftp server="upload.sourceforge.net" remotedir="incoming" passive="yes" newer="yes" verbose="yes" userid="anonymous" password="${user.name}@users.sourceforge.net">
-            <fileset dir="${upload.dir}"/>
-        </ftp>
-    </target>
-    -->
-	
     <!-- Clean everything files -->
     <target name="clean" description="clean the complete build output">
         <jnode.antall target="clean"/>
@@ -574,17 +449,6 @@ clean             Remove all intermediate build results.
             <bootclasspath refid="cp"/>
         </jnode.javadoc>
     </target>
-
-    <!-- Backup CVS files -->
-    <!-- TODO create replacement SVN task
-    <target name="backup">
-        <mkdir dir="${backup.dir}"/>
-        <tstamp>
-            <format property="date" pattern="dd-MM-yyyy"/>
-        </tstamp>
-        <get src="http://cvs.sourceforge.net/cvstarballs/jnode-cvsroot.tar.bz2" dest="${backup.dir}/jnode-cvsroot-${date}.tar.bz2" usetimestamp="true" verbose="true"/>
-    </target>
-    -->
 
     <!-- Compare classpath version of jnode with real classpath version -->
     <target name="cp-compare" depends="assemble">
@@ -715,7 +579,7 @@ clean             Remove all intermediate build results.
       </hotswap>
     </target>
 
-    <target name="oj-compare" depends="assemble">
+    <target name="oj-compare" depends="assemble" description="compare the classlibrary with OpenJDK">
             <taskdef name="cp-compare" classname="org.jnode.ant.taskdefs.classpath.CompareTask" classpathref="cp-jnode"/>
 
             <patternset id="cp-includes-pattern">
@@ -726,11 +590,18 @@ clean             Remove all intermediate build results.
 
             <patternset id="cp-sources-pattern">
                 <exclude name="com/sun/demo/**/*"/>
+                <exclude name="com/sun/imageio/plugins/jpeg/**/*"/>
+                <exclude name="com/sun/java/swing/plaf/gtk/**/*"/>
+                <exclude name="com/sun/java/swing/plaf/windows/**/*"/>
+                <exclude name="com/sun/jmx/snmp/**/*"/>
+                <exclude name="com/sun/script/javascript/**/*"/>
                 <exclude name="com/sun/tools/hat/**/*"/>
                 <exclude name="com/sun/tools/example/**/*"/>
                 <exclude name="com/sun/tools/javah/**/*"/>
                 <exclude name="com/sun/tools/internal/txw2/**/*"/>
-                <exclude name="sun/jvmstat/**/*"/>
+                <!--<exclude name="sun/jvmstat/**/*"/> -->
+                <exclude name="sun/java2d/opengl/**/*"/>
+                <exclude name="sun/management/snmp/**/*"/>
                 <exclude name="sun/tools/attach/**/*"/>
                 <exclude name="sun/tools/jinfo/**/*"/>
                 <exclude name="sun/tools/jps/**/*"/>
@@ -738,7 +609,7 @@ clean             Remove all intermediate build results.
                 <exclude name="sun/tools/jstack/**/*"/>
                 <exclude name="sun/tools/jstat/**/*"/>
                 <exclude name="sun/tools/jstatd/**/*"/>
-                <exclude name="sun/tools/jconsole/**/*"/>
+                <!-- <exclude name="sun/tools/jconsole/**/*"/> -->
             </patternset>
 
             <delete dir="${build.dir}/openjdk-compare"/>
@@ -851,27 +722,6 @@ clean             Remove all intermediate build results.
         </n2a>
     </target>
 
-	<!-- check plugin dependencies -->
-	<target name="check-plugins" depends="assemble-plugins">
-		<!-- Check all plugins -->
-		<taskdef name="checkDeps" classname="org.jnode.build.dependencies.BCELDependencyChecker" 
-			classpathref="cp-jnode" />
-        <!--
-        TODO: remove duplicate classes from mmtk related plugins and enable their checking. 
-        -->
-        <checkDeps>
-			<plugins dir="${plugins.dir}/">
-				<include name="*.jar" />
-                <exclude name="*mmtk*.jar" />
-            </plugins>
-			
-			<descriptors dir="${descriptors.dir}/">
-				<include name="*.xml" />
-				<exclude name="*plugin-list.xml" />
-                <exclude name="*mmtk*.xml" />
-            </descriptors>
-		</checkDeps>
-	</target>
     <!-- Create a patch -->
     <!-- TODO create replacement SVN task
     <target name="create-patch">
