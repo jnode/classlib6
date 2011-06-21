@@ -27,3 +27,4 @@
  * {@link SEIStub} and its supporting code.
  */
 package com.sun.xml.internal.ws.client.sei;
+//jnode misnamed file in OpenJDK
