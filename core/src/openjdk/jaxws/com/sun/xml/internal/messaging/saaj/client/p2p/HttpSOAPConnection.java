@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005, 2006, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2005, 2011, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -61,17 +61,11 @@ public class HttpSOAPConnection extends SOAPConnection {
         Logger.getLogger(LogDomainConstants.HTTP_CONN_DOMAIN,
                          "com.sun.xml.internal.messaging.saaj.client.p2p.LocalStrings");
 
-    private static final String defaultProxyHost = null;
-    private static final int defaultProxyPort = -1;
-
     MessageFactory messageFactory = null;
 
     boolean closed = false;
 
     public HttpSOAPConnection() throws SOAPException {
-        proxyHost = defaultProxyHost;
-        proxyPort = defaultProxyPort;
-
         try {
             messageFactory = MessageFactory.newInstance(SOAPConstants.DYNAMIC_SOAP_PROTOCOL);
         } catch (NoSuchMethodError ex) {
@@ -146,11 +140,7 @@ public class HttpSOAPConnection extends SOAPConnection {
 
         if (endPoint instanceof URL)
             try {
-                PriviledgedPost pp =
-                    new PriviledgedPost(this, message, (URL) endPoint);
-                SOAPMessage response =
-                    (SOAPMessage) AccessController.doPrivileged(pp);
-
+                SOAPMessage response = post(message, (URL) endPoint);
                 return response;
             } catch (Exception ex) {
                 // TBD -- chaining?
@@ -159,73 +149,6 @@ public class HttpSOAPConnection extends SOAPConnection {
             log.severe("SAAJ0007.p2p.bad.endPoint.type");
             throw new SOAPExceptionImpl("Bad endPoint type " + endPoint);
         }
-    }
-
-    static class PriviledgedPost implements PrivilegedExceptionAction {
-
-        HttpSOAPConnection c;
-        SOAPMessage message;
-        URL endPoint;
-
-        PriviledgedPost(
-            HttpSOAPConnection c,
-            SOAPMessage message,
-            URL endPoint) {
-            this.c = c;
-            this.message = message;
-            this.endPoint = endPoint;
-        }
-
-        public Object run() throws Exception {
-            return c.post(message, endPoint);
-        }
-    }
-
-    // TBD
-    //    Fix this to do things better.
-
-    private String proxyHost = null;
-
-    static class PriviledgedSetProxyAction implements PrivilegedExceptionAction {
-                                                                                                                                             
-        String proxyHost = null;
-        int proxyPort = 0;
-
-        PriviledgedSetProxyAction(String host, int port) {
-            this.proxyHost = host;
-            this.proxyPort = port;
-        }
-                                                                                                                                             
-        public Object run() throws Exception {
-            System.setProperty("http.proxyHost", proxyHost);
-            System.setProperty("http.proxyPort", new Integer(proxyPort).toString());
-            log.log(Level.FINE, "SAAJ0050.p2p.proxy.host", 
-                    new String[] { proxyHost });
-            log.log(Level.FINE, "SAAJ0051.p2p.proxy.port",
-                    new String[] { new Integer(proxyPort).toString() });
-            return proxyHost;
-        }
-    }
-
-
-    public void setProxy(String host, int port) {
-        try {
-            proxyPort = port;
-            PriviledgedSetProxyAction ps = new PriviledgedSetProxyAction(host, port); 
-            proxyHost = (String) AccessController.doPrivileged(ps);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-    
-    public String getProxyHost() {
-        return proxyHost;
-    }
-
-    private int proxyPort = -1;
-
-    public int getProxyPort() {
-        return proxyPort;
     }
 
     SOAPMessage post(SOAPMessage message, URL endPoint) throws SOAPException {
@@ -266,7 +189,7 @@ public class HttpSOAPConnection extends SOAPConnection {
             httpConnection.setDoOutput(true);
             httpConnection.setDoInput(true);
             httpConnection.setUseCaches(false);
-            HttpURLConnection.setFollowRedirects(true);
+            httpConnection.setInstanceFollowRedirects(true);
 
             if (message.saveRequired())
                 message.saveChanges();

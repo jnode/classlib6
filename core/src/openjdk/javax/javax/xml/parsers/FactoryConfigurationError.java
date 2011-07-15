@@ -32,10 +32,11 @@ package javax.xml.parsers;
  * or instantiated.
  *
  * @author <a href="mailto:Jeff.Suttor@Sun.com">Jeff Suttor</a>
- * @version $Revision: 1.5 $, $Date: 2010/02/03 07:34:04 $
+ * @version $Revision: 1.7 $, $Date: 2010-11-01 04:36:09 $
  */
 
 public class FactoryConfigurationError extends Error {
+    private static final long serialVersionUID = -827108682472263355L;
 
     /**
      *<code>Exception</code> that represents the error.

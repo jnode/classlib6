@@ -36,6 +36,7 @@ package javax.xml.stream;
  * @since 1.6
  */
 public class FactoryConfigurationError extends Error {
+    private static final long serialVersionUID = -2994412584589975744L;
 
   Exception nested;
 

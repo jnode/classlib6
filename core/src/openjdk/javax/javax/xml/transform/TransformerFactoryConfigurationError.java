@@ -23,6 +23,10 @@
  * questions.
  */
 
+/*
+ * $Id: TransformerFactoryConfigurationError.java,v 1.7 2010-11-01 04:36:11 joehw Exp $
+ * %W% %E%
+ */
 package javax.xml.transform;
 
 /**
@@ -32,6 +36,7 @@ package javax.xml.transform;
  * or instantiated.
  */
 public class TransformerFactoryConfigurationError extends Error {
+    private static final long serialVersionUID = -6527718720676281516L;
 
     /**
      * <code>Exception</code> for the
