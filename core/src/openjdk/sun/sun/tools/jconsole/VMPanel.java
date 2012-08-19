@@ -583,6 +583,7 @@ public class VMPanel extends JTabbedPane implements PropertyChangeListener {
                 }
             }
 
+            // jnode
             // Set the first enabled tab in the tabs list
             // as the selected tab on initial update
             //
