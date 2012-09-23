@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003, 2007, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1996, 2012, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -22,37 +22,28 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package sun.awt;
 
-import java.awt.Component;
-import java.awt.KeyboardFocusManager;
-import java.awt.Window;
 
-import java.awt.peer.KeyboardFocusManagerPeer;
+package com.sun.beans.editors;
 
-public class KeyboardFocusManagerPeerImpl implements KeyboardFocusManagerPeer {
-    static native Window getNativeFocusedWindow();
-    static native Component getNativeFocusOwner();
-    static native void clearNativeGlobalFocusOwner(Window activeWindow);
+/**
+ * Property editor for a java builtin "short" type.
+ *
+ */
 
-    KeyboardFocusManagerPeerImpl(KeyboardFocusManager manager) {
+import java.beans.*;
+
+public class ShortEditor extends NumberEditor {
+
+    public String getJavaInitializationString() {
+        Object value = getValue();
+        return (value != null)
+                ? "((short)" + value + ")"
+                : "null";
     }
 
-    public Window getCurrentFocusedWindow() {
-        return getNativeFocusedWindow();
-    }
-    
-    public void setCurrentFocusOwner(Component comp) {
+    public void setAsText(String text) throws IllegalArgumentException {
+        setValue((text == null) ? null : Short.decode(text));
     }
 
-    public Component getCurrentFocusOwner() {
-        return getNativeFocusOwner();
-    }    
-    public void clearGlobalFocusOwner(Window activeWindow) {
-        clearNativeGlobalFocusOwner(activeWindow);
-    }
-
-    public static void removeLastFocusRequest(Component heavyweight) {
-        AWTAccessor.getKeyboardFocusManagerAccessor().removeLastFocusRequest(heavyweight);
-    }
 }

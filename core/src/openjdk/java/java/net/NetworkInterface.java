@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2000, 2010, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000, 2011, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -527,13 +527,8 @@ public final class NetworkInterface {
         if (displayName != null) {
             result += " (" + displayName + ")";
         }
-        result += " index: "+index+" addresses:\n";
-        for (Enumeration e = getInetAddresses(); e.hasMoreElements(); ) {
-            InetAddress addr = (InetAddress)e.nextElement();
-            result += addr+";\n";
-        }
         return result;
     }
-    private static native void init();
 
+    private static native void init();
 }

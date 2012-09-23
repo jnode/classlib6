@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1995, 2007, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1995, 2011, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -798,10 +798,25 @@ public abstract class Component implements ImageObserver, MenuContainer,
     
     static {
         AWTAccessor.setComponentAccessor(new AWTAccessor.ComponentAccessor() {
+                public AppContext getAppContext(Component comp) {
+                    return comp.appContext;
+                }
+
+                public void setAppContext(Component comp, AppContext appContext) {
+                    comp.appContext = appContext;
+                }
+
                 public AccessControlContext getAccessControlContext(Component comp) {
                     return comp.getAccessControlContext();
                 }
 
+                public boolean requestFocusInWindow(Component comp, CausedFocusEvent.Cause cause) {
+                    return comp.requestFocusInWindow(cause);
+                }
+
+                public void requestFocus(Component comp, CausedFocusEvent.Cause cause) {
+                    comp.requestFocus(cause);
+                }
             });
     }
 

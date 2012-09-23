@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1996, 2007, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1996, 2011, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -42,9 +42,9 @@ import sun.awt.AppContext;
 import sun.awt.AWTAutoShutdown;
 import sun.awt.PeerEvent;
 import sun.awt.SunToolkit;
+import sun.awt.AWTAccessor;
 
 import java.security.AccessControlContext;
-import java.security.ProtectionDomain;
 
 import sun.misc.SharedSecrets;
 import sun.misc.JavaSecurityAccess;
@@ -158,6 +158,26 @@ public class EventQueue {
     private final String name = "AWT-EventQueue-" + nextThreadNum();
 
     private static final Logger eventLog = Logger.getLogger("java.awt.event.EventQueue");
+
+    static {
+        AWTAccessor.setEventQueueAccessor(
+            new AWTAccessor.EventQueueAccessor() {
+                public boolean noEvents(EventQueue eventQueue) {
+                    return eventQueue.noEvents();
+                }
+                public Thread getDispatchThread(EventQueue eventQueue) {
+                    return eventQueue.dispatchThread;
+                }
+                public EventQueue getNextQueue(EventQueue eventQueue) {
+                    return eventQueue.nextQueue;
+                }
+                public void removeSourceEvents(EventQueue eventQueue,
+                                               Object source,
+                                               boolean removeAllEvents) {
+                    eventQueue.removeSourceEvents(source, removeAllEvents);
+                }
+            });
+    }
 
     public EventQueue() {
         for (int i = 0; i < NUM_PRIORITIES; i++) {
@@ -609,6 +629,41 @@ public class EventQueue {
             // This could become the sole method of dispatching in time.
             setCurrentEventAndMostRecentTimeImpl(event);
 
+            ((ActiveEvent)event).dispatch();
+        } else if (src instanceof Component) {
+            ((Component)src).dispatchEvent(event);
+            event.dispatched();
+        } else if (src instanceof MenuComponent) {
+            ((MenuComponent)src).dispatchEvent(event);
+        } else if (src instanceof TrayIcon) {
+            ((TrayIcon)src).dispatchEvent(event);
+        } else if (src instanceof AWTAutoShutdown) {
+            if (noEvents()) {
+                dispatchThread.stopDispatching();
+            }
+        } else {
+            System.err.println("unable to dispatch event: " + event);
+        }
+    }
+
+    private static AccessControlContext getAccessControlContextFrom(Object src) {
+        return src instanceof Component ?
+            ((Component)src).getAccessControlContext() :
+            src instanceof MenuComponent ?
+                ((MenuComponent)src).getAccessControlContext() :
+                src instanceof TrayIcon ?
+                    ((TrayIcon)src).getAccessControlContext() :
+                    null;
+    }
+
+    /**
+     * Called from dispatchEvent() under a correct AccessControlContext  
+     */
+    private void dispatchEventImpl(final AWTEvent event, final Object src) {
+        event.isPosted = true;
+        if (event instanceof ActiveEvent) {
+            // This could become the sole method of dispatching in time.
+            setCurrentEventAndMostRecentTimeImpl(event);
             ((ActiveEvent)event).dispatch();
         } else if (src instanceof Component) {
             ((Component)src).dispatchEvent(event);
