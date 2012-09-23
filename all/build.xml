@@ -211,13 +211,7 @@
         <copy file="${root.dir}/all/build/classlib-src.jar" tofile="${main.jnode.dir}/all/lib/classlib-src.jar" overwrite="yes"/>
     </target>
 
-    <target name="ftp-properties">
-        <property name="ftp.server" value="codemammoth.com"/>
-        <property name="ftp.dir" value="classlib"/>
-        <property name="download.url" value="http://codemammoth.com/jnodeftp"/>
-    </target>
-
-    <target name="upload" depends="prepare,ftp-properties" description="upload the classlib binaries to the FTP server">
+    <target name="upload" depends="prepare" description="upload the classlib binaries to the FTP server">
         <fail message="main.jnode.dir not set in jnode.properties">
             <condition><not><isset property="main.jnode.dir"/></not></condition>
         </fail>
@@ -225,7 +219,7 @@
             <condition><not><isset property="ftp.user"/></not></condition>
         </fail>
         <fail message="ftp.pass not set in jnode.properties">
-            <condition><not><isset property="ftp.pass"/></not></condition>
+            <condition><not><isset property="ftp.password"/></not></condition>
         </fail>
         <!-- compute checksum for uploadables -->
         <checksum algorithm="MD5" property="classlib.md5">
@@ -250,13 +244,15 @@ to.keep=${current}
         <ftp action="mkdir"
             server="${ftp.server}"
             userid="${ftp.user}"
-            password="${ftp.pass}"
+            password="${ftp.password}"
+            passive="${ftp.passive}"
             remotedir="${ftp.dir}/${current}"
             verbose="yes"/>
         <!-- upload files -->
         <ftp server="${ftp.server}"
             userid="${ftp.user}"
-            password="${ftp.pass}"
+            password="${ftp.password}"
+            passive="${ftp.passive}"
             remotedir="${ftp.dir}/${current}"
             verbose="yes">
             <fileset dir="${root.dir}/all/build/" includes="classlib.pack.gz,classlib-src.jar.bz2"/>
@@ -264,7 +260,8 @@ to.keep=${current}
         <!-- upload ftp.properties -->
         <ftp server="${ftp.server}"
             userid="${ftp.user}"
-            password="${ftp.pass}"
+            password="${ftp.password}"
+            passive="${ftp.passive}"
             remotedir="${ftp.dir}">
             <fileset dir="${root.dir}/all/build/" includes="ftp.properties"/>
         </ftp>
@@ -272,7 +269,8 @@ to.keep=${current}
         <ftp action="del"
             server="${ftp.server}"
             userid="${ftp.user}"
-            password="${ftp.pass}"
+            password="${ftp.password}"
+            passive="${ftp.passive}"
             remotedir="${ftp.dir}"
             verbose="yes">
             <fileset>
@@ -283,7 +281,8 @@ to.keep=${current}
         <ftp action="rmdir"
             server="${ftp.server}"
             userid="${ftp.user}"
-            password="${ftp.pass}"
+            password="${ftp.password}"
+            passive="${ftp.passive}"
             remotedir="${ftp.dir}"
             verbose="yes">
             <fileset>
@@ -304,12 +303,13 @@ classlib-src.md5=${classlib-src.md5}</echo>
 
     <target name="all" depends="clean,classlib-pack,classlib-src-bz,upload" description="clean build and upload"/>
 
-    <target name="ftp-init" depends="prepare,ftp-properties" description="initialize the FTP server">
+    <target name="ftp-init" depends="prepare" description="initialize the FTP server">
         <!-- create maid directory -->
         <ftp action="mkdir"
             server="${ftp.server}"
             userid="${ftp.user}"
-            password="${ftp.pass}"
+            password="${ftp.password}"
+            passive="${ftp.passive}"
             remotedir="${ftp.dir}"
             verbose="yes"/>
         <!-- create ftp.properties -->
@@ -317,7 +317,8 @@ classlib-src.md5=${classlib-src.md5}</echo>
         <!-- upload ftp.properties -->
         <ftp server="${ftp.server}"
             userid="${ftp.user}"
-            password="${ftp.pass}"
+            password="${ftp.password}"
+            passive="${ftp.passive}"
             remotedir="${ftp.dir}">
             <fileset dir="${root.dir}/all/build/" includes="ftp.properties"/>
         </ftp>

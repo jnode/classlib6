@@ -113,5 +113,9 @@ jnode.user.home=/jnode/home
 # Set these properties for uploading classlib binaries
 # -----------------------------------------------
 # main.jnode.dir=${root.dir}/../jnode
+# ftp.server=
 # ftp.user=
-# ftp.pass=
+# ftp.password=
+# ftp.passive=
+# ftp.dir=
+# download.url=
