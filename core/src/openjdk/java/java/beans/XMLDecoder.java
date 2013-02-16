@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2000, 2005, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2000, 2012, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -31,6 +31,10 @@ import java.io.IOException;
 
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
+
+import java.security.AccessControlContext;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 import org.xml.sax.SAXException;
 
@@ -66,6 +70,7 @@ import javax.xml.parsers.SAXParser;
  * @author Philip Milne
  */
 public class XMLDecoder { 
+    private final AccessControlContext acc = AccessController.getContext();
     private InputStream in; 
     private Object owner; 
     private ExceptionListener exceptionListener; 
@@ -248,10 +253,15 @@ public class XMLDecoder {
      */
     private ObjectHandler getHandler() {
         if ( handler == null ) {
+            if ((this.acc == null) && (null != System.getSecurityManager())) {
+                throw new SecurityException("AccessControlContext is not set");
+            }
+            handler = AccessController.doPrivileged(new PrivilegedAction<ObjectHandler>() {
+                public ObjectHandler run() {
+                    ObjectHandler handler = new ObjectHandler(XMLDecoder.this, getClassLoader());
             SAXParserFactory factory = SAXParserFactory.newInstance();
             try {
                 SAXParser parser = factory.newSAXParser();
-                handler = new ObjectHandler( this, getClassLoader() );
                 parser.parse( in, handler );
             }
             catch ( ParserConfigurationException e ) {
@@ -267,6 +277,9 @@ public class XMLDecoder {
             catch ( IOException ioe ) {
                 getExceptionListener().exceptionThrown( ioe );
             }
+                    return handler;
+                }
+            }, this.acc);
         }
         return handler;
     }

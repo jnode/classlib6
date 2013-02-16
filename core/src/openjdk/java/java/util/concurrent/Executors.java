@@ -530,18 +530,17 @@ public class Executors {
                 return AccessController.doPrivileged(
                     new PrivilegedExceptionAction<T>() {
                         public T run() throws Exception {
-                        ClassLoader savedcl = null;
                         Thread t = Thread.currentThread();
-                        try {
                             ClassLoader cl = t.getContextClassLoader();
-                            if (ccl != cl) {
+                            if (ccl == cl) {
+                                return task.call();
+                            } else {
                                 t.setContextClassLoader(ccl);
-                                savedcl = cl;
-                            }
+                                try {
                                 return task.call();
                         } finally {
-                            if (savedcl != null)
-                                t.setContextClassLoader(savedcl);
+                                    t.setContextClassLoader(cl);
+                                }
                         }
                     }
                 }, acc);
