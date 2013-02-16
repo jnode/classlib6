@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module relativePaths="true" type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" inherit-compiler-output="false">
+    <exclude-exploded />
     <output url="file://$USER_HOME$/ext/devel/classlib6/build/classes" />
     <exclude-output />
-    <exclude-exploded />
     <content url="file://$USER_HOME$/ext/devel/classlib6">
       <excludeFolder url="file://$USER_HOME$/ext/devel/classlib6/all" />
       <excludeFolder url="file://$USER_HOME$/ext/devel/classlib6/builder" />
