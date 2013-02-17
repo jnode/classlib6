@@ -115,13 +115,12 @@ public final
         return genericInfo; //return cached repository
     }
 
-    //jnode
     /**
      * Package-private constructor used by ReflectAccess to enable
      * instantiation of these objects in Java code from the java.lang
      * package via sun.reflect.LangReflectAccess.
      */
-    public Method(Class declaringClass,
+    Method(Class declaringClass,
            String name,
            Class[] parameterTypes,
            Class returnType,

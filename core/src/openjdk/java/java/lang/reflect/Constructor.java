@@ -111,13 +111,12 @@ public final
     // and potentially many Constructor objects pointing to it.)
     private Constructor<T>      root;
 
-    //jnode
     /**
      * Package-private constructor used by ReflectAccess to enable
      * instantiation of these objects in Java code from the java.lang
      * package via sun.reflect.LangReflectAccess.
      */
-    public Constructor(Class<T> declaringClass,
+    Constructor(Class<T> declaringClass,
                 Class[] parameterTypes,
                 Class[] checkedExceptions,
                 int modifiers,

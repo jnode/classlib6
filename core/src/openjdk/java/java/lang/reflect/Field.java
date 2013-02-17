@@ -106,13 +106,13 @@ class Field extends AccessibleObject implements Member {
         return genericInfo; //return cached repository
     }
 
-    //jnode
+
     /**
      * Package-private constructor used by ReflectAccess to enable
      * instantiation of these objects in Java code from the java.lang
      * package via sun.reflect.LangReflectAccess.
      */
-    public Field(Class declaringClass,
+    Field(Class declaringClass,
           String name,
           Class type,
           int modifiers,
