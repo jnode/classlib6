@@ -169,8 +169,8 @@
         <property name="classlib.pack" value="${root.dir}/all/build/classlib.pack.gz" />
         <delete file="${classlib.pack}"/>
         <echo message="packing..."/>
-        <exec executable="pack200">
-            <arg value="-J-Xmx256m"/>
+        <exec executable="pack200" failonerror="true" >
+            <arg value="-J-Xmx1024m"/>
             <arg file="${classlib.pack}"/>
             <arg file="${classlib.jar}"/>
         </exec>
