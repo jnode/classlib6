@@ -1165,24 +1165,67 @@ public class Thread implements Runnable
     //openjdk
     private static final StackTraceElement[] EMPTY_STACK_TRACE = new StackTraceElement[0];
     //openjdk
+    /**
+     * Returns an array of stack trace elements representing the stack dump
+     * of this thread.  This method will return a zero-length array if
+     * this thread has not started or has terminated.
+     * If the returned array is of non-zero length then the first element of
+     * the array represents the top of the stack, which is the most recent
+     * method invocation in the sequence.  The last element of the array
+     * represents the bottom of the stack, which is the least recent method
+     * invocation in the sequence.
+     *
+     * <p>If there is a security manager, and this thread is not
+     * the current thread, then the security manager's
+     * <tt>checkPermission</tt> method is called with a
+     * <tt>RuntimePermission("getStackTrace")</tt> permission
+     * to see if it's ok to get the stack trace.
+     *
+     * <p>Some virtual machines may, under some circumstances, omit one
+     * or more stack frames from the stack trace.  In the extreme case,
+     * a virtual machine that has no stack trace information concerning
+     * this thread is permitted to return a zero-length array from this
+     * method.
+     *
+     * @return an array of <tt>StackTraceElement</tt>,
+     * each represents one stack frame.
+     *
+     * @throws SecurityException
+     *        if a security manager exists and its
+     *        <tt>checkPermission</tt> method doesn't allow
+     *        getting the stack trace of thread.
+     * @see SecurityManager#checkPermission
+     * @see RuntimePermission
+     * @see Throwable#getStackTrace
+     *
+     * @since 1.5
+     */
     public StackTraceElement[] getStackTrace() {
         if (this != Thread.currentThread()) {
             // check for getStackTrace permission
             SecurityManager security = System.getSecurityManager();
             if (security != null) {
-                security.checkPermission(new RuntimePermission("getStackTrace"));
+                security.checkPermission(
+                    SecurityConstants.GET_STACK_TRACE_PERMISSION);
             }
+            // optimization so we do not call into the vm for threads that
+            // have not yet started or have terminated
             if (!isAlive()) {
                 return EMPTY_STACK_TRACE;
             }
-	        return getStackTrace0();
+            StackTraceElement[][] stackTraceArray = dumpThreads(new Thread[] {this});
+            StackTraceElement[] stackTrace = stackTraceArray[0];
+            // a thread that was alive during the previous isAlive call may have
+            // since terminated, therefore not having a stacktrace.
+            if (stackTrace == null) {
+                stackTrace = EMPTY_STACK_TRACE;
+            }
+            return stackTrace;
         } else {
-	        // Don't need JVM help for current thread
-	        return (new Exception()).getStackTrace();
-	    }
+            // Don't need JVM help for current thread
+            return (new Exception()).getStackTrace();
+        }
     }
-
-    private native StackTraceElement[] getStackTrace0();
 
     /**
    * <p>
@@ -1268,18 +1311,19 @@ public class Thread implements Runnable
   }
 
 
-      /**
-   * Returns the current state of the thread.  This
-   * is designed for monitoring thread behaviour, rather
-   * than for synchronization control.
-   *
-   * @return the current thread state.
-   */
-  public State getState()
-  {
-      //todo implement
-    throw new UnsupportedClassVersionError();
-  }
+    //openjdk
+    /**
+     * Returns the state of this thread.
+     * This method is designed for use in monitoring of the system state,
+     * not for synchronization control.
+     *
+     * @return this thread's state.
+     * @since 1.5
+     */
+    public State getState() {
+        // get current thread state
+        return sun.misc.VM.toThreadState(getThreadStatus());
+    }
 
     //jnode + openjdk
     static final ThreadGroup ROOT_GROUP;
@@ -1299,6 +1343,8 @@ public class Thread implements Runnable
         }
         ROOT_GROUP = g;
     }
+
+    private native int getThreadStatus(); //jnode (TODO replace this by a private int attribute like in openjdk)
 
     private static native void die0();
 
@@ -1372,14 +1418,10 @@ public class Thread implements Runnable
         return m;
     }
 
-    private static StackTraceElement[][] dumpThreads(Thread[] threads) {
-        //todo implement it
-        throw new UnsupportedOperationException();
-    }
-    private static Thread[] getThreads() {
-        //todo implement it
-        throw new UnsupportedOperationException();
-    }
+    //openjdk
+    private native static StackTraceElement[][] dumpThreads(Thread[] threads);
+    //openjdk
+    private native static Thread[] getThreads();
 
     /* Set the blocker field; invoked via sun.misc.SharedSecrets from java.nio code
      */
