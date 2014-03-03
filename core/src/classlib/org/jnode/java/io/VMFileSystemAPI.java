@@ -20,8 +20,8 @@
 
 package org.jnode.java.io;
 
-import java.io.IOException;
 import java.io.File;
+import java.io.IOException;
 import java.io.VMOpenMode;
 
 /**
@@ -153,4 +153,6 @@ public interface VMFileSystemAPI {
 	public long getFreeSpace(String normalizedPath) throws IOException;
 
 	public long getUsableSpace(String normalizedPath) throws IOException;
+
+    public int getOpenFileDescriptorCount();
 }
