@@ -68,7 +68,7 @@ public class AnnotateTask extends FileSetTask {
 
     private Properties annotations = new Properties();
 
-    protected void doExecute() throws BuildException {
+    protected int doExecute() throws BuildException {
         try {
             SimpleDateFormat format = new SimpleDateFormat(pattern);
             startTime = format.parse(buildStartTime).getTime();
@@ -76,16 +76,21 @@ public class AnnotateTask extends FileSetTask {
             throw new BuildException("invalid buildStartTime or pattern", e);
         }
 
+        int nbModifiedFiles = 0;
         try {
             if (readProperties()) {
                 for (String file : classesFiles) {
                     File classFile = new File(baseDir, file);
-                    processFile(classFile);
+                    boolean fileModified = processFile(classFile);
+                    if (fileModified) {
+                        nbModifiedFiles++;
+                    }
                 }
             }
         } catch (IOException ioe) {
             throw new BuildException(ioe);
         }
+        return nbModifiedFiles;
     }
 
     /**
@@ -201,14 +206,14 @@ public class AnnotateTask extends FileSetTask {
      * Actually process a class file (called from parent class).
      */
     @Override
-    protected void processFile(File classFile) throws IOException {
+    protected boolean processFile(File classFile) throws IOException {
         if (classFile.lastModified() < startTime) {
-            return;
+            return false;
         }
 
         String annotations = getAnnotations(classFile);
         if (annotations == null) {
-            return;
+            return false;
         }
 
         File tmpFile = new File(classFile.getParentFile(), classFile.getName() + ".tmp");
@@ -239,6 +244,7 @@ public class AnnotateTask extends FileSetTask {
                 throw new IOException("can't rename " + tmpFile.getAbsolutePath());
             }
         }
+        return classIsModified;
     }
 
     /**

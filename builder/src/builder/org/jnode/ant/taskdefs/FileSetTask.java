@@ -55,7 +55,12 @@ public abstract class FileSetTask extends Task {
 
     public final void execute() throws BuildException {
         try {
-            doExecute();
+            int nbModifiedFiles = doExecute();
+            if (nbModifiedFiles == 0) {
+                log("Files are already up to date");
+            } else {
+                log("%d files have been modified", nbModifiedFiles);
+            }
         } catch (BuildException be) {
             if (failOnError) {
                 throw be;
@@ -71,26 +76,37 @@ public abstract class FileSetTask extends Task {
         }
     }
 
-    protected void doExecute() throws BuildException {
+    protected int doExecute() throws BuildException {
         // default implementation : simply iterate on all files
-        processFiles();
+        return processFiles();
     }
 
-    protected final void processFiles() throws BuildException {
+    protected final int processFiles() throws BuildException {
         final Project project = getProject();
+        int nbModifiedFiles = 0;
         try {
             for (FileSet fs : fileSets) {
                 final String[] files = fs.getDirectoryScanner(project)
                     .getIncludedFiles();
                 final File projectDir = fs.getDir(project);
                 for (String fname : files) {
-                    processFile(new File(projectDir, fname));
+                    boolean modified = processFile(new File(projectDir, fname));
+                    if (modified) {
+                        nbModifiedFiles++;
+                    }
                 }
             }
         } catch (IOException e) {
             throw new BuildException(e);
         }
+        return nbModifiedFiles;
     }
 
-    protected abstract void processFile(File file) throws IOException;
+    /**
+     *
+     * @param file
+     * @return true is the file has been modified, false if it was already up to date.
+     * @throws IOException
+     */
+    protected abstract boolean processFile(File file) throws IOException;
 }

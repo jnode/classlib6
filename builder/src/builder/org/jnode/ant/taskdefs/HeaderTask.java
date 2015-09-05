@@ -70,13 +70,13 @@ public class HeaderTask extends FileSetTask {
         return line.trim().equals(hdrLine.trim());
     }
 
-    protected void doExecute() throws BuildException {
+    protected int doExecute() throws BuildException {
         if (headerFile == null) {
             throw new BuildException("HeaderFile must be set");
         }
         try {
             header = readFile(headerFile);
-            processFiles();
+            return processFiles();
         } catch (IOException ex) {
             throw new BuildException(ex);
         }
@@ -91,16 +91,19 @@ public class HeaderTask extends FileSetTask {
     }
 
     @Override
-    protected void processFile(File file) throws IOException {
+    protected boolean processFile(File file) throws IOException {
         final String[] inp = readFile(file);
+        boolean fileUpdated = false;
         if (!compareHeader(inp, header)) {
             if (update) {
                 log("Updating " + file);
                 writeUpdateFile(file, inp, header);
+                fileUpdated = true;
             } else {
                 log("Wrong header in " + file);
             }
         }
+        return fileUpdated;
     }
 
     private void writeUpdateFile(File file, String[] lines, String[] header) throws IOException {
