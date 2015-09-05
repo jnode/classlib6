@@ -386,37 +386,8 @@ clean             Remove all intermediate build results.
                 <pathelement location="${root.dir}/core/src/openjdk/org"/>
                 <pathelement location="${root.dir}/core/src/openjdk/sun"/>
                 <pathelement location="${root.dir}/core/src/openjdk/vm"/>
-                <pathelement location="${root.dir}/core/src/endorsed/nanoxml"/>
-                <pathelement location="${root.dir}/core/src/core"/>
-                <pathelement location="${root.dir}/core/src/vmmagic"/>
-                <pathelement location="${root.dir}/core/src/driver"/>
             </sourcepath>
-            <package name="org.jnode.driver"/>
-            <package name="org.jnode.naming"/>
-            <package name="org.jnode.plugin"/>
-            <package name="org.jnode.system"/>
             <bootclasspath refid="cp"/>
-        </jnode.javadoc>
-    </target>
-
-    <!-- Generate only the MMTk api javadoc files -->
-    <target name="javadoc-mmtk">
-        <jnode.javadoc destdir="${build.dir}/javadoc/mmtk">
-            <sourcepath>
-                <pathelement location="${root.dir}/core/src/vmmagic"/>
-                <pathelement location="${root.dir}/core/src/mmtk-vm"/>
-                <pathelement location="${root.dir}/core/src/core"/>
-                <pathelement location="${root.dir}/core/src/classpath/gnu"/>
-                <pathelement location="${root.dir}/core/src/classpath/ext"/>
-                <pathelement location="${root.dir}/core/src/classpath/vm"/>
-                <pathelement location="${root.dir}/core/src/openjdk/sun"/>
-                <pathelement location="${root.dir}/core/src/openjdk/vm"/>
-                <pathelement location="${root.dir}/core/src/endorsed/nanoxml"/>
-            </sourcepath>
-            <package name="org.mmtk.*"/>
-            <package name="org.jnode.vm.memmgr.mmtk.*"/>
-            <package name="org.vmmagic.*"/>
-            <classpath refid="cp"/>
         </jnode.javadoc>
     </target>
 
@@ -437,16 +408,7 @@ clean             Remove all intermediate build results.
                 <pathelement location="${root.dir}/core/src/openjdk/sun"/>
                 <pathelement location="${root.dir}/core/src/openjdk/svm"/>
                 <pathelement location="${root.dir}/core/src/openjdk/vm"/>
-                <pathelement location="${root.dir}/core/src/core"/>
-                <pathelement location="${root.dir}/core/src/driver"/>
-                <pathelement location="${root.dir}/core/src/mmtk-vm"/>
-                <pathelement location="${root.dir}/core/src/endorsed/nanoxml"/>
-                <pathelement location="${root.dir}/core/src/test"/>
-                <pathelement location="${root.dir}/core/src/vmmagic"/>
             </sourcepath>
-            <package name="org.jnode.*"/>
-            <package name="org.mmtk.*"/>
-            <package name="org.vmmagic.*"/>
             <bootclasspath refid="cp"/>
         </jnode.javadoc>
     </target>
