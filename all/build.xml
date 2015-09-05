@@ -451,6 +451,10 @@ clean             Remove all intermediate build results.
     </target>
 
     <target name="oj-compare" depends="assemble" description="compare the classlibrary with OpenJDK">
+            <fail message="main.openjdk.dir not set in jnode.properties">
+                <condition><not><isset property="main.openjdk.dir"/></not></condition>
+            </fail>
+
             <taskdef name="cp-compare" classname="org.jnode.ant.taskdefs.classpath.CompareTask" classpathref="cp-jnode"/>
 
             <patternset id="cp-includes-pattern">
@@ -521,23 +525,23 @@ clean             Remove all intermediate build results.
                        -->
                 </vmspecificsources>
                 <classpathsources>
-                    <fileset dir="${root.dir}/../openjdk/jdk/src/share/classes/">
+                    <fileset dir="${main.openjdk.dir}/jdk/src/share/classes/">
                         <patternset refid="cp-includes-pattern"/>
                         <patternset refid="cp-sources-pattern"/>
                     </fileset>
-                    <fileset dir="${root.dir}/../openjdk/corba/src/share/classes/">
+                    <fileset dir="${main.openjdk.dir}/corba/src/share/classes/">
                         <patternset refid="cp-includes-pattern"/>
                         <patternset refid="cp-sources-pattern"/>
                     </fileset>
-                    <fileset dir="${root.dir}/../openjdk/jaxp/src/">
+                    <!--fileset dir="${main.openjdk.dir}/jaxp/src/">
                         <patternset refid="cp-includes-pattern"/>
                         <patternset refid="cp-sources-pattern"/>
-                    </fileset>
-                    <fileset dir="${root.dir}/../openjdk/jaxws/src/">
+                    </fileset-->
+                    <!--fileset dir="${main.openjdk.dir}/jaxws/src/">
                         <patternset refid="cp-includes-pattern"/>
                         <patternset refid="cp-sources-pattern"/>
-                    </fileset>
-                    <fileset dir="${root.dir}/../openjdk/langtools/src/share/classes/">
+                    </fileset-->
+                    <fileset dir="${main.openjdk.dir}/langtools/src/share/classes/">
                         <patternset refid="cp-includes-pattern"/>
                         <patternset refid="cp-sources-pattern"/>
                     </fileset>

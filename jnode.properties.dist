@@ -3,6 +3,8 @@
 # Copy this file to jnode.properties and edit that file as needed.
 #
 
+# main.openjdk.dir=${root.dir}/../openjdk
+
 # -----------------------------------------------
 # Set these properties for uploading classlib binaries
 # -----------------------------------------------
