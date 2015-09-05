@@ -160,8 +160,14 @@
         <fail message="ftp.user not set in jnode.properties">
             <condition><not><isset property="ftp.user"/></not></condition>
         </fail>
-        <fail message="ftp.pass not set in jnode.properties">
+        <fail message="ftp.password not set in jnode.properties">
             <condition><not><isset property="ftp.password"/></not></condition>
+        </fail>
+        <fail message="download.url not set in jnode.properties">
+            <condition><not><isset property="download.url"/></not></condition>
+        </fail>
+        <fail message="ftp.dir not set in jnode.properties">
+            <condition><not><isset property="ftp.dir"/></not></condition>
         </fail>
         <!-- compute checksum for uploadables -->
         <checksum algorithm="MD5" property="classlib.md5">
