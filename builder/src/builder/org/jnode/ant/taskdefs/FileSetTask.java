@@ -59,7 +59,7 @@ public abstract class FileSetTask extends Task {
             if (nbModifiedFiles == 0) {
                 log("Files are already up to date");
             } else {
-                log("%d files have been modified", nbModifiedFiles);
+                log(String.format("%d files have been modified", nbModifiedFiles));
             }
         } catch (BuildException be) {
             if (failOnError) {
