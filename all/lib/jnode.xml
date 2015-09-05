@@ -49,14 +49,6 @@
     </sequential>
   </macrodef>
 
-  <!-- Copy descriptors to the descriptors directory -->
-  <presetdef name="jnode.copy-descriptors">
-    <copy todir="${descriptors.dir}">
-      <fileset dir="${basedir}/descriptors"/>
-      <filterset refid="descriptors-filter"/>
-    </copy>
-  </presetdef>
-
   <!-- Perform a default clean -->
   <presetdef name="jnode.clean">
     <delete dir="${my-build.dir}" quiet="true"/>

@@ -20,39 +20,17 @@
 
     <property name="root.dir" value="${basedir}/.."/>
     <property name="build.dir" value="${basedir}/build"/>
-    <property name="reports.dir" value="${build.dir}/reports"/>
-    <property name="cdroms.dir" value="${build.dir}/cdroms"/>
-    <property name="descriptors.dir" value="${build.dir}/descriptors"/>
-    <property name="plugins.dir" value="${build.dir}/plugins"/>
-    <property name="initjars.dir" value="${build.dir}/initjars"/>
-    <property name="save.dir" value="${basedir}/save"/>
     <property name="backup.dir" value="${build.dir}/backup"/>
 
-    <property name="jnode-builder.jar" value="${build.dir}/descriptors/jnode-builder.jar"/>
-    <property name="jnode-configure.jar" value="${build.dir}/descriptors/jnode-configure.jar"/>
+    <property name="jnode-builder.jar" value="${build.dir}/jnode-builder.jar"/>
     <property name="jnode-core.jar" value="${root.dir}/core/build/classes"/>
-    <property name="thinlet.jar" value="${root.dir}/gui/build/classes"/>
-    <property name="jnode-fonts.jar" value="${build.dir}/descriptors/jnode-fonts.jar"/>
-  	<property name="jnode-images.jar" value="${build.dir}/descriptors/jnode-images.jar"/>
-
-    <property name="jnode-mmtk-genrc.jar" value="${root.dir}/core/build/classes-plan/org.jnode.vm.memmgr.mmtk.genrc"/>
-	<property name="jnode-mmtk-ms.jar" value="${root.dir}/core/build/classes-plan/org.jnode.vm.memmgr.mmtk.ms"/>
-	<property name="jnode-mmtk-nogc.jar" value="${root.dir}/core/build/classes-plan/org.jnode.vm.memmgr.mmtk.nogc"/>
 
     <property name="ant.jar" value="${root.dir}/core/lib/ant.jar"/>
-    <property name="ant-launcher.jar" value="${root.dir}/core/lib/ant-launcher.jar"/>
     <property name="commons-net.jar" value="${root.dir}/core/lib/commons-net-1.1.0.jar"/>
-    <property name="junit.jar" value="${root.dir}/core/lib/junit-4.5.jar"/>
-    <property name="mmtk.jar" value="${root.dir}/core/lib/mmtk/mmtk.jar"/>
-	<property name="mauve.jar" value="${root.dir}/core/lib/mauve.jar"/>
-    <property name="ejc.jar" value="${root.dir}/core/lib/ejc-3.1.1.jar"/>
 
     <property name="sabre.jar" value="${root.dir}/builder/lib/sabre.jar" />
 
     <!-- libraries needed to run tests -->
-    <property name="jmock-cglib.jar" value="${root.dir}/core/lib/jmock-cglib-1.0.1.jar"/>
-    <property name="jmock.jar" value="${root.dir}/core/lib/jmock-1.0.1.jar"/>
-    <property name="cglib.jar" value="${root.dir}/core/lib/cglib-2.1.jar"/>
     <property name="asm.jar" value="${root.dir}/core/lib/asm-1.5.3.jar"/>
 	<property name="asm-attrs.jar" value="${root.dir}/core/lib/asm-attrs-1.5.3.jar"/>
 	<property name="asm-util.jar" value="${root.dir}/core/lib/asm-util-1.5.3.jar"/>
@@ -62,50 +40,24 @@
     <!-- libraries needed to check plugin dependencies -->
     <property name="bcel-5.1.jar" value="${root.dir}/builder/lib/bcel-5.1.jar" />	
 
-    <!-- libraries needed to check rules in source code -->
-    <property name="pmd.jar" value="${root.dir}/builder/lib/pmd/pmd-3.0.jar"/>
-    <property name="jaxen.jar" value="${root.dir}/builder/lib/pmd/jaxen-core-1.0-fcs.jar"/>
-    <property name="saxpath.jar" value="${root.dir}/builder/lib/pmd/saxpath-1.0-fcs.jar"/>
-    <property name="xerces.jar" value="${root.dir}/builder/lib/pmd/xercesImpl-2.6.2.jar"/>
-    <property name="xmlParserAPIs.jar" value="${root.dir}/builder/pmd/lib/xmlParserAPIs-2.6.2.jar"/>
-
-    <!-- lists of plugins to use while booting -->
-    <property name="default-plugin-list" value="${basedir}/conf/default-plugin-list.xml"/>
-    <property name="full-plugin-list" value="${basedir}/conf/full-plugin-list.xml"/>
-    <property name="install-plugin-list" value="${basedir}/conf/install-plugin-list.xml"/>
-    <property name="system-plugin-list" value="${basedir}/conf/system-plugin-list.xml"/>
-    <property name="sources.dist.tar.gz" value="${build.dir}/jnodesources-${jnode-ver}.tar.gz"/>
-
     <path id="cp">
-        <pathelement location="${mmtk.jar}"/>
         <pathelement location="${ant.jar}"/>
-        <pathelement location="${junit.jar}"/>
-        <pathelement location="${jmock.jar}"/>
-        <pathelement location="${jmock-cglib.jar}"/>
         <pathelement location="${asm.jar}"/>
     	<pathelement location="${asm-attrs.jar}"/>
     	<pathelement location="${asm-util.jar}"/>
-        <pathelement location="${cglib.jar}"/>
         <pathelement location="${log4j.jar}"/>
         <pathelement location="${basedir}/conf"/>
         <pathelement location="${commons-net.jar}"/>
-        <pathelement location="${mauve.jar}"/>
         <pathelement location="${sabre.jar}"/>
     </path>
 
     <path id="cp-jnode">
         <pathelement location="${jnode-builder.jar}"/>
         <pathelement location="${jnode-core.jar}"/>
-        <pathelement location="${thinlet.jar}"/>
 	    <pathelement location="${bcel-5.1.jar}"/>
         <path refid="cp"/>
     </path>
 
-
-    <filterset id="descriptors-filter">
-        <filter token="PROVIDER" value="JNode.org"/>
-        <filter token="VERSION" value="${jnode-ver}"/>
-    </filterset>
 
     <patternset id="exts">
         <include name="**/*.dat"/>
@@ -126,11 +78,7 @@
         <!-- Initialize all project directories -->
         <property file="${root.dir}/jnode.properties"/>
         <!-- Set overwritable properties -->
-        <property name="jnode.memmgr.plugin.id" value="org.jnode.vm.memmgr.def"/>
         <property name="compilerarg" value="-nowarn"/>
-
-        <!-- Derive properties -->
-    	<property name="jnode-mmtk.jar" value="${root.dir}/core/build/classes-plan/${jnode.memmgr.plugin.id}"/>
 
     	<!-- Initialize timestamp -->
         <tstamp/>
@@ -147,12 +95,6 @@
     	
         <!-- Create basic build directories -->
         <mkdir dir="${build.dir}"/>
-        <mkdir dir="${reports.dir}"/>
-        <mkdir dir="${save.dir}"/>
-        <mkdir dir="${cdroms.dir}"/>
-        <mkdir dir="${descriptors.dir}"/>
-        <mkdir dir="${plugins.dir}"/>
-        <mkdir dir="${initjars.dir}"/>
     </target>
 
     <target name="classlib" depends="prepare" description="compile and create the classlib JAR file">
@@ -299,12 +241,10 @@ classlib-src.md5=${classlib-src.md5}</echo>
 
     <target name="quick-deploy" depends="classlib,classlib-src,copy" description="build and copy"/>
 
-    <target name="quickdeploy" depends="quick-deploy" description="build and copy"/>
-
     <target name="all" depends="clean,classlib-pack,classlib-src-bz,upload" description="clean build and upload"/>
 
     <target name="ftp-init" depends="prepare" description="initialize the FTP server">
-        <!-- create maid directory -->
+        <!-- create main directory -->
         <ftp action="mkdir"
             server="${ftp.server}"
             userid="${ftp.user}"
@@ -503,43 +443,11 @@ clean             Remove all intermediate build results.
     </target>
 
     <target name="header-fix" depends="assemble">
-        <!-- todo clean up the excludes -->
         <taskdef name="header" classname="org.jnode.ant.taskdefs.HeaderTask" classpathref="cp-jnode"/>
 
         <header update="on" headerFile="${root.dir}/all/template/header.txt">
             <fileset dir="${root.dir}/builder/src/builder" includes="**/*.java"/>
-            <fileset dir="${root.dir}/core/src/classpath/ext" includes="**/*.java"/>
-            <fileset dir="${root.dir}/core/src/classpath/vm" includes="**/*.java"
-                    excludes="gnu/classpath/jdwp/VMFrame.java,
-                               gnu/classpath/jdwp/VMIdManager.java,
-                               gnu/classpath/jdwp/VMMethod.java,
-                               gnu/classpath/jdwp/VMVirtualMachine.java,
-                               gnu/classpath/VMStackWalker.java,
-                               gnu/java/lang/VMInstrumentationImpl.java,
-                               gnu/java/nio/VMChannel.java,
-                               java/lang/Thread.java,
-                               java/lang/VMProcess.java,
-                               java/lang/VMSystem.java"/>
-            <fileset dir="${root.dir}/core/src/openjdk/vm" includes="**/*.java" excludes="java/lang/NativeStrictMath.java"/>
-            <fileset dir="${root.dir}/core/src/core" includes="**/*.java" excludes="org/jnode/imageio/jpeg/JPEGDecoder"/>
-            <fileset dir="${root.dir}/core/src/mmtk-vm" includes="**/*.java" excludes="org/mmtk/vm/**/*.java"/>
-            <fileset dir="${root.dir}/core/src/driver" includes="**/*.java"/>
-            <fileset dir="${root.dir}/core/src/test" includes="**/*.java" excludes="org/jnode/test/mauve/**/*.java,org/jtestserver/**/*.java"/>
         </header>
-    </target>
-
-    <target name="check-debugger-properties" depends="prepare">
-        <fail message="Please set jnode.debugger.host property in jnode.properties." unless="jnode.debugger.host"/>
-        <fail message="Please set jnode.debugger.port property in jnode.properties." unless="jnode.debugger.port"/>        
-    </target>
-
-    <target name="hotswap" depends="check-debugger-properties,assemble-projects" description="hotswap the modified classes">
-      <taskdef name="hotswap" classname="org.jnode.ant.taskdefs.Hotswap" classpathref="cp-jnode" />
-      <hotswap verbose="true" host="${jnode.debugger.host}" port="${jnode.debugger.port}">
-        <fileset dir="../core/build/classes/" includes="**/*.class">
-          <date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
-        </fileset>
-      </hotswap>
     </target>
 
     <target name="oj-compare" depends="assemble" description="compare the classlibrary with OpenJDK">

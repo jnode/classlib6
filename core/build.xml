@@ -3,19 +3,13 @@
   <typedef file="${basedir}/../all/lib/jnode.xml"/>
 		
   <property name="my-build.dir" value="${basedir}/build"/>
-  <property name="my-gen.dir" value="${my-build.dir}/gen"/>
-  <property name="my-gen-plan.dir" value="${my-build.dir}/gen-plan"/>
   <property name="my-classes.dir" value="${my-build.dir}/classes"/>
-  <property name="my-classes-plan.dir" value="${my-build.dir}/classes-plan"/>
   <property name="my-src.dir" value="${basedir}/src"/>
   <property name="my-non-resources" value="**/*.java,**/package.html"/>
 	
   <!-- Subproject specific classpath -->
   <path id="my-cp">
     <path refid="cp"/>
-    <pathelement location="${junit.jar}"/>
-  	<pathelement location="${mmtk.jar}"/>
-  	<pathelement location="${mauve.jar}"/>
   </path>
 
   <!-- the sources that we have to compile -->
@@ -43,25 +37,9 @@
     <pathelement location="${my-src.dir}/openjdk/langtools"/>
   </path>
 
-  <macrodef name="ExpandTest">
-    <attribute name="classname"/>
-    <attribute name="type"/>
-    <attribute name="template" default="${my-src.dir}/test/org/jnode/test/PrimitiveTest.jtemplate"/>
-    <sequential>
-      <copy tofile="${my-gen.dir}/org/jnode/test/@{classname}.java" file="@{template}">
-        <filterset>
-          <filter token="classname" value="@{classname}"/>
-          <filter token="type" value="@{type}"/>
-        </filterset>
-      </copy>
-    </sequential>
-  </macrodef>
-
   <!-- Initialize all subproject directories -->
   <target name="prepare">
     <mkdir dir="${my-classes.dir}"/>
-    <mkdir dir="${my-gen.dir}"/>
-  	<jnode.copy-descriptors/>
 
   	<copy todir="${my-classes.dir}">
       <fileset dir="${my-src.dir}/classpath/gnu" includes="**/*.properties"/>
