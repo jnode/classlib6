@@ -3,7 +3,11 @@
 # Copy this file to jnode.properties and edit that file as needed.
 #
 
+# Path to OpenJDK sources (see http://download.java.net/openjdk/jdk6/)
 # main.openjdk.dir=${root.dir}/../openjdk
+
+# Path to GNU Classpath sources (see http://www.gnu.org/software/classpath/downloads/downloads.html)
+# main.classpath.dir=${root.dir}/../classpath
 
 # -----------------------------------------------
 # Set these properties for uploading classlib binaries
