@@ -24,8 +24,6 @@
     <property name="ant.jar" value="${root.dir}/core/lib/ant.jar"/>
     <property name="commons-net.jar" value="${root.dir}/core/lib/commons-net-1.1.0.jar"/>
 
-    <property name="sabre.jar" value="${root.dir}/builder/lib/sabre.jar" />
-
     <!-- libraries needed to run tests -->
     <property name="asm.jar" value="${root.dir}/core/lib/asm-1.5.3.jar"/>
 	<property name="asm-attrs.jar" value="${root.dir}/core/lib/asm-attrs-1.5.3.jar"/>
@@ -44,7 +42,6 @@
         <pathelement location="${log4j.jar}"/>
         <pathelement location="${basedir}/conf"/>
         <pathelement location="${commons-net.jar}"/>
-        <pathelement location="${sabre.jar}"/>
     </path>
 
     <path id="cp-jnode">
