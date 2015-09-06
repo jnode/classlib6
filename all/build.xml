@@ -10,9 +10,6 @@
     <!-- Include antlib -->
     <typedef file="${basedir}/lib/jnode.xml"/>
 
-    <!-- JNode version -->
-    <property name="jnode-ver" value="0.2.9-dev"/>
-
     <!-- Java target and source version -->
     <property name="java.target" value="1.6"/>
     <property name="java.source" value="1.6"/>
@@ -20,7 +17,6 @@
 
     <property name="root.dir" value="${basedir}/.."/>
     <property name="build.dir" value="${basedir}/build"/>
-    <property name="backup.dir" value="${build.dir}/backup"/>
 
     <property name="jnode-builder.jar" value="${build.dir}/jnode-builder.jar"/>
     <property name="jnode-core.jar" value="${root.dir}/core/build/classes"/>
