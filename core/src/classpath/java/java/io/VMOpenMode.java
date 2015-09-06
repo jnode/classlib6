@@ -20,8 +20,6 @@
 
 package java.io;
 
-import org.apache.log4j.Logger;
-
 import gnu.java.nio.channels.FileChannelImpl;
 
 /**
@@ -36,8 +34,6 @@ public enum VMOpenMode {
 	/** Open for reading and writing, file is created if file does not exist */
 	READ_WRITE("rw", true, true);
 
-    private static final Logger log = Logger.getLogger(VMOpenMode.class);
-        
 	private final String mode;
 	private final boolean read;	
 	private final boolean write;	

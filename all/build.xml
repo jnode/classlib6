@@ -29,8 +29,6 @@
 	<property name="asm-attrs.jar" value="${root.dir}/core/lib/asm-attrs-1.5.3.jar"/>
 	<property name="asm-util.jar" value="${root.dir}/core/lib/asm-util-1.5.3.jar"/>
 	
-    <property name="log4j.jar" value="${root.dir}/core/lib/log4j-1.2.8.jar"/>
-
     <!-- libraries needed to check plugin dependencies -->
     <property name="bcel-5.1.jar" value="${root.dir}/builder/lib/bcel-5.1.jar" />	
 
@@ -39,7 +37,6 @@
         <pathelement location="${asm.jar}"/>
     	<pathelement location="${asm-attrs.jar}"/>
     	<pathelement location="${asm-util.jar}"/>
-        <pathelement location="${log4j.jar}"/>
         <pathelement location="${basedir}/conf"/>
         <pathelement location="${commons-net.jar}"/>
     </path>
