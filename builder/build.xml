@@ -9,7 +9,6 @@
 <!-- Subproject specific classpath -->
   <path id="my-cp">
     <pathelement location="${jnode-core.jar}"/>
-    <pathelement location="${basedir}/lib/xml-apis.jar"/>
     <pathelement location="${bcel-5.1.jar}"/>
     <path refid="cp"/>
   </path>
