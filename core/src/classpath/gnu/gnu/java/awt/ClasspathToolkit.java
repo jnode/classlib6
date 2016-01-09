@@ -57,6 +57,7 @@ import java.security.AccessController;
 import java.util.Map;
 
 import javax.imageio.spi.IIORegistry;
+import org.jnode.annotation.PrivilegedActionPragma;
 
 /**
  * An abstract superclass for Classpath toolkits.
@@ -115,6 +116,7 @@ public abstract class ClasspathToolkit
    * which implement {@link java.awt.font.OpenType} or
    * {@link java.awt.font.MultipleMaster}.
    */
+  @PrivilegedActionPragma
   public Font getFont (String name, Map attrs) 
   {
     Font f = null;
