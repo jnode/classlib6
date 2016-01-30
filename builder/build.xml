@@ -3,21 +3,13 @@
   <typedef file="${basedir}/../all/lib/jnode.xml"/>
 	
   <property name="my-build.dir"   value="${basedir}/build"/>
-  <property name="my-gen.dir"   value="${basedir}/build/src"/>
   <property name="my-classes.dir" value="${my-build.dir}/classes"/>
   <property name="my-src.dir"     value="${basedir}/src"/>
-  <property name="javacc.dir"     value="${basedir}/lib" />
-  <property name="jnasm-src.dir"  value="${my-src.dir}/builder/org/jnode/jnasm"/>
-  <property name="jnasm-preprocessor-gen.dir"  value="${my-gen.dir}/org/jnode/jnasm/preprocessor/gen"/>
-  <property name="jnasm-assembler-gen.dir"  value="${my-gen.dir}/org/jnode/jnasm/assembler/gen"/>
 
 <!-- Subproject specific classpath -->
   <path id="my-cp">
     <pathelement location="${jnode-core.jar}"/>
-    <pathelement location="${jnode-fs.jar}"/>
-    <pathelement location="${basedir}/lib/xml-apis.jar"/>
     <pathelement location="${bcel-5.1.jar}"/>
-    <pathelement location="${nanoxml-java.jar}"/>
     <path refid="cp"/>
   </path>
 
@@ -55,7 +47,6 @@
   <target name="compile" depends="prepare">
     <jnode.compile>
       <src path="${my-src.dir}/builder"/>
-      <!--src path="${my-gen.dir}"/-->
       <classpath refid="my-cp"/>
     </jnode.compile>
   </target>
@@ -63,11 +54,7 @@
 <!-- Assemble the jarfiles -->
   <target name="assemble" depends="compile">
     <jar jarfile="${jnode-builder.jar}"
-        basedir="${my-classes.dir}"
-        excludes="org/jnode/configure/**"/>
-    <jar jarfile="${jnode-configure.jar}"
-        basedir="${my-classes.dir}"
-        includes="org/jnode/configure/**"/>
+        basedir="${my-classes.dir}"/>
   </target>
 
 <!-- Do it all -->

@@ -10,9 +10,6 @@
     <!-- Include antlib -->
     <typedef file="${basedir}/lib/jnode.xml"/>
 
-    <!-- JNode version -->
-    <property name="jnode-ver" value="0.2.9-dev"/>
-
     <!-- Java target and source version -->
     <property name="java.target" value="1.6"/>
     <property name="java.source" value="1.6"/>
@@ -20,92 +17,37 @@
 
     <property name="root.dir" value="${basedir}/.."/>
     <property name="build.dir" value="${basedir}/build"/>
-    <property name="reports.dir" value="${build.dir}/reports"/>
-    <property name="cdroms.dir" value="${build.dir}/cdroms"/>
-    <property name="descriptors.dir" value="${build.dir}/descriptors"/>
-    <property name="plugins.dir" value="${build.dir}/plugins"/>
-    <property name="initjars.dir" value="${build.dir}/initjars"/>
-    <property name="save.dir" value="${basedir}/save"/>
-    <property name="backup.dir" value="${build.dir}/backup"/>
 
-    <property name="jnode-builder.jar" value="${build.dir}/descriptors/jnode-builder.jar"/>
-    <property name="jnode-configure.jar" value="${build.dir}/descriptors/jnode-configure.jar"/>
+    <property name="jnode-builder.jar" value="${build.dir}/jnode-builder.jar"/>
     <property name="jnode-core.jar" value="${root.dir}/core/build/classes"/>
-    <property name="thinlet.jar" value="${root.dir}/gui/build/classes"/>
-    <property name="jnode-fonts.jar" value="${build.dir}/descriptors/jnode-fonts.jar"/>
-  	<property name="jnode-images.jar" value="${build.dir}/descriptors/jnode-images.jar"/>
-
-    <property name="jnode-mmtk-genrc.jar" value="${root.dir}/core/build/classes-plan/org.jnode.vm.memmgr.mmtk.genrc"/>
-	<property name="jnode-mmtk-ms.jar" value="${root.dir}/core/build/classes-plan/org.jnode.vm.memmgr.mmtk.ms"/>
-	<property name="jnode-mmtk-nogc.jar" value="${root.dir}/core/build/classes-plan/org.jnode.vm.memmgr.mmtk.nogc"/>
 
     <property name="ant.jar" value="${root.dir}/core/lib/ant.jar"/>
-    <property name="ant-launcher.jar" value="${root.dir}/core/lib/ant-launcher.jar"/>
     <property name="commons-net.jar" value="${root.dir}/core/lib/commons-net-1.1.0.jar"/>
-    <property name="junit.jar" value="${root.dir}/core/lib/junit-4.5.jar"/>
-    <property name="mmtk.jar" value="${root.dir}/core/lib/mmtk/mmtk.jar"/>
-	<property name="mauve.jar" value="${root.dir}/core/lib/mauve.jar"/>
-    <property name="ejc.jar" value="${root.dir}/core/lib/ejc-3.1.1.jar"/>
-
-    <property name="sabre.jar" value="${root.dir}/builder/lib/sabre.jar" />
 
     <!-- libraries needed to run tests -->
-    <property name="jmock-cglib.jar" value="${root.dir}/core/lib/jmock-cglib-1.0.1.jar"/>
-    <property name="jmock.jar" value="${root.dir}/core/lib/jmock-1.0.1.jar"/>
-    <property name="cglib.jar" value="${root.dir}/core/lib/cglib-2.1.jar"/>
     <property name="asm.jar" value="${root.dir}/core/lib/asm-1.5.3.jar"/>
 	<property name="asm-attrs.jar" value="${root.dir}/core/lib/asm-attrs-1.5.3.jar"/>
 	<property name="asm-util.jar" value="${root.dir}/core/lib/asm-util-1.5.3.jar"/>
 	
-    <property name="log4j.jar" value="${root.dir}/core/lib/log4j-1.2.8.jar"/>
-
     <!-- libraries needed to check plugin dependencies -->
     <property name="bcel-5.1.jar" value="${root.dir}/builder/lib/bcel-5.1.jar" />	
 
-    <!-- libraries needed to check rules in source code -->
-    <property name="pmd.jar" value="${root.dir}/builder/lib/pmd/pmd-3.0.jar"/>
-    <property name="jaxen.jar" value="${root.dir}/builder/lib/pmd/jaxen-core-1.0-fcs.jar"/>
-    <property name="saxpath.jar" value="${root.dir}/builder/lib/pmd/saxpath-1.0-fcs.jar"/>
-    <property name="xerces.jar" value="${root.dir}/builder/lib/pmd/xercesImpl-2.6.2.jar"/>
-    <property name="xmlParserAPIs.jar" value="${root.dir}/builder/pmd/lib/xmlParserAPIs-2.6.2.jar"/>
-
-    <!-- lists of plugins to use while booting -->
-    <property name="default-plugin-list" value="${basedir}/conf/default-plugin-list.xml"/>
-    <property name="full-plugin-list" value="${basedir}/conf/full-plugin-list.xml"/>
-    <property name="install-plugin-list" value="${basedir}/conf/install-plugin-list.xml"/>
-    <property name="system-plugin-list" value="${basedir}/conf/system-plugin-list.xml"/>
-    <property name="sources.dist.tar.gz" value="${build.dir}/jnodesources-${jnode-ver}.tar.gz"/>
-
     <path id="cp">
-        <pathelement location="${mmtk.jar}"/>
         <pathelement location="${ant.jar}"/>
-        <pathelement location="${junit.jar}"/>
-        <pathelement location="${jmock.jar}"/>
-        <pathelement location="${jmock-cglib.jar}"/>
         <pathelement location="${asm.jar}"/>
     	<pathelement location="${asm-attrs.jar}"/>
     	<pathelement location="${asm-util.jar}"/>
-        <pathelement location="${cglib.jar}"/>
-        <pathelement location="${log4j.jar}"/>
         <pathelement location="${basedir}/conf"/>
         <pathelement location="${commons-net.jar}"/>
-        <pathelement location="${mauve.jar}"/>
-        <pathelement location="${sabre.jar}"/>
     </path>
 
     <path id="cp-jnode">
         <pathelement location="${jnode-builder.jar}"/>
         <pathelement location="${jnode-core.jar}"/>
-        <pathelement location="${thinlet.jar}"/>
 	    <pathelement location="${bcel-5.1.jar}"/>
         <path refid="cp"/>
     </path>
 
-
-    <filterset id="descriptors-filter">
-        <filter token="PROVIDER" value="JNode.org"/>
-        <filter token="VERSION" value="${jnode-ver}"/>
-    </filterset>
 
     <patternset id="exts">
         <include name="**/*.dat"/>
@@ -126,11 +68,7 @@
         <!-- Initialize all project directories -->
         <property file="${root.dir}/jnode.properties"/>
         <!-- Set overwritable properties -->
-        <property name="jnode.memmgr.plugin.id" value="org.jnode.vm.memmgr.def"/>
         <property name="compilerarg" value="-nowarn"/>
-
-        <!-- Derive properties -->
-    	<property name="jnode-mmtk.jar" value="${root.dir}/core/build/classes-plan/${jnode.memmgr.plugin.id}"/>
 
     	<!-- Initialize timestamp -->
         <tstamp/>
@@ -147,12 +85,6 @@
     	
         <!-- Create basic build directories -->
         <mkdir dir="${build.dir}"/>
-        <mkdir dir="${reports.dir}"/>
-        <mkdir dir="${save.dir}"/>
-        <mkdir dir="${cdroms.dir}"/>
-        <mkdir dir="${descriptors.dir}"/>
-        <mkdir dir="${plugins.dir}"/>
-        <mkdir dir="${initjars.dir}"/>
     </target>
 
     <target name="classlib" depends="prepare" description="compile and create the classlib JAR file">
@@ -218,8 +150,14 @@
         <fail message="ftp.user not set in jnode.properties">
             <condition><not><isset property="ftp.user"/></not></condition>
         </fail>
-        <fail message="ftp.pass not set in jnode.properties">
+        <fail message="ftp.password not set in jnode.properties">
             <condition><not><isset property="ftp.password"/></not></condition>
+        </fail>
+        <fail message="download.url not set in jnode.properties">
+            <condition><not><isset property="download.url"/></not></condition>
+        </fail>
+        <fail message="ftp.dir not set in jnode.properties">
+            <condition><not><isset property="ftp.dir"/></not></condition>
         </fail>
         <!-- compute checksum for uploadables -->
         <checksum algorithm="MD5" property="classlib.md5">
@@ -299,12 +237,10 @@ classlib-src.md5=${classlib-src.md5}</echo>
 
     <target name="quick-deploy" depends="classlib,classlib-src,copy" description="build and copy"/>
 
-    <target name="quickdeploy" depends="quick-deploy" description="build and copy"/>
-
     <target name="all" depends="clean,classlib-pack,classlib-src-bz,upload" description="clean build and upload"/>
 
     <target name="ftp-init" depends="prepare" description="initialize the FTP server">
-        <!-- create maid directory -->
+        <!-- create main directory -->
         <ftp action="mkdir"
             server="${ftp.server}"
             userid="${ftp.user}"
@@ -339,26 +275,14 @@ classlib-src.md5=${classlib-src.md5}</echo>
     <!-- Give help on possible targets -->
     <target name="help" description="help on the important targets">
         <echo>
-Welcome to the JNode build system.
+Welcome to the JNode Classlib build system.
 			
 You can use this build system to perform various tasks, 
 by specifying one or more targets on the command line. 
 See the list below for an explanation of all targets.
 			
-<!--
-create-patch      Create a patch file containing the differences
-                  between the local sources and the cvs HEAD
-                  branch.
--->
-encoding-test     Verify the file encoding of all java source
-                  files.
-encoding-fix      Correct the file encoding of all java source
-                  files.
-			
 javadoc           Generate documentation of all java source files.
 javadoc-small     Generate documentation of the basic JNode api's.
-
-check-plugins     Run tests to check plugin dependencies.
 
 clean             Remove all intermediate build results.
         </echo>
@@ -386,37 +310,8 @@ clean             Remove all intermediate build results.
                 <pathelement location="${root.dir}/core/src/openjdk/org"/>
                 <pathelement location="${root.dir}/core/src/openjdk/sun"/>
                 <pathelement location="${root.dir}/core/src/openjdk/vm"/>
-                <pathelement location="${root.dir}/core/src/endorsed/nanoxml"/>
-                <pathelement location="${root.dir}/core/src/core"/>
-                <pathelement location="${root.dir}/core/src/vmmagic"/>
-                <pathelement location="${root.dir}/core/src/driver"/>
             </sourcepath>
-            <package name="org.jnode.driver"/>
-            <package name="org.jnode.naming"/>
-            <package name="org.jnode.plugin"/>
-            <package name="org.jnode.system"/>
             <bootclasspath refid="cp"/>
-        </jnode.javadoc>
-    </target>
-
-    <!-- Generate only the MMTk api javadoc files -->
-    <target name="javadoc-mmtk">
-        <jnode.javadoc destdir="${build.dir}/javadoc/mmtk">
-            <sourcepath>
-                <pathelement location="${root.dir}/core/src/vmmagic"/>
-                <pathelement location="${root.dir}/core/src/mmtk-vm"/>
-                <pathelement location="${root.dir}/core/src/core"/>
-                <pathelement location="${root.dir}/core/src/classpath/gnu"/>
-                <pathelement location="${root.dir}/core/src/classpath/ext"/>
-                <pathelement location="${root.dir}/core/src/classpath/vm"/>
-                <pathelement location="${root.dir}/core/src/openjdk/sun"/>
-                <pathelement location="${root.dir}/core/src/openjdk/vm"/>
-                <pathelement location="${root.dir}/core/src/endorsed/nanoxml"/>
-            </sourcepath>
-            <package name="org.mmtk.*"/>
-            <package name="org.jnode.vm.memmgr.mmtk.*"/>
-            <package name="org.vmmagic.*"/>
-            <classpath refid="cp"/>
         </jnode.javadoc>
     </target>
 
@@ -437,22 +332,17 @@ clean             Remove all intermediate build results.
                 <pathelement location="${root.dir}/core/src/openjdk/sun"/>
                 <pathelement location="${root.dir}/core/src/openjdk/svm"/>
                 <pathelement location="${root.dir}/core/src/openjdk/vm"/>
-                <pathelement location="${root.dir}/core/src/core"/>
-                <pathelement location="${root.dir}/core/src/driver"/>
-                <pathelement location="${root.dir}/core/src/mmtk-vm"/>
-                <pathelement location="${root.dir}/core/src/endorsed/nanoxml"/>
-                <pathelement location="${root.dir}/core/src/test"/>
-                <pathelement location="${root.dir}/core/src/vmmagic"/>
             </sourcepath>
-            <package name="org.jnode.*"/>
-            <package name="org.mmtk.*"/>
-            <package name="org.vmmagic.*"/>
             <bootclasspath refid="cp"/>
         </jnode.javadoc>
     </target>
 
     <!-- Compare classpath version of jnode with real classpath version -->
     <target name="cp-compare" depends="assemble">
+        <fail message="main.classpath.dir not set in jnode.properties">
+            <condition><not><isset property="main.classpath.dir"/></not></condition>
+        </fail>
+
         <taskdef name="cp-compare" classname="org.jnode.ant.taskdefs.classpath.CompareTask" classpathref="cp-jnode"/>
 
         <patternset id="cp-includes-pattern">
@@ -498,41 +388,34 @@ clean             Remove all intermediate build results.
                 <fileset dir="${root.dir}/core/src/classpath/tools">
                     <patternset refid="cp-includes-pattern"/>
                	</fileset>
-                <fileset dir="${root.dir}/core/src/classpath/sun">
-                    <patternset refid="cp-includes-pattern"/>
-               	</fileset>
             </vmsources>
-            <vmspecificsources>
-                <fileset dir="${root.dir}/core/src/classpath/vm">
-                    <patternset refid="cp-includes-pattern"/>
-               	</fileset>
-            </vmspecificsources>
+            <vmspecificsources/>
             <classpathsources>
-                <fileset dir="${root.dir}/../classpath">
+                <fileset dir="${main.classpath.dir}">
                     <patternset refid="cp-includes-pattern"/>
                     <patternset refid="cp-sources-pattern"/>
                 </fileset>
-                <fileset dir="${root.dir}/../classpath/external/jsr166">
+                <fileset dir="${main.classpath.dir}/external/jsr166">
                     <patternset refid="cp-includes-pattern"/>
                     <patternset refid="cp-sources-pattern"/>
                 </fileset>
-                <fileset dir="${root.dir}/../classpath/resource">
+                <fileset dir="${main.classpath.dir}/resource">
 	                <patternset refid="cp-includes-pattern"/>
                 </fileset>
-                <fileset dir="${root.dir}/../classpath/external/w3c_dom">
+                <fileset dir="${main.classpath.dir}/external/w3c_dom">
                     <patternset refid="cp-includes-pattern"/>
                 </fileset>
-                <fileset dir="${root.dir}/../classpath/external/relaxngDatatype">
+                <fileset dir="${main.classpath.dir}/external/relaxngDatatype">
                     <patternset refid="cp-includes-pattern"/>
                 </fileset>
-                <fileset dir="${root.dir}/../classpath/external/sax">
+                <fileset dir="${main.classpath.dir}/external/sax">
                     <patternset refid="cp-includes-pattern"/>
                 </fileset>
-                <fileset dir="${root.dir}/../classpath/tools">
+                <fileset dir="${main.classpath.dir}/tools">
                     <patternset refid="cp-includes-pattern"/>
                     <patternset refid="cp-sources-pattern"/>
                 </fileset>
-                <fileset dir="${root.dir}/../classpath/tools/external/asm">
+                <fileset dir="${main.classpath.dir}/tools/external/asm">
                     <patternset refid="cp-includes-pattern"/>
                     <patternset refid="cp-sources-pattern"/>
                 </fileset>
@@ -541,46 +424,18 @@ clean             Remove all intermediate build results.
     </target>
 
     <target name="header-fix" depends="assemble">
-        <!-- todo clean up the excludes -->
         <taskdef name="header" classname="org.jnode.ant.taskdefs.HeaderTask" classpathref="cp-jnode"/>
 
         <header update="on" headerFile="${root.dir}/all/template/header.txt">
             <fileset dir="${root.dir}/builder/src/builder" includes="**/*.java"/>
-            <fileset dir="${root.dir}/core/src/classpath/ext" includes="**/*.java"/>
-            <fileset dir="${root.dir}/core/src/classpath/vm" includes="**/*.java"
-                    excludes="gnu/classpath/jdwp/VMFrame.java,
-                               gnu/classpath/jdwp/VMIdManager.java,
-                               gnu/classpath/jdwp/VMMethod.java,
-                               gnu/classpath/jdwp/VMVirtualMachine.java,
-                               gnu/classpath/VMStackWalker.java,
-                               gnu/java/lang/VMInstrumentationImpl.java,
-                               gnu/java/nio/VMChannel.java,
-                               java/lang/Thread.java,
-                               java/lang/VMProcess.java,
-                               java/lang/VMSystem.java"/>
-            <fileset dir="${root.dir}/core/src/openjdk/vm" includes="**/*.java" excludes="java/lang/NativeStrictMath.java"/>
-            <fileset dir="${root.dir}/core/src/core" includes="**/*.java" excludes="org/jnode/imageio/jpeg/JPEGDecoder"/>
-            <fileset dir="${root.dir}/core/src/mmtk-vm" includes="**/*.java" excludes="org/mmtk/vm/**/*.java"/>
-            <fileset dir="${root.dir}/core/src/driver" includes="**/*.java"/>
-            <fileset dir="${root.dir}/core/src/test" includes="**/*.java" excludes="org/jnode/test/mauve/**/*.java,org/jtestserver/**/*.java"/>
         </header>
     </target>
 
-    <target name="check-debugger-properties" depends="prepare">
-        <fail message="Please set jnode.debugger.host property in jnode.properties." unless="jnode.debugger.host"/>
-        <fail message="Please set jnode.debugger.port property in jnode.properties." unless="jnode.debugger.port"/>        
-    </target>
-
-    <target name="hotswap" depends="check-debugger-properties,assemble-projects" description="hotswap the modified classes">
-      <taskdef name="hotswap" classname="org.jnode.ant.taskdefs.Hotswap" classpathref="cp-jnode" />
-      <hotswap verbose="true" host="${jnode.debugger.host}" port="${jnode.debugger.port}">
-        <fileset dir="../core/build/classes/" includes="**/*.class">
-          <date datetime="${hotswap.class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
-        </fileset>
-      </hotswap>
-    </target>
-
     <target name="oj-compare" depends="assemble" description="compare the classlibrary with OpenJDK">
+            <fail message="main.openjdk.dir not set in jnode.properties">
+                <condition><not><isset property="main.openjdk.dir"/></not></condition>
+            </fail>
+
             <taskdef name="cp-compare" classname="org.jnode.ant.taskdefs.classpath.CompareTask" classpathref="cp-jnode"/>
 
             <patternset id="cp-includes-pattern">
@@ -651,23 +506,23 @@ clean             Remove all intermediate build results.
                        -->
                 </vmspecificsources>
                 <classpathsources>
-                    <fileset dir="${root.dir}/../openjdk/jdk/src/share/classes/">
+                    <fileset dir="${main.openjdk.dir}/jdk/src/share/classes/">
                         <patternset refid="cp-includes-pattern"/>
                         <patternset refid="cp-sources-pattern"/>
                     </fileset>
-                    <fileset dir="${root.dir}/../openjdk/corba/src/share/classes/">
+                    <fileset dir="${main.openjdk.dir}/corba/src/share/classes/">
                         <patternset refid="cp-includes-pattern"/>
                         <patternset refid="cp-sources-pattern"/>
                     </fileset>
-                    <fileset dir="${root.dir}/../openjdk/jaxp/src/">
+                    <!--fileset dir="${main.openjdk.dir}/jaxp/src/">
                         <patternset refid="cp-includes-pattern"/>
                         <patternset refid="cp-sources-pattern"/>
-                    </fileset>
-                    <fileset dir="${root.dir}/../openjdk/jaxws/src/">
+                    </fileset-->
+                    <!--fileset dir="${main.openjdk.dir}/jaxws/src/">
                         <patternset refid="cp-includes-pattern"/>
                         <patternset refid="cp-sources-pattern"/>
-                    </fileset>
-                    <fileset dir="${root.dir}/../openjdk/langtools/src/share/classes/">
+                    </fileset-->
+                    <fileset dir="${main.openjdk.dir}/langtools/src/share/classes/">
                         <patternset refid="cp-includes-pattern"/>
                         <patternset refid="cp-sources-pattern"/>
                     </fileset>
@@ -686,53 +541,4 @@ clean             Remove all intermediate build results.
                      failonerror="true"
                      basedir="${root.dir}/core/build/classes"/>
     </target>
-
-	<!-- check that all native methods are properly implemented for JNode -->
-    <target name="native-method-check" depends="assemble-projects">
-    	<echo message="native-method-check"/>
-        <taskdef name="native-check" classname="org.jnode.ant.taskdefs.NativeCheckTask" 
-        		classpathref="cp-jnode"/>
-
-        <native-check trace="false" failonerror="false">
-            <fileset dir="${root.dir}/core/build/classes">
-                <patternset includes="**/*.class"/>
-            </fileset>        	
-        </native-check>
-    </target>
-
-    <!-- Run all tests -->
-    <target name="tests" depends="assemble">
-        <ant target="tests" dir="${root.dir}/fs" inheritall="on" inheritrefs="on"/>
-    </target>
-
-    <!-- Check the encoding of all files -->
-    <target name="encoding-test" depends="assemble">
-        <taskdef name="n2a" classname="org.jnode.ant.taskdefs.Native2AsciiTask" classpathref="cp-jnode"/>
-
-        <n2a update="off">
-            <fileset dir="${root.dir}" includes="**/*.java"/>
-        </n2a>
-    </target>
-
-    <!-- Check and fix the encoding of all files -->
-    <target name="encoding-fix" depends="assemble">
-        <taskdef name="n2a" classname="org.jnode.ant.taskdefs.Native2AsciiTask" classpathref="cp-jnode"/>
-
-        <n2a update="on">
-            <fileset dir="${root.dir}" includes="**/*.java"/>
-        </n2a>
-    </target>
-
-    <!-- Create a patch -->
-    <!-- TODO create replacement SVN task
-    <target name="create-patch">
-        <property name="patch.file" value="${root.dir}/patch.txt"/>             
-		<echo>Creating patch in ${patch.file}</echo>
-		<cvs output="${patch.file}" dest="${root.dir}">
-		    <commandline>
-		        <argument line="-q diff -u -N"/>
-		    </commandline>
-		</cvs>
-	</target>
-	-->
 </project>

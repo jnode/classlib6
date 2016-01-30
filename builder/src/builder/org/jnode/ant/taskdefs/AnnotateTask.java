@@ -22,29 +22,13 @@ package org.jnode.ant.taskdefs;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Properties;
 import org.apache.tools.ant.BuildException;
-import org.jnode.annotation.MagicPermission;
-import org.jnode.annotation.SharedStatics;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ClassAdapter;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.attrs.Annotation;
-import org.objectweb.asm.attrs.Attributes;
-import org.objectweb.asm.attrs.RuntimeVisibleAnnotations;
-import org.objectweb.asm.util.TraceClassVisitor;
 
 /**
  * That ant task will add some annotations to some compiled classes
@@ -55,9 +39,6 @@ import org.objectweb.asm.util.TraceClassVisitor;
  * @author Fabien DUMINY (fduminy at jnode dot org)
  */
 public class AnnotateTask extends FileSetTask {
-    private static final String SHAREDSTATICS_TYPE_DESC = Type.getDescriptor(SharedStatics.class);
-    private static final String MAGICPERMISSION_TYPE_DESC = Type.getDescriptor(MagicPermission.class);
-
     private File annotationFile;
     private String[] classesFiles;
 
@@ -67,8 +48,9 @@ public class AnnotateTask extends FileSetTask {
     private String baseDir;
 
     private Properties annotations = new Properties();
+    private final Annotator annotator = new Annotator();
 
-    protected void doExecute() throws BuildException {
+    protected int doExecute() throws BuildException {
         try {
             SimpleDateFormat format = new SimpleDateFormat(pattern);
             startTime = format.parse(buildStartTime).getTime();
@@ -76,16 +58,21 @@ public class AnnotateTask extends FileSetTask {
             throw new BuildException("invalid buildStartTime or pattern", e);
         }
 
+        int nbModifiedFiles = 0;
         try {
             if (readProperties()) {
                 for (String file : classesFiles) {
                     File classFile = new File(baseDir, file);
-                    processFile(classFile);
+                    boolean fileModified = processFile(classFile);
+                    if (fileModified) {
+                        nbModifiedFiles++;
+                    }
                 }
             }
         } catch (IOException ioe) {
             throw new BuildException(ioe);
         }
+        return nbModifiedFiles;
     }
 
     /**
@@ -100,7 +87,7 @@ public class AnnotateTask extends FileSetTask {
     /**
      * Define the time at which build started.
      *
-     * @param annotationFile
+     * @param buildStartTime
      */
     public final void setBuildStartTime(String buildStartTime) {
         this.buildStartTime = buildStartTime;
@@ -109,7 +96,7 @@ public class AnnotateTask extends FileSetTask {
     /**
      * Define the pattern with which buildStartTime is defined.
      *
-     * @param annotationFile
+     * @param pattern
      */
     public final void setPattern(String pattern) {
         this.pattern = pattern;
@@ -201,14 +188,14 @@ public class AnnotateTask extends FileSetTask {
      * Actually process a class file (called from parent class).
      */
     @Override
-    protected void processFile(File classFile) throws IOException {
+    protected boolean processFile(File classFile) throws IOException {
         if (classFile.lastModified() < startTime) {
-            return;
+            return false;
         }
 
         String annotations = getAnnotations(classFile);
         if (annotations == null) {
-            return;
+            return false;
         }
 
         File tmpFile = new File(classFile.getParentFile(), classFile.getName() + ".tmp");
@@ -225,12 +212,6 @@ public class AnnotateTask extends FileSetTask {
         }
 
         if (classIsModified) {
-            if (trace) {
-                traceClass(classFile, "before");
-
-                traceClass(tmpFile, "after");
-            }
-
             if (!classFile.delete()) {
                 throw new IOException("can't delete " + classFile.getAbsolutePath());
             }
@@ -239,31 +220,7 @@ public class AnnotateTask extends FileSetTask {
                 throw new IOException("can't rename " + tmpFile.getAbsolutePath());
             }
         }
-    }
-
-    /**
-     * Simple debug method that trace a class file.
-     * It can be used to visually check that the annotations has been
-     * properly added
-     *
-     * @param file
-     * @throws IOException
-     */
-    private void traceClass(File file, String message) throws IOException {
-        System.out.println("===== (" + message + ") trace for " + file.getAbsolutePath() + " =====");
-        FileInputStream fis = null;
-        try {
-            fis = new FileInputStream(file);
-
-            ClassReader cr = new ClassReader(fis);
-            TraceClassVisitor tcv = new TraceClassVisitor(null, new PrintWriter(System.out));
-            cr.accept(tcv, Attributes.getDefaultAttributes(), true);
-        } finally {
-            if (fis != null) {
-                fis.close();
-            }
-        }
-        System.out.println("----- end trace -----");
+        return classIsModified;
     }
 
     /**
@@ -279,118 +236,19 @@ public class AnnotateTask extends FileSetTask {
     private boolean addAnnotation(File classFile, InputStream inputClass, File tmpFile, String annotations)
         throws BuildException {
         boolean classIsModified = false;
-        FileOutputStream outputClass = null;
 
-        ClassWriter cw = new ClassWriter(false);
         try {
-            ClassReader cr = new ClassReader(inputClass);
-
-            List<String> annotationTypeDescs = new ArrayList<String>(2);
-            if (annotations.contains("SharedStatics")) {
-                annotationTypeDescs.add(SHAREDSTATICS_TYPE_DESC);
-            }
-            if (annotations.contains("MagicPermission")) {
-                annotationTypeDescs.add(MAGICPERMISSION_TYPE_DESC);
-            }
-
-            MarkerClassVisitor mcv = new MarkerClassVisitor(cw, annotationTypeDescs);
-            cr.accept(mcv, Attributes.getDefaultAttributes(), true);
-
-            if (mcv.classIsModified()) {
-                System.out.println("adding annotations " + annotations + " to file " + classFile.getName());
-                classIsModified = true;
-
-                outputClass = new FileOutputStream(tmpFile);
-
-                byte[] b = cw.toByteArray();
-                outputClass.write(b);
-            }
+            classIsModified = annotator.addAnnotations(inputClass, tmpFile, Arrays.asList(annotations.split(",")));
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new BuildException("Unable to add annotations to file " + classFile.getName(), ex);
         } finally {
-            if (outputClass != null) {
-                try {
-                    outputClass.close();
-                } catch (IOException e) {
-                    System.err.println("Can't close stream for file " + classFile.getName());
-                }
-
+            if (classIsModified) {
                 long timestamp = classFile.lastModified();
                 tmpFile.setLastModified(timestamp);
             }
         }
 
         return classIsModified;
-    }
-
-    /**
-     * Visitor for a class file that actually do the job of adding annotations in the class.
-     *
-     * @author fabien
-     */
-    private static class MarkerClassVisitor extends ClassAdapter {
-        private final List<String> annotationTypeDescs;
-
-        private boolean classIsModified = false;
-
-        public MarkerClassVisitor(ClassVisitor cv, List<String> annotationTypeDescs) {
-            super(cv);
-
-            this.annotationTypeDescs = annotationTypeDescs;
-        }
-
-        @Override
-        public void visit(int version, int access, String name,
-                          String superName, String[] interfaces, String sourceFile) {
-            super.visit(org.objectweb.asm.Constants.V1_5, access,
-                name, superName, interfaces, sourceFile);
-        }
-
-        @Override
-        public void visitAttribute(Attribute attr) {
-            if (attr instanceof RuntimeVisibleAnnotations) {
-                RuntimeVisibleAnnotations rva = (RuntimeVisibleAnnotations) attr;
-                for (Object annotation : rva.annotations) {
-                    if (annotation instanceof Annotation) {
-                        Annotation ann = (Annotation) annotation;
-                        for (String annTypeDesc : annotationTypeDescs) {
-                            if (ann.type.equals(annTypeDesc)) {
-                                // we have found one of the annotations -> we won't need to add it again !
-                                annotationTypeDescs.remove(annTypeDesc);
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            super.visitAttribute(attr);
-        }
-
-        @SuppressWarnings("unchecked")
-        public void visitEnd() {
-            if (!annotationTypeDescs.isEmpty()) {
-                // we have not found the annotation -> we will add it and so modify the class
-                classIsModified = true;
-                RuntimeVisibleAnnotations attr = new RuntimeVisibleAnnotations();
-
-                for (String annTypeDesc : annotationTypeDescs) {
-
-                    Annotation ann = new Annotation(annTypeDesc);
-                    ann.add("name", "");
-
-                    attr.annotations.add(ann);
-                }
-
-                cv.visitAttribute(attr);
-            }
-
-            super.visitEnd();
-        }
-
-        public boolean classIsModified() {
-            return classIsModified;
-        }
     }
 }

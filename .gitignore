@@ -1,6 +1,7 @@
+# exclude all 'build' directories child of root directory (<rootDir>/builder/src/builder/org/jnode/build is not ignored)
+/*/build
 
-# /
-build
+# other exclusions
 .classpath
 .project
 *.patch

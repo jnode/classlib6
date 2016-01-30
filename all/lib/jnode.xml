@@ -26,6 +26,11 @@
     <element name="parameters" implicit="true"/>
 
     <sequential>
+      <condition property="javadoc.memoryMaximumSize" value="1024m" else="512m">
+            <os arch="amd64"/>
+      </condition>
+      <echo message="Setting javadoc.memoryMaximumSize to ${javadoc.memoryMaximumSize}"/>
+
       <mkdir dir="@{destdir}"/>
       <javadoc
       	destdir="@{destdir}"
@@ -33,25 +38,16 @@
 		version="true"
 		use="true"
 		windowtitle="JNode"
-		maxmemory="256M">
+		maxmemory="${javadoc.memoryMaximumSize}">
 
 		<parameters/>
 		<classpath refid="cp" />
 		<group title="JNode" packages="org.jnode.*,org.vmmagic.*" />
 		<group title="Classpath" packages="java.*,javax.*,gnu.*" />
-		<group title="MMTk" packages="org.mmtk.*" />
 		<!-- link href="http://jnode.org"/ -->
       </javadoc>
     </sequential>
   </macrodef>
-
-  <!-- Copy descriptors to the descriptors directory -->
-  <presetdef name="jnode.copy-descriptors">
-    <copy todir="${descriptors.dir}">
-      <fileset dir="${basedir}/descriptors"/>
-      <filterset refid="descriptors-filter"/>
-    </copy>
-  </presetdef>
 
   <!-- Perform a default clean -->
   <presetdef name="jnode.clean">
