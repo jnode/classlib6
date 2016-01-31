@@ -134,6 +134,10 @@ public class VMIOUtils {
             return 0;
         }
 
+        public int getOpenFileDescriptorCount() {
+            return 0;
+        }
+
         public boolean isDirectory(String file) {
             return false;
         }
